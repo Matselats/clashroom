@@ -391,16 +391,14 @@ footer a:hover{color:var(--ink)}
         data-en="Clashroom · Made for Norwegian teachers · <a href='mailto:hello@clashroom.dev'>hello@clashroom.dev</a> · Always free">Clashroom · Laget for norske lærere · <a href="mailto:hello@clashroom.dev">hello@clashroom.dev</a> · Alltid gratis</span>
 </footer>
 
+<script src="shared.js"></script>
 <script>
-function setLang(l){
-  localStorage.setItem('clashroom_lang',l);
+function onLangChange(){
+  var l=getLang();
   document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('on',b.textContent.toLowerCase()===l)});
   document.querySelectorAll('[data-'+l+']').forEach(function(el){el.innerHTML=el.getAttribute('data-'+l)});
 }
-
-var lang=localStorage.getItem('clashroom_lang')||'no';
-if(lang!=='no') setLang(lang);
-else document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('on',b.textContent==='NO')});
+onLangChange();
 
 var obs=new IntersectionObserver(function(entries){
   entries.forEach(function(e){

@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Timer – Clashroom</title>
+<script src="shared.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
@@ -319,13 +320,9 @@ const LANG = {
   }
 };
 
-let lang = localStorage.getItem('clashroom_lang') || 'no';
-const L = () => LANG[lang];
+const L = () => LANG[getLang()];
 
 function applyLang() {
-  document.documentElement.lang = lang;
-  document.getElementById('lang-flag').textContent = lang === 'no' ? '🇳🇴' : '🇬🇧';
-  document.getElementById('lang-txt').textContent  = lang === 'no' ? 'Norsk' : 'English';
   const t = (id, v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
   t('tab-work',       L().tab_work);
   t('tab-group',      L().tab_group);
@@ -340,11 +337,7 @@ function applyLang() {
   renderPresets();
 }
 
-function toggleLang() {
-  lang = lang === 'no' ? 'en' : 'no';
-  localStorage.setItem('clashroom_lang', lang);
-  applyLang();
-}
+function onLangChange() { applyLang(); }
 
 // ─── STATE ────────────────────────────────────────────────────
 let mode        = 'work';

@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Klassekart – Clashroom</title>
+<script src="shared.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
@@ -389,13 +390,9 @@ const LANG = {
   }
 };
 
-let lang = localStorage.getItem('clashroom_lang') || 'no';
-const L = () => LANG[lang];
+const L = () => LANG[getLang()];
 
 function applyLang() {
-  document.documentElement.lang = lang;
-  document.getElementById('lang-flag').textContent = lang === 'no' ? '🇳🇴' : '🇬🇧';
-  document.getElementById('lang-txt').textContent  = lang === 'no' ? 'Norsk' : 'English';
   const t = (id, v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
   const p = (id, v) => { const e=document.getElementById(id); if(e) e.placeholder=v; };
   t('t-sidebar-title',    L().sidebar_title);
@@ -419,14 +416,9 @@ function applyLang() {
   t('t-empty-desc',       L().empty_desc);
 }
 
-function toggleLang() {
-  lang = lang === 'no' ? 'en' : 'no';
-  localStorage.setItem('clashroom_lang', lang);
-  applyLang();
-}
+function onLangChange() { applyLang(); }
 
 // ─── CONSTANTS ────────────────────────────────────────────────
-const COLORS = ['#e63946','#2176ae','#f5a623','#2a9d5c','#9b5de5','#f77f00','#4cc9f0','#0d9488','#ef476f','#06d6a0'];
 const MAX_STUDENTS = 32;
 
 // ─── STATE ────────────────────────────────────────────────────
@@ -434,10 +426,6 @@ let layout = 'pairs';
 let constraints = JSON.parse(localStorage.getItem('kk_constraints') || '[]');
 let lastNames = [];
 
-function colorFor(name) {
-  let h = 0; for (const c of name) h = c.charCodeAt(0)+((h<<5)-h);
-  return COLORS[Math.abs(h) % COLORS.length];
-}
 function initials(n) {
   return n.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0,2);
 }
@@ -496,15 +484,6 @@ function parseNames() {
     .map(n => n.trim())
     .filter(n => n.length > 0)
     .slice(0, MAX_STUDENTS);
-}
-
-// ─── SHUFFLE ─────────────────────────────────────────────────
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length-1; i > 0; i--) {
-    const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];
-  }
-  return a;
 }
 
 // ─── ADJACENT CHECK ──────────────────────────────────────────

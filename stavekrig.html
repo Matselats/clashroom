@@ -4,287 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stavekrig – Nynorsk</title>
+<link rel="stylesheet" href="shared.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
-
   :root {
-    --ink: #1a1a2e;
-    --paper: #f7f5f0;
     --accent: #e63946;
-    --gold: #f4a832;
-    --green: #2a9d5c;
-    --blue: #2176ae;
-    --muted: #8a8a9a;
-    --card: #ffffff;
-    --border: #e0ddd8;
+    --accent-dim: rgba(230,57,70,0.14);
+    --accent-border: rgba(230,57,70,0.35);
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--ink);
-    color: var(--paper);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  /* HEADER */
-  header {
-    width: 100%;
-    padding: 18px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-
-  .logo {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.3rem;
-    letter-spacing: -0.03em;
-  }
-  .logo span { color: var(--accent); }
-
-  .badge {
-    background: rgba(255,255,255,0.08);
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.78rem;
-    color: var(--muted);
-  }
-
-  /* SCREENS */
-  .screen {
-    display: none;
-    width: 100%;
-    max-width: 480px;
-    padding: 32px 20px;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-  }
-  .screen.active { display: flex; }
-
-  h1 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 2rem;
-    text-align: center;
-    letter-spacing: -0.04em;
-    line-height: 1.1;
-  }
-  h1 em { color: var(--accent); font-style: normal; }
-
-  .sub {
-    color: var(--muted);
-    font-size: 0.92rem;
-    text-align: center;
-    line-height: 1.5;
-  }
-
-  .card {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    padding: 24px;
-    width: 100%;
-  }
-
-  input[type="text"] {
-    width: 100%;
-    padding: 14px 16px;
-    border-radius: 12px;
-    border: 2px solid rgba(255,255,255,0.15);
-    background: rgba(255,255,255,0.06);
-    color: var(--paper);
-    font-size: 1.1rem;
-    font-family: 'DM Sans', sans-serif;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  input[type="text"]:focus { border-color: var(--accent); }
-  input[type="text"]::placeholder { color: var(--muted); }
-
-  button {
-    width: 100%;
-    padding: 15px;
-    border-radius: 12px;
-    border: none;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-  }
-  button:hover { opacity: 0.88; transform: translateY(-1px); }
-  button:active { transform: translateY(0); }
-
-  .btn-primary { background: var(--accent); color: white; }
-  .btn-secondary { background: rgba(255,255,255,0.1); color: var(--paper); }
-  .btn-green { background: var(--green); color: white; }
-
-  /* LOBBY */
-  .player-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-  }
-
-  .player-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.08);
-    animation: slideIn 0.3s ease;
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(-10px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  .player-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.9rem;
-    flex-shrink: 0;
-  }
-
-  .player-name-text { font-weight: 600; font-size: 0.95rem; }
-  .player-ready { margin-left: auto; font-size: 0.8rem; color: var(--green); }
-
-  /* GAME */
-  .game-header {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0;
-  }
-
-  .round-badge {
-    background: var(--accent);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 700;
-  }
-
-  .timer-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .timer-circle {
-    width: 48px;
-    height: 48px;
-    position: relative;
-  }
-
-  .timer-circle svg {
-    transform: rotate(-90deg);
-    width: 48px;
-    height: 48px;
-  }
-
-  .timer-circle .track {
-    fill: none;
-    stroke: rgba(255,255,255,0.1);
-    stroke-width: 4;
-  }
-
-  .timer-circle .progress {
-    fill: none;
-    stroke: var(--gold);
-    stroke-width: 4;
-    stroke-linecap: round;
-    stroke-dasharray: 125.6;
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 1s linear, stroke 0.3s;
-  }
-
-  .timer-text {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 0.95rem;
-  }
-
-  .word-card {
-    width: 100%;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 32px 24px;
-    text-align: center;
-  }
-
-  .word-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--muted);
-    margin-bottom: 10px;
-  }
-
-  .bokmaal-word {
-    font-family: 'Syne', sans-serif;
-    font-size: 2.4rem;
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    color: var(--paper);
-  }
-
-  .answer-wrap {
-    width: 100%;
-    position: relative;
-  }
-
-  .answer-input {
-    width: 100%;
-    padding: 16px 60px 16px 18px;
-    border-radius: 14px;
-    border: 2px solid rgba(255,255,255,0.15);
-    background: rgba(255,255,255,0.06);
-    color: var(--paper);
-    font-size: 1.3rem;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .answer-input:focus { border-color: var(--blue); }
-
-  .send-btn {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: auto;
-    padding: 8px 16px;
-    font-size: 0.85rem;
-    border-radius: 10px;
-    background: var(--blue);
-    color: white;
-  }
-
+  .word-display { font-size: 2.4rem; }
   .feedback-banner {
     width: 100%;
     padding: 14px 20px;
@@ -297,183 +24,52 @@
   .feedback-banner.correct { background: rgba(42,157,92,0.2); border: 1px solid var(--green); color: #5de097; }
   .feedback-banner.wrong { background: rgba(230,57,70,0.2); border: 1px solid var(--accent); color: #ff8a93; }
   .feedback-banner.show { display: block; }
-
-  /* SCOREBOARD */
-  .score-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 16px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    transition: background 0.2s;
-  }
-  .score-row.top { background: rgba(244,168,50,0.12); border-color: rgba(244,168,50,0.3); }
-
-  .rank {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1rem;
-    width: 24px;
-    text-align: center;
-    color: var(--muted);
-  }
-  .rank.gold { color: var(--gold); }
-
-  .score-name { font-weight: 600; flex: 1; }
-  .score-pts {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.1rem;
-    color: var(--gold);
-  }
-
-  .streak-badge {
-    background: rgba(230,57,70,0.2);
-    color: var(--accent);
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 700;
-  }
-
-  /* WAITING */
-  .waiting-pulse {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-    padding: 20px 0;
-  }
-  .dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: var(--muted);
-    animation: pulse 1.4s ease infinite;
-  }
-  .dot:nth-child(2) { animation-delay: 0.2s; }
-  .dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes pulse {
-    0%, 60%, 100% { opacity: 0.3; transform: scale(1); }
-    30% { opacity: 1; transform: scale(1.3); }
-  }
-
-  .divider {
-    width: 100%;
-    height: 1px;
-    background: rgba(255,255,255,0.08);
-    margin: 4px 0;
-  }
-
-  .role-toggle {
-    display: flex;
-    gap: 8px;
-    width: 100%;
-  }
-  .role-btn {
-    flex: 1;
-    padding: 12px;
-    border-radius: 12px;
-    border: 2px solid rgba(255,255,255,0.1);
-    background: transparent;
-    color: var(--muted);
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .role-btn.active {
-    border-color: var(--accent);
-    background: rgba(230,57,70,0.1);
-    color: var(--paper);
-  }
-
-  .info-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.82rem;
-    color: var(--muted);
-    width: 100%;
-    padding: 0 2px;
-  }
-
-  .countdown-big {
-    font-family: 'Syne', sans-serif;
-    font-size: 5rem;
-    font-weight: 800;
-    color: var(--accent);
-    text-align: center;
-    animation: popIn 0.3s ease;
-  }
-  @keyframes popIn {
-    from { transform: scale(1.4); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
-
-  /* Results */
-  .podium {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    height: 120px;
-    margin: 10px 0;
-  }
-  .podium-block {
-    flex: 1;
-    border-radius: 10px 10px 0 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding-top: 10px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    gap: 4px;
-  }
-  .podium-block .emoji { font-size: 1.4rem; }
-  .p1 { background: rgba(244,168,50,0.25); height: 100%; border: 1px solid rgba(244,168,50,0.4); }
-  .p2 { background: rgba(255,255,255,0.08); height: 75%; border: 1px solid rgba(255,255,255,0.15); }
-  .p3 { background: rgba(255,255,255,0.05); height: 55%; border: 1px solid rgba(255,255,255,0.1); }
-
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">Stave<span>krig</span></div>
-  <div class="badge">Nynorsk · 8. trinn</div>
+  <a class="logo" href="index.html">Stave<span>krig</span></a>
+  <div class="header-right">
+    <div class="round-info" id="header-info">Nynorsk · 8. trinn</div>
+    <button class="lang-btn" onclick="toggleLang()">
+      <span id="lang-flag">🇳🇴</span>
+      <span id="lang-txt">Norsk</span>
+    </button>
+  </div>
 </header>
 
 <!-- SCREEN: ROLE SELECT -->
 <div class="screen active" id="screen-role">
-  <h1>Vil du <em>lære</em> eller <em>lede</em>?</h1>
-  <p class="sub">Læreren starter spillet. Elevene kobler seg på med navn.</p>
+  <div style="text-align:center;padding-top:16px;">
+    <h1 id="t-title">Vil du <em>lære</em> eller <em>lede</em>?</h1>
+    <p class="sub" id="t-subtitle">Læreren starter spillet. Elevene kobler seg på med navn.</p>
+  </div>
   <div class="role-toggle">
     <button class="role-btn active" onclick="selectRole('student')" id="role-student">🎮 Elev</button>
     <button class="role-btn" onclick="selectRole('teacher')" id="role-teacher">🏫 Lærer</button>
   </div>
   <div class="card" style="gap:14px;display:flex;flex-direction:column;">
-    <input type="text" id="name-input" placeholder="Skriv navnet ditt..." maxlength="20" />
-    <button class="btn-primary" onclick="joinGame()">Bli med →</button>
+    <input type="text" id="name-input" maxlength="20" />
+    <button class="btn-primary" onclick="joinGame()" id="t-join-btn">Bli med →</button>
   </div>
-  <p class="sub" style="font-size:0.78rem;">Del denne siden med elevene dine — alle bruker samme nettleser-fane</p>
+  <p class="sub" style="font-size:0.78rem;" id="t-share-hint">Del denne siden med elevene dine — alle bruker sin egen enhet</p>
 </div>
 
 <!-- SCREEN: LOBBY -->
 <div class="screen" id="screen-lobby">
-  <h1>Venter på<br><em>spillere...</em></h1>
-  <p class="sub" id="lobby-status">0 elever klare</p>
+  <h1 id="t-lobby-title">Venter på<br><em>spillere...</em></h1>
+  <p class="sub" id="lobby-status">0 spillere klar</p>
   <div class="card" style="gap: 12px; display: flex; flex-direction: column;">
     <div class="player-list" id="player-list"></div>
-    <div class="waiting-pulse">
+    <div class="dots">
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
   </div>
-  <div id="teacher-controls" style="display:none; width:100%; gap:10px; flex-direction:column; display:none;">
-    <button class="btn-green" onclick="startCountdown()">▶ Start spillet</button>
+  <div id="teacher-controls" style="display:none; width:100%; gap:10px; flex-direction:column;">
+    <button class="btn-green" onclick="startCountdown()" id="t-start-btn">▶ Start spillet</button>
     <div class="info-row">
-      <span>10 ord · 15 sek per ord</span>
+      <span id="t-game-info">10 ord · 15 sek per ord</span>
       <span id="player-count">0 spillere</span>
     </div>
   </div>
@@ -481,70 +77,174 @@
 
 <!-- SCREEN: COUNTDOWN -->
 <div class="screen" id="screen-countdown">
-  <p class="sub">Spillet starter om...</p>
+  <p class="sub" id="t-get-ready">Spillet starter om...</p>
   <div class="countdown-big" id="countdown-num">3</div>
-  <p class="sub">Gjør deg klar! 🎯</p>
+  <p class="sub" id="t-ready-hint">Gjør deg klar! 🎯</p>
 </div>
 
 <!-- SCREEN: GAME -->
 <div class="screen" id="screen-game">
-  <div class="game-header">
-    <div class="round-badge">Ord <span id="round-num">1</span> av 10</div>
-    <div class="timer-wrap">
-      <div class="timer-circle">
-        <svg viewBox="0 0 48 48">
-          <circle class="track" cx="24" cy="24" r="20"/>
-          <circle class="progress" id="timer-ring" cx="24" cy="24" r="20"/>
-        </svg>
-        <div class="timer-text" id="timer-text">15</div>
-      </div>
-    </div>
+  <div style="width:100%;display:flex;justify-content:space-between;align-items:center;">
+    <div class="round-tag" id="t-round-tag">Ord <span id="round-num">1</span> av 10</div>
+    <div style="font-family:'DM Mono',monospace;font-size:0.83rem;color:var(--gold)">⚡ <span id="my-score-display">0</span> <span id="t-pts-label">poeng</span></div>
   </div>
 
-  <div class="word-card">
-    <div class="word-label">Oversett til nynorsk</div>
-    <div class="bokmaal-word" id="current-word">huset</div>
+  <div class="word-stage">
+    <div class="timer-wrap">
+      <svg viewBox="0 0 44 44">
+        <circle class="ring-track" cx="22" cy="22" r="18"/>
+        <circle class="ring-prog" id="ring-prog" cx="22" cy="22" r="18"/>
+      </svg>
+      <div class="ring-num" id="ring-num">15</div>
+    </div>
+    <div class="word-eyebrow" id="t-word-label">Oversett til nynorsk</div>
+    <div class="word-display" id="current-word">huset</div>
   </div>
 
   <div class="answer-wrap">
-    <input class="answer-input" type="text" id="answer-input" placeholder="Nynorsk..." autocomplete="off" autocorrect="off" spellcheck="false" />
-    <button class="send-btn" onclick="submitAnswer()">Send</button>
+    <input class="answer-input" type="text" id="answer-input" autocomplete="off" autocorrect="off" spellcheck="false" />
+    <button class="send-btn" onclick="submitAnswer()" id="t-send-btn">Send</button>
   </div>
 
   <div class="feedback-banner" id="feedback-banner">Riktig! +100 poeng 🎉</div>
 
   <div class="info-row">
-    <span>Du: <strong id="my-score-display">0 poeng</strong></span>
+    <span><span id="t-you-label">Du</span>: <strong id="my-score-info">0 poeng</strong></span>
     <span id="streak-display"></span>
   </div>
 </div>
 
 <!-- SCREEN: BETWEEN ROUNDS -->
 <div class="screen" id="screen-between">
-  <h1>Svar: <em id="correct-answer-show">hus</em></h1>
+  <h1><span id="t-answer-label">Svar</span>: <em id="correct-answer-show">hus</em></h1>
   <p class="sub" id="between-msg">Neste ord kommer snart...</p>
   <div style="width:100%;display:flex;flex-direction:column;gap:8px;" id="mini-scoreboard"></div>
 </div>
 
 <!-- SCREEN: RESULTS -->
 <div class="screen" id="screen-results">
-  <h1>Spillet<br>er <em>over!</em></h1>
+  <h1 id="t-results-title">Spillet<br>er <em>over!</em></h1>
   <div class="podium" id="podium"></div>
   <div style="width:100%;display:flex;flex-direction:column;gap:8px;" id="final-scoreboard"></div>
-  <button class="btn-primary" onclick="resetGame()">Spill igjen 🔄</button>
-  <button class="btn-secondary" onclick="showScreen('screen-role')">Endre innstillinger</button>
+  <button class="btn-primary" onclick="resetGame()" id="t-play-again">Spill igjen 🔄</button>
+  <button class="btn-secondary" onclick="showScreen('screen-role')" id="t-change-settings">Endre innstillinger</button>
+  <a class="home-link" href="index.html" id="t-back-link">← Tilbake til Clashroom</a>
 </div>
 
+<script src="shared.js"></script>
 <script>
+// ─── TRANSLATIONS ─────────────────────────────────────────────
+const LANG = {
+  no: {
+    title:       'Vil du <em>lære</em> eller <em>lede</em>?',
+    subtitle:    'Læreren starter spillet. Elevene kobler seg på med navn.',
+    role_student:'🎮 Elev',
+    role_teacher:'🏫 Lærer',
+    name_ph:     'Skriv navnet ditt...',
+    join_btn:    'Bli med →',
+    share_hint:  'Del denne siden med elevene dine — alle bruker sin egen enhet',
+    lobby_title: 'Venter på<br><em>spillere...</em>',
+    start_btn:   '▶ Start spillet',
+    game_info:   '10 ord · 15 sek per ord',
+    get_ready:   'Spillet starter om...',
+    ready_hint:  'Gjør deg klar! 🎯',
+    word_label:  'Oversett til nynorsk',
+    pts_label:   'poeng',
+    send_btn:    'Send',
+    you_label:   'Du',
+    answer_label:'Svar',
+    results_title:'Spillet<br>er <em>over!</em>',
+    play_again:  'Spill igjen 🔄',
+    change:      'Endre innstillinger',
+    back:        '← Tilbake til Clashroom',
+    remaining:   n => `${n} ord igjen...`,
+    last_word:   'Siste ord! Resultater kommer...',
+    players_ready: n => `${n} spiller${n !== 1 ? 'e' : ''} klar`,
+    players_count: n => `${n} spillere`,
+    correct_fb:  pts => `Riktig! +${pts} poeng`,
+    wrong_fb:    w => `Feil. Riktig svar: ${w}`,
+    timeout_fb:  w => `Tiden er ute! Svar: ${w}`,
+    streak_fb:   ' 🔥 Streak!',
+    streak_badge:n => `🔥 ${n} på rad`,
+  },
+  en: {
+    title:       'Want to <em>learn</em> or <em>lead</em>?',
+    subtitle:    'The teacher starts the game. Students join with their name.',
+    role_student:'🎮 Student',
+    role_teacher:'🏫 Teacher',
+    name_ph:     'Your name...',
+    join_btn:    'Join →',
+    share_hint:  'Share this page with your students — everyone uses their own device',
+    lobby_title: 'Waiting for<br><em>players...</em>',
+    start_btn:   '▶ Start game',
+    game_info:   '10 words · 15 sec each',
+    get_ready:   'Game starts in...',
+    ready_hint:  'Get ready! 🎯',
+    word_label:  'Translate to Nynorsk',
+    pts_label:   'pts',
+    send_btn:    'Send',
+    you_label:   'You',
+    answer_label:'Answer',
+    results_title:'Game<br><em>over!</em>',
+    play_again:  'Play again 🔄',
+    change:      'Change settings',
+    back:        '← Back to Clashroom',
+    remaining:   n => `${n} words left...`,
+    last_word:   'Last word! Results coming...',
+    players_ready: n => `${n} player${n !== 1 ? 's' : ''} ready`,
+    players_count: n => `${n} players`,
+    correct_fb:  pts => `Correct! +${pts} pts`,
+    wrong_fb:    w => `Wrong. Correct answer: ${w}`,
+    timeout_fb:  w => `Time's up! Answer: ${w}`,
+    streak_fb:   ' 🔥 Streak!',
+    streak_badge:n => `🔥 ${n} in a row`,
+  }
+};
+
+const L = () => LANG[getLang()];
+
+function onLangChange() { applyLang(); }
+
+function applyLang() {
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+  const txt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const ph = (id, val) => { const el = document.getElementById(id); if (el) el.placeholder = val; };
+
+  set('t-title', L().title);
+  txt('t-subtitle', L().subtitle);
+  txt('role-student', L().role_student);
+  txt('role-teacher', L().role_teacher);
+  ph('name-input', L().name_ph);
+  txt('t-join-btn', L().join_btn);
+  txt('t-share-hint', L().share_hint);
+  set('t-lobby-title', L().lobby_title);
+  txt('t-start-btn', L().start_btn);
+  txt('t-game-info', L().game_info);
+  txt('t-get-ready', L().get_ready);
+  txt('t-ready-hint', L().ready_hint);
+  txt('t-word-label', L().word_label);
+  txt('t-pts-label', L().pts_label);
+  txt('t-send-btn', L().send_btn);
+  txt('t-you-label', L().you_label);
+  txt('t-answer-label', L().answer_label);
+  set('t-results-title', L().results_title);
+  txt('t-play-again', L().play_again);
+  txt('t-change-settings', L().change);
+  txt('t-back-link', L().back);
+  ph('answer-input', getLang() === 'no' ? 'Nynorsk...' : 'Nynorsk...');
+
+  if (state.players.length > 0) renderLobby();
+}
+
 // ─── WORD BANK ───────────────────────────────────────────────
 const wordBank = [
   { bm: "huset", ny: ["huset"] },
   { bm: "bilen", ny: ["bilen"] },
   { bm: "ikke", ny: ["ikkje"] },
-  { bm: "jeg", ny: ["eg", "eg"] },
+  { bm: "jeg", ny: ["eg"] },
   { bm: "hva", ny: ["kva"] },
   { bm: "noe", ny: ["noko"] },
-  { bm: "noen", ny: ["nokon", "nokon"] },
+  { bm: "noen", ny: ["nokon"] },
   { bm: "hvor", ny: ["kvar"] },
   { bm: "hvorfor", ny: ["kvifor"] },
   { bm: "hun", ny: ["ho", "henne"] },
@@ -586,37 +286,11 @@ let state = {
   isTeacher: false,
 };
 
-const COLORS = ['#e63946','#2176ae','#f4a832','#2a9d5c','#9b5de5','#f77f00','#4cc9f0','#e9c46a'];
-
-// ─── HELPERS ─────────────────────────────────────────────────
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-function getColor(name) {
-  let hash = 0;
-  for (let c of name) hash = c.charCodeAt(0) + ((hash << 5) - hash);
-  return COLORS[Math.abs(hash) % COLORS.length];
-}
-
-function getInitial(name) { return name.charAt(0).toUpperCase(); }
-
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 // ─── ROLE SELECT ─────────────────────────────────────────────
 function selectRole(role) {
   state.role = role;
   document.getElementById('role-student').classList.toggle('active', role === 'student');
   document.getElementById('role-teacher').classList.toggle('active', role === 'teacher');
-  document.getElementById('name-input').placeholder = role === 'teacher' ? 'Ditt navn (lærer)...' : 'Skriv navnet ditt...';
 }
 
 function joinGame() {
@@ -644,18 +318,14 @@ function joinGame() {
 function renderLobby() {
   const list = document.getElementById('player-list');
   list.innerHTML = '';
-  state.players.forEach((p, i) => {
+  state.players.forEach(p => {
     const el = document.createElement('div');
     el.className = 'player-item';
-    el.innerHTML = `
-      <div class="player-avatar" style="background:${getColor(p)}">${getInitial(p)}</div>
-      <div class="player-name-text">${p}</div>
-      <div class="player-ready">✓ klar</div>
-    `;
+    el.innerHTML = `${avHtml(p,32)}<div class="p-name">${esc(p)}</div><div class="p-pts">⚡ ${state.scores[p]||0}</div>`;
     list.appendChild(el);
   });
-  document.getElementById('lobby-status').textContent = `${state.players.length} spiller${state.players.length !== 1 ? 'e' : ''} klar`;
-  document.getElementById('player-count').textContent = `${state.players.length} spillere`;
+  document.getElementById('lobby-status').textContent = L().players_ready(state.players.length);
+  document.getElementById('player-count').textContent = L().players_count(state.players.length);
 }
 
 // ─── COUNTDOWN ───────────────────────────────────────────────
@@ -695,23 +365,28 @@ function startRound() {
   document.getElementById('answer-input').value = '';
   document.getElementById('answer-input').disabled = false;
   document.getElementById('feedback-banner').className = 'feedback-banner';
-  document.getElementById('my-score-display').textContent = (state.scores[state.myName] || 0) + ' poeng';
+  document.getElementById('my-score-display').textContent = state.scores[state.myName] || 0;
+  document.getElementById('my-score-info').textContent = (state.scores[state.myName] || 0) + ' ' + L().pts_label;
   updateStreakDisplay();
 
   showScreen('screen-game');
   document.getElementById('answer-input').focus();
 
-  updateTimerRing(15, 15);
+  const ringEl = document.getElementById('ring-prog');
+  updateRing(15, 15, ringEl);
+  ringEl.style.stroke = 'var(--gold)';
+  document.getElementById('ring-num').textContent = 15;
+
   clearInterval(state.timerInterval);
   state.timerInterval = setInterval(() => {
     state.timeLeft--;
-    document.getElementById('timer-text').textContent = state.timeLeft;
-    updateTimerRing(state.timeLeft, 15);
+    document.getElementById('ring-num').textContent = state.timeLeft;
+    updateRing(state.timeLeft, 15, ringEl);
 
     if (state.timeLeft <= 5) {
-      document.getElementById('timer-ring').style.stroke = '#e63946';
+      ringEl.style.stroke = 'var(--red)';
     } else if (state.timeLeft <= 10) {
-      document.getElementById('timer-ring').style.stroke = '#f4a832';
+      ringEl.style.stroke = 'var(--gold)';
     }
 
     if (state.timeLeft <= 0) {
@@ -721,17 +396,11 @@ function startRound() {
   }, 1000);
 }
 
-function updateTimerRing(current, max) {
-  const circumference = 125.6;
-  const offset = circumference - (current / max) * circumference;
-  document.getElementById('timer-ring').style.strokeDashoffset = offset;
-}
-
 function updateStreakDisplay() {
   const streak = state.streaks[state.myName] || 0;
   const el = document.getElementById('streak-display');
   if (streak >= 2) {
-    el.innerHTML = `<span class="streak-badge">🔥 ${streak} på rad</span>`;
+    el.innerHTML = `<span class="streak-badge">${L().streak_badge(streak)}</span>`;
   } else {
     el.textContent = '';
   }
@@ -759,14 +428,15 @@ function submitAnswer() {
 
   if (isCorrect) {
     state.streaks[state.myName] = (state.streaks[state.myName] || 0) + 1;
-    const streakBonus = state.streaks[state.myName] >= 3 ? ' 🔥 Streak!' : '';
-    showFeedback(true, `Riktig! +${total} poeng${streakBonus}`);
+    const streakText = state.streaks[state.myName] >= 3 ? L().streak_fb : '';
+    showFeedback(true, L().correct_fb(total) + streakText);
   } else {
     state.streaks[state.myName] = 0;
-    showFeedback(false, `Feil. Riktig svar: ${word.ny[0]}`);
+    showFeedback(false, L().wrong_fb(word.ny[0]));
   }
 
-  document.getElementById('my-score-display').textContent = state.scores[state.myName] + ' poeng';
+  document.getElementById('my-score-display').textContent = state.scores[state.myName];
+  document.getElementById('my-score-info').textContent = state.scores[state.myName] + ' ' + L().pts_label;
   updateStreakDisplay();
 
   setTimeout(() => showBetween(word.ny[0]), 1200);
@@ -777,7 +447,7 @@ function timeOut() {
   document.getElementById('answer-input').disabled = true;
   const word = state.gameWords[state.currentRound];
   state.streaks[state.myName] = 0;
-  showFeedback(false, `Tiden er ute! Svar: ${word.ny[0]}`);
+  showFeedback(false, L().timeout_fb(word.ny[0]));
   setTimeout(() => showBetween(word.ny[0]), 1200);
 }
 
@@ -796,20 +466,20 @@ function showBetween(correctAnswer) {
   mini.innerHTML = '';
   sorted.slice(0, 5).forEach((p, i) => {
     const el = document.createElement('div');
-    el.className = 'score-row' + (i === 0 ? ' top' : '');
+    el.className = 'board-row' + (i === 0 ? ' leader' : '');
     el.innerHTML = `
-      <div class="rank ${i === 0 ? 'gold' : ''}">${i === 0 ? '👑' : i + 1}</div>
-      <div class="player-avatar" style="background:${getColor(p)};width:28px;height:28px;font-size:0.75rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">${getInitial(p)}</div>
-      <div class="score-name">${p}</div>
-      <div class="score-pts">${state.scores[p] || 0}</div>
+      <div class="b-rank ${i === 0 ? 'gold' : ''}">${i === 0 ? '👑' : i + 1}</div>
+      ${avHtml(p,24)}
+      <div class="b-name">${esc(p)}</div>
+      <div class="b-pts">${state.scores[p] || 0}</div>
     `;
     mini.appendChild(el);
   });
 
   const remaining = state.totalRounds - state.currentRound - 1;
   document.getElementById('between-msg').textContent = remaining > 0
-    ? `${remaining} ord igjen...`
-    : 'Siste ord! Resultater kommer...';
+    ? L().remaining(remaining)
+    : L().last_word;
 
   showScreen('screen-between');
   state.currentRound++;
@@ -827,31 +497,26 @@ function showBetween(correctAnswer) {
 function showResults() {
   const sorted = [...state.players].sort((a, b) => (state.scores[b] || 0) - (state.scores[a] || 0));
 
-  // Podium
   const podium = document.getElementById('podium');
   podium.innerHTML = '';
-  const order = [1, 0, 2]; // 2nd, 1st, 3rd
-  const emojis = ['🥇', '🥈', '🥉'];
-  order.forEach(idx => {
-    const p = sorted[idx];
-    if (!p) return;
-    const block = document.createElement('div');
-    block.className = `podium-block p${idx === 0 ? 1 : idx === 1 ? 2 : 3}`;
-    block.innerHTML = `<div class="emoji">${emojis[idx]}</div><div>${p.split(' ')[0]}</div><div style="font-size:0.7rem;color:var(--muted)">${state.scores[p] || 0}p</div>`;
-    podium.appendChild(block);
+  [[1,'pod2'],[0,'pod1'],[2,'pod3']].forEach(([idx, cls]) => {
+    const p = sorted[idx]; if (!p) return;
+    const d = document.createElement('div');
+    d.className = `pod ${cls}`;
+    d.innerHTML = `<div class="pod-emoji">${['🥇','🥈','🥉'][idx]}</div><div>${esc(p.split(' ')[0])}</div><div style="color:var(--gold);font-family:'DM Mono',monospace;font-size:0.75rem">${state.scores[p]||0}</div>`;
+    podium.appendChild(d);
   });
 
-  // Full scoreboard
   const final = document.getElementById('final-scoreboard');
   final.innerHTML = '';
   sorted.forEach((p, i) => {
     const el = document.createElement('div');
-    el.className = 'score-row' + (i === 0 ? ' top' : '');
+    el.className = 'board-row' + (i === 0 ? ' leader' : '');
     el.innerHTML = `
-      <div class="rank ${i === 0 ? 'gold' : ''}">${i + 1}</div>
-      <div class="player-avatar" style="background:${getColor(p)};width:32px;height:32px;font-size:0.85rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">${getInitial(p)}</div>
-      <div class="score-name">${p}</div>
-      <div class="score-pts">${state.scores[p] || 0} p</div>
+      <div class="b-rank ${i === 0 ? 'gold' : ''}">${i + 1}</div>
+      ${avHtml(p,28)}
+      <div class="b-name">${esc(p)}</div>
+      <div class="b-pts">⚡ ${state.scores[p] || 0}</div>
     `;
     final.appendChild(el);
   });
@@ -859,7 +524,6 @@ function showResults() {
   showScreen('screen-results');
 }
 
-// ─── RESET ───────────────────────────────────────────────────
 function resetGame() {
   Object.keys(state.scores).forEach(k => { state.scores[k] = 0; state.streaks[k] = 0; });
   state.currentRound = 0;
@@ -875,6 +539,9 @@ document.addEventListener('keydown', e => {
     if (active && active.id === 'screen-role') joinGame();
   }
 });
+
+// ─── INIT ────────────────────────────────────────────────────
+applyLang();
 </script>
 </body>
 </html>

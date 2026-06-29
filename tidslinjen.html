@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="shared.js"></script>
 <style>
 :root{
   --bg:#0f0f1a;--card:#1a1a2e;--paper:#f0ede6;
@@ -21,7 +22,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--paper);min-
 .lang-btn:hover{color:var(--paper)}
 
 .screen{display:none;width:100%;max-width:560px;flex-direction:column;align-items:center}
-.screen.on{display:flex}
+.screen.active{display:flex}
 
 h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.6rem;text-align:center;margin-bottom:6px;letter-spacing:-.02em}
 .sub{color:var(--muted);font-size:.85rem;text-align:center;margin-bottom:28px}
@@ -95,7 +96,7 @@ textarea:focus{outline:none;border-color:var(--accent)}
 <button class="lang-btn" onclick="toggleLang()" id="langBtn">EN</button>
 
 <!-- SETUP -->
-<div class="screen on" id="setup">
+<div class="screen active" id="setup">
   <h1 data-no="Tidslinjen" data-en="The Timeline">Tidslinjen</h1>
   <p class="sub" data-no="Hvilket år skjedde det? Test historiekunnskapen din." data-en="What year did it happen? Test your history knowledge.">Hvilket år skjedde det? Test historiekunnskapen din.</p>
 
@@ -145,7 +146,6 @@ textarea:focus{outline:none;border-color:var(--accent)}
 
 <script>
 var TOTAL=20,TIME=12,STEAL_EACH=25;
-var lang=localStorage.getItem('clashroom_lang')||'no';
 var mode='mixed';
 
 var EVENTS=[
@@ -189,8 +189,6 @@ var EVENTS=[
 
 var players=[],scores=[],round=0,questions=[],timer,timeLeft,answered,currentPlayer;
 
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
 
 function makeQuestions(){
   var pool=EVENTS.filter(function(e){return mode==='mixed'||e.cat===mode});
@@ -198,7 +196,6 @@ function makeQuestions(){
   return pool.slice(0,TOTAL);
 }
 
-function show(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on')});document.getElementById(id).classList.add('on')}
 
 function setMode(m,btn){
   mode=m;
@@ -216,15 +213,15 @@ function startGame(){
   currentPlayer=0;
   questions=makeQuestions();
   if(questions.length<TOTAL)TOTAL=questions.length;
-  show('game');
+  showScreen('game');
   showRound();
 }
 
 function showRound(){
   var q=questions[round];
   document.getElementById('roundLabel').textContent=(round+1)+' / '+TOTAL;
-  document.getElementById('eventText').textContent=lang==='en'?q.en:q.no;
-  var catLabel=q.cat==='norge'?(lang==='en'?'Norwegian history':'Norgeshistorie'):(lang==='en'?'World history':'Verdenshistorie');
+  document.getElementById('eventText').textContent=getLang()==='en'?q.en:q.no;
+  var catLabel=q.cat==='norge'?(getLang()==='en'?'Norwegian history':'Norgeshistorie'):(getLang()==='en'?'World history':'Verdenshistorie');
   document.getElementById('eventCat').textContent=catLabel;
 
   var optsEl=document.getElementById('opts');
@@ -322,7 +319,7 @@ function renderScores(stealer){
 }
 
 function showResult(){
-  show('result');
+  showScreen('result');
   var sorted=players.map(function(n,i){return{name:n,pts:scores[i]}}).sort(function(a,b){return b.pts-a.pts});
   var pod=document.getElementById('podium');
   pod.innerHTML='';
@@ -338,21 +335,17 @@ function showResult(){
   });
 }
 
-function reset(){show('setup');round=0;currentPlayer=0;TOTAL=20}
+function reset(){showScreen('setup');round=0;currentPlayer=0;TOTAL=20}
 
-function toggleLang(){
-  lang=lang==='no'?'en':'no';
-  localStorage.setItem('clashroom_lang',lang);
-  applyLang();
-}
-function applyLang(){
-  document.getElementById('langBtn').textContent=lang==='no'?'EN':'NO';
-  document.querySelectorAll('[data-'+lang+']').forEach(function(el){
-    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.placeholder=el.getAttribute('data-'+lang);
-    else el.innerHTML=el.getAttribute('data-'+lang);
+function onLangChange(){
+  var l=getLang();
+  document.getElementById('langBtn').textContent=l==='no'?'EN':'NO';
+  document.querySelectorAll('[data-'+l+']').forEach(function(el){
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.placeholder=el.getAttribute('data-'+l);
+    else el.innerHTML=el.getAttribute('data-'+l);
   });
 }
-applyLang();
+onLangChange();
 </script>
 </body>
 </html>
