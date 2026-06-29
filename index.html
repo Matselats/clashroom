@@ -325,7 +325,7 @@
     <h1>Learning that hits different.</h1>
     <p class="hero-sub">Free classroom games that make students compete to learn. No login. No download. Just share the link.</p>
     <div class="hero-stats">
-      <div class="hstat"><span class="hstat-num">3</span><div class="hstat-label">Games live</div></div>
+      <div class="hstat"><span class="hstat-num">5</span><div class="hstat-label">Games live</div></div>
       <div class="hstat"><span class="hstat-num">30</span><div class="hstat-label">Players/game</div></div>
       <div class="hstat"><span class="hstat-num">100%</span><div class="hstat-label">Free</div></div>
     </div>
@@ -343,7 +343,8 @@
     <button class="tab active" onclick="filterSubject('all', this)">🎮 All games</button>
     <button class="tab" onclick="filterSubject('norsk', this)">📝 Norsk</button>
     <button class="tab" onclick="filterSubject('english', this)">🇬🇧 English</button>
-    <button class="tab" onclick="filterSubject('maths', this)">🔢 Maths <span style="font-size:0.65rem;opacity:0.6">(soon)</span></button>
+    <button class="tab" onclick="filterSubject('maths', this)">🔢 Maths</button>
+    <button class="tab" onclick="filterSubject('tools', this)">🛠️ Lærerverktøy</button>
   </div>
 
   <div class="subject-section active" id="section-all">
@@ -375,24 +376,24 @@
           <div class="play-row"><span class="play-label">Play now</span><div class="play-arrow">→</div></div>
         </div>
       </a>
-      <div class="game-card coming" style="--cc:#2176ae;--cb:#eff6ff;">
+      <a class="game-card" href="grammarduell.html" style="--cc:#2176ae;--cb:#eff6ff;">
         <div class="card-top"><div class="card-type-tag">👥 Multiplayer</div><div class="card-subject-tag">English</div>🧠</div>
         <div class="card-body">
           <div class="card-title">Grammar Duel</div>
-          <div class="card-desc">Battle classmates on verb tenses, articles, and sentence structure.</div>
-          <div class="card-meta"><span class="meta-chip">📚 English</span><span class="meta-chip">🎯 Grammar</span></div>
+          <div class="card-desc">Pick the correct verb form faster than your classmates. Tenses, conditionals, perfect forms — all in one battle.</div>
+          <div class="card-meta"><span class="meta-chip">⚡ 15 sek/spørsmål</span><span class="meta-chip">📚 9. trinn</span><span class="meta-chip">🎯 Verb tenses</span></div>
+          <div class="play-row"><span class="play-label">Play now</span><div class="play-arrow">→</div></div>
         </div>
-        <div class="coming-banner">Coming soon</div>
-      </div>
-      <div class="game-card coming" style="--cc:#0d9488;--cb:#f0fdfa;">
+      </a>
+      <a class="game-card" href="mathblitz.html" style="--cc:#0d9488;--cb:#f0fdfa;">
         <div class="card-top"><div class="card-type-tag">👥 Multiplayer</div><div class="card-subject-tag">Maths</div>🔢</div>
         <div class="card-body">
           <div class="card-title">Math Blitz</div>
-          <div class="card-desc">Mental arithmetic at full speed. Race your classmates to the answer.</div>
-          <div class="card-meta"><span class="meta-chip">📚 Maths</span><span class="meta-chip">⚡ Fast-paced</span></div>
+          <div class="card-desc">Mental arithmetic at full speed. Race your classmates to the answer before time runs out.</div>
+          <div class="card-meta"><span class="meta-chip">⚡ 10 sek/oppgave</span><span class="meta-chip">📚 8–10. trinn</span><span class="meta-chip">🔢 Maths</span></div>
+          <div class="play-row"><span class="play-label">Play now</span><div class="play-arrow">→</div></div>
         </div>
-        <div class="coming-banner">Coming soon</div>
-      </div>
+      </a>
       <div class="game-card coming" style="--cc:#22c55e;--cb:#f0fdf4;">
         <div class="card-top"><div class="card-type-tag">🎯 Solo</div><div class="card-subject-tag">Norsk</div>📖</div>
         <div class="card-body">
@@ -448,29 +449,55 @@
           <div class="play-row"><span class="play-label">Play now</span><div class="play-arrow">→</div></div>
         </div>
       </a>
-      <div class="game-card coming" style="--cc:#2176ae;--cb:#eff6ff;">
+      <a class="game-card" href="grammarduell.html" style="--cc:#2176ae;--cb:#eff6ff;">
         <div class="card-top"><div class="card-type-tag">👥 Multiplayer</div><div class="card-subject-tag">English</div>🧠</div>
         <div class="card-body">
           <div class="card-title">Grammar Duel</div>
-          <div class="card-desc">Battle on verb tenses, articles, and sentence structure.</div>
-          <div class="card-meta"><span class="meta-chip">Grammar</span></div>
+          <div class="card-desc">Pick the correct verb form faster than your classmates. Tenses, conditionals, perfect forms — all in one battle.</div>
+          <div class="card-meta"><span class="meta-chip">⚡ 15 sek/spørsmål</span><span class="meta-chip">📚 9. trinn</span><span class="meta-chip">🎯 Verb tenses</span></div>
+          <div class="play-row"><span class="play-label">Play now</span><div class="play-arrow">→</div></div>
         </div>
-        <div class="coming-banner">Coming soon</div>
-      </div>
+      </a>
     </div>
   </div>
 
   <div class="subject-section" id="section-maths">
     <div class="games-grid">
-      <div class="game-card coming" style="--cc:#0d9488;--cb:#f0fdfa;">
+      <a class="game-card" href="mathblitz.html" style="--cc:#0d9488;--cb:#f0fdfa;">
         <div class="card-top"><div class="card-type-tag">👥 Multiplayer</div><div class="card-subject-tag">Maths</div>🔢</div>
         <div class="card-body">
           <div class="card-title">Math Blitz</div>
-          <div class="card-desc">Mental arithmetic at full speed. Race your classmates.</div>
-          <div class="card-meta"><span class="meta-chip">Coming soon</span></div>
+          <div class="card-desc">Mental arithmetic at full speed. Race your classmates to the answer before time runs out.</div>
+          <div class="card-meta"><span class="meta-chip">⚡ 10 sek/oppgave</span><span class="meta-chip">📚 8–10. trinn</span></div>
+          <div class="play-row"><span class="play-label">Play now</span><div class="play-arrow">→</div></div>
         </div>
-        <div class="coming-banner">Coming soon</div>
-      </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="subject-section" id="section-tools">
+    <div class="section-head" style="margin-bottom:16px;">
+      <div class="section-sub">Tools for the teacher — not the students. No login, no fuss.</div>
+    </div>
+    <div class="games-grid">
+      <a class="game-card" href="klassekart.html" style="--cc:#6c31e3;--cb:#f3f0ff;">
+        <div class="card-top"><div class="card-type-tag">🛠️ Verktøy</div><div class="card-subject-tag">Alle fag</div>🪑</div>
+        <div class="card-body">
+          <div class="card-title">Klassekart</div>
+          <div class="card-desc">Lim inn elevnavn og få et tilfeldig sittekart på sekunder. Sett begrensninger og regenerer med ett klikk.</div>
+          <div class="card-meta"><span class="meta-chip">👥 Maks 32 elever</span><span class="meta-chip">🖨 Utskriftsvennlig</span></div>
+          <div class="play-row"><span class="play-label">Åpne verktøy</span><div class="play-arrow">→</div></div>
+        </div>
+      </a>
+      <a class="game-card" href="timer.html" style="--cc:#2176ae;--cb:#eff6ff;">
+        <div class="card-top"><div class="card-type-tag">🛠️ Verktøy</div><div class="card-subject-tag">Alle fag</div>⏱</div>
+        <div class="card-body">
+          <div class="card-title">Klassetimer</div>
+          <div class="card-desc">Fullskjerm nedtellingstimer for smartboard. Tre modi: arbeidsøkt, gruppearbeid og prøve — med ulikt fargetema.</div>
+          <div class="card-meta"><span class="meta-chip">🖥 Fullskjerm</span><span class="meta-chip">🔔 Lydsignal</span><span class="meta-chip">⌨ Tastatursnarvei</span></div>
+          <div class="play-row"><span class="play-label">Åpne verktøy</span><div class="play-arrow">→</div></div>
+        </div>
+      </a>
     </div>
   </div>
 
