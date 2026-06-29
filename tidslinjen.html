@@ -189,6 +189,7 @@ var EVENTS=[
 
 var players=[],scores=[],round=0,questions=[],timer,timeLeft,answered,currentPlayer;
 
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
 
 function makeQuestions(){
@@ -316,7 +317,7 @@ function renderScores(stealer){
   var sorted=players.map(function(n,i){return{name:n,pts:scores[i],idx:i}}).sort(function(a,b){return b.pts-a.pts});
   el.innerHTML=sorted.map(function(p){
     var st=(stealer===p.idx)?'<span class="steal-tag">STEAL</span>':'';
-    return '<div class="score-row"><span class="score-name">'+p.name+st+'</span><span class="score-pts">'+p.pts+'p</span></div>';
+    return '<div class="score-row"><span class="score-name">'+esc(p.name)+st+'</span><span class="score-pts">'+p.pts+'p</span></div>';
   }).join('');
 }
 
@@ -332,7 +333,7 @@ function showResult(){
     var div=document.createElement('div');
     div.className='pod';
     var rank=top.indexOf(p)+1;
-    div.innerHTML='<div class="pod-name">'+p.name+'</div><div class="pod-bar">'+rank+'</div><div class="pod-pts">'+p.pts+'p</div>';
+    div.innerHTML='<div class="pod-name">'+esc(p.name)+'</div><div class="pod-bar">'+rank+'</div><div class="pod-pts">'+p.pts+'p</div>';
     pod.appendChild(div);
   });
 }
