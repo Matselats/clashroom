@@ -403,8 +403,7 @@ function submitAnswer() {
   document.getElementById('answer-input').disabled = true;
 
   const word = state.gameWords[state.currentRound];
-  const correct = word.en.map(a => a.toLowerCase());
-  const isCorrect = correct.some(c => input === c || input.includes(c) || c.includes(input));
+  const isCorrect = checkAnswer(input, word.en);
 
   if (isCorrect) {
     const stealPerPlayer = 30;

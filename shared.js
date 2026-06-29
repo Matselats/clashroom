@@ -36,6 +36,40 @@ function updateRing(cur, max, el) {
   el.style.strokeDashoffset = circ - (cur / max) * circ;
 }
 
+// ─── ANSWER VALIDATION ──────────────────────────────────────
+
+function normalizeAnswer(s) {
+  return String(s).trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function levenshtein(a, b) {
+  var m = a.length, n = b.length;
+  var d = [];
+  for (var i = 0; i <= m; i++) d[i] = [i];
+  for (var j = 0; j <= n; j++) d[0][j] = j;
+  for (var i = 1; i <= m; i++) {
+    for (var j = 1; j <= n; j++) {
+      var cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+    }
+  }
+  return d[m][n];
+}
+
+function checkAnswer(input, accepted) {
+  var inp = normalizeAnswer(input);
+  if (!inp) return false;
+  if (!Array.isArray(accepted)) accepted = [accepted];
+  for (var i = 0; i < accepted.length; i++) {
+    var ans = normalizeAnswer(accepted[i]);
+    if (inp === ans) return true;
+    if (Math.abs(inp.length - ans.length) > 2) continue;
+    var maxDist = ans.length <= 3 ? 0 : ans.length <= 4 ? 1 : 2;
+    if (levenshtein(inp, ans) <= maxDist) return true;
+  }
+  return false;
+}
+
 // ─── LANGUAGE ────────────────────────────────────────────────
 
 var _lang = localStorage.getItem('clashroom_lang') || 'no';

@@ -416,8 +416,7 @@ function submitAnswer() {
   document.getElementById('answer-input').disabled = true;
 
   const word = state.gameWords[state.currentRound];
-  const correct = word.ny.map(a => a.toLowerCase());
-  const isCorrect = correct.includes(input);
+  const isCorrect = checkAnswer(input, word.ny);
 
   const timeBonus = Math.round((state.timeLeft / 15) * 50);
   const basePoints = isCorrect ? 100 : 0;
