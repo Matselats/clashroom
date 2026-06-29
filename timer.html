@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timer – Clashroom</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --ink:    #0f0f1a;
+    --paper:  #f0ede6;
+    --border: rgba(255,255,255,0.1);
+    --muted:  #6b6b80;
+
+    /* modes */
+    --work-accent:  #2176ae;
+    --group-accent: #2a9d5c;
+    --test-accent:  #e63946;
+    --accent: var(--work-accent);
+  }
+
+  * { box-sizing:border-box; margin:0; padding:0; }
+
+  body {
+    font-family:'DM Sans',sans-serif;
+    background:var(--ink);
+    color:var(--paper);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    transition:background 0.5s;
+  }
+  body.mode-group { background:#0a1a10; }
+  body.mode-test  { background:#1a0a0a; }
+
+  header {
+    padding:12px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid var(--border);
+    background:rgba(0,0,0,0.4);
+    backdrop-filter:blur(8px);
+  }
+
+  .logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; letter-spacing:-0.03em; text-decoration:none; color:var(--paper); }
+  .logo span { color:var(--accent); transition:color 0.4s; }
+
+  .header-right { display:flex; align-items:center; gap:8px; }
+
+  .lang-btn {
+    display:flex; align-items:center; gap:4px;
+    background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
+    color:var(--paper); padding:5px 10px; border-radius:20px;
+    font-size:0.75rem; font-family:'DM Sans',sans-serif; font-weight:600;
+    cursor:pointer; transition:background 0.15s; white-space:nowrap;
+  }
+  .lang-btn:hover { background:rgba(255,255,255,0.13); }
+
+  .back-btn {
+    display:flex; align-items:center; gap:4px;
+    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+    color:var(--muted); padding:5px 10px; border-radius:20px;
+    font-size:0.75rem; text-decoration:none;
+    transition:background 0.15s;
+  }
+  .back-btn:hover { background:rgba(255,255,255,0.11); color:var(--paper); }
+
+  /* ── MAIN LAYOUT ── */
+  .page { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; gap:28px; }
+
+  /* ── MODE TABS ── */
+  .mode-tabs { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .mode-tab {
+    padding:9px 18px; border-radius:24px;
+    border:2px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.05);
+    color:var(--muted);
+    font-family:'Syne',sans-serif; font-weight:700; font-size:0.85rem;
+    cursor:pointer; transition:all 0.2s;
+  }
+  .mode-tab:hover { border-color:rgba(255,255,255,0.25); color:var(--paper); }
+  .mode-tab.active-work  { border-color:var(--work-accent);  background:rgba(33,118,174,0.15);  color:var(--paper); }
+  .mode-tab.active-group { border-color:var(--group-accent); background:rgba(42,157,92,0.15);   color:var(--paper); }
+  .mode-tab.active-test  { border-color:var(--test-accent);  background:rgba(230,57,70,0.15);   color:var(--paper); }
+
+  /* ── BIG DISPLAY ── */
+  .timer-display {
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+  }
+
+  .mode-label {
+    font-family:'Syne',sans-serif; font-weight:800; font-size:0.85rem;
+    letter-spacing:0.18em; text-transform:uppercase;
+    opacity:0.5; transition:color 0.4s;
+  }
+
+  .big-time {
+    font-family:'DM Mono',monospace;
+    font-size:clamp(4.5rem,18vw,10rem);
+    font-weight:500;
+    letter-spacing:-0.02em;
+    line-height:1;
+    transition:color 0.4s;
+    cursor:pointer;
+  }
+  .big-time.work-color  { color:var(--work-accent); }
+  .big-time.group-color { color:var(--group-accent); }
+  .big-time.test-color  { color:var(--test-accent); }
+  .big-time.urgent { animation:urgentPulse 0.7s ease infinite; }
+  @keyframes urgentPulse {
+    0%,100% { opacity:1; }
+    50%      { opacity:0.5; }
+  }
+  .big-time.done { animation:donePop 0.4s ease; }
+  @keyframes donePop {
+    0%   { transform:scale(1.15); }
+    100% { transform:scale(1); }
+  }
+
+  .progress-bar-wrap {
+    width:min(480px,90vw); height:6px;
+    background:rgba(255,255,255,0.07);
+    border-radius:3px; overflow:hidden;
+  }
+  .progress-bar {
+    height:100%; border-radius:3px;
+    transition:width 1s linear, background 0.4s;
+    background:var(--work-accent);
+  }
+
+  /* ── CONTROLS ── */
+  .controls { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .ctrl-btn {
+    padding:12px 24px; border-radius:13px; border:none;
+    font-family:'Syne',sans-serif; font-weight:800; font-size:0.92rem;
+    cursor:pointer; transition:opacity 0.15s, transform 0.1s;
+  }
+  .ctrl-btn:hover { opacity:0.88; transform:translateY(-1px); }
+  .ctrl-btn:active { transform:translateY(0); }
+  .btn-start { background:var(--work-accent); color:white; }
+  .btn-start.group { background:var(--group-accent); }
+  .btn-start.test  { background:var(--test-accent); }
+  .btn-pause  { background:rgba(255,255,255,0.1); color:var(--paper); border:1px solid rgba(255,255,255,0.12); }
+  .btn-reset  { background:rgba(255,255,255,0.07); color:var(--muted); border:1px solid rgba(255,255,255,0.08); }
+
+  /* ── PRESETS ── */
+  .presets { display:flex; gap:7px; flex-wrap:wrap; justify-content:center; }
+  .preset-btn {
+    padding:8px 16px; border-radius:10px;
+    border:2px solid rgba(255,255,255,0.1);
+    background:transparent; color:var(--muted);
+    font-family:'Syne',sans-serif; font-weight:700; font-size:0.83rem;
+    cursor:pointer; transition:all 0.2s;
+  }
+  .preset-btn:hover { border-color:rgba(255,255,255,0.3); color:var(--paper); }
+  .preset-btn.active-p { color:var(--paper); }
+  .preset-btn.ap-work  { border-color:var(--work-accent);  background:rgba(33,118,174,0.12); }
+  .preset-btn.ap-group { border-color:var(--group-accent); background:rgba(42,157,92,0.12); }
+  .preset-btn.ap-test  { border-color:var(--test-accent);  background:rgba(230,57,70,0.12); }
+
+  /* Custom input */
+  .custom-wrap {
+    display:flex; gap:8px; align-items:center; justify-content:center; flex-wrap:wrap;
+  }
+  .custom-wrap input {
+    padding:8px 14px; border-radius:10px;
+    border:2px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.06);
+    color:var(--paper); font-family:'DM Mono',monospace; font-size:1rem;
+    width:90px; text-align:center; outline:none; transition:border-color 0.2s;
+  }
+  .custom-wrap input:focus { border-color:var(--work-accent); }
+  .custom-wrap label { font-size:0.8rem; color:var(--muted); }
+  .custom-set {
+    padding:8px 16px; border-radius:10px; border:none;
+    background:rgba(255,255,255,0.1); color:var(--paper);
+    font-family:'Syne',sans-serif; font-weight:700; font-size:0.83rem;
+    cursor:pointer; transition:opacity 0.15s;
+  }
+  .custom-set:hover { opacity:0.85; }
+
+  /* done overlay */
+  .done-banner {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.8); backdrop-filter:blur(4px);
+    align-items:center; justify-content:center; flex-direction:column;
+    gap:20px; z-index:200;
+  }
+  .done-banner.show { display:flex; }
+  .done-icon { font-size:5rem; animation:donePop 0.5s ease; }
+  .done-text { font-family:'Syne',sans-serif; font-weight:800; font-size:2.5rem; text-align:center; }
+  .done-sub  { color:var(--muted); font-size:1rem; }
+  .done-dismiss {
+    padding:13px 32px; border-radius:14px; border:none;
+    font-family:'Syne',sans-serif; font-weight:800; font-size:1rem;
+    background:var(--work-accent); color:white; cursor:pointer;
+    transition:opacity 0.15s;
+  }
+  .done-dismiss:hover { opacity:0.88; }
+
+  @media (max-width:480px) {
+    .ctrl-btn { padding:11px 18px; font-size:0.85rem; }
+    .preset-btn { padding:7px 12px; font-size:0.78rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="index.html">Clash<span>room</span> ⏱</a>
+  <div class="header-right">
+    <button class="lang-btn" onclick="toggleLang()">
+      <span id="lang-flag">🇳🇴</span>
+      <span id="lang-txt">Norsk</span>
+    </button>
+  </div>
+</header>
+
+<div class="page">
+
+  <div class="mode-tabs">
+    <button class="mode-tab" onclick="setMode('work')"  id="tab-work"></button>
+    <button class="mode-tab" onclick="setMode('group')" id="tab-group"></button>
+    <button class="mode-tab" onclick="setMode('test')"  id="tab-test"></button>
+  </div>
+
+  <div class="timer-display">
+    <div class="mode-label" id="mode-label"></div>
+    <div class="big-time work-color" id="big-time">00:00</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progress-bar" style="width:100%"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn btn-start" id="btn-start" onclick="startPause()"></button>
+    <button class="ctrl-btn btn-reset" onclick="resetTimer()" id="t-reset-btn"></button>
+  </div>
+
+  <div class="presets" id="presets"></div>
+
+  <div class="custom-wrap">
+    <label id="t-custom-label"></label>
+    <input type="number" id="custom-input" min="1" max="99" placeholder="–" />
+    <label id="t-min-label"></label>
+    <button class="custom-set" onclick="setCustom()" id="t-custom-set"></button>
+  </div>
+
+</div>
+
+<!-- DONE OVERLAY -->
+<div class="done-banner" id="done-banner" onclick="dismissDone()">
+  <div class="done-icon" id="done-icon"></div>
+  <div class="done-text" id="done-text"></div>
+  <div class="done-sub"  id="done-sub"></div>
+  <button class="done-dismiss" id="t-dismiss-btn" onclick="dismissDone()"></button>
+</div>
+
+<script>
+// ─── TRANSLATIONS ─────────────────────────────────────────────
+const LANG = {
+  no: {
+    tab_work:    "⏱ Arbeidsøkt",
+    tab_group:   "👥 Gruppearbeid",
+    tab_test:    "📝 Prøve",
+    label_work:  "ARBEIDSØKT",
+    label_group: "GRUPPEARBEID",
+    label_test:  "PRØVETID",
+    start:       "▶ Start",
+    pause:       "⏸ Pause",
+    resume:      "▶ Fortsett",
+    reset:       "↺ Nullstill",
+    custom_lbl:  "Egendefinert:",
+    min_lbl:     "min",
+    custom_set:  "Sett →",
+    done_icon_work:  "⏰",
+    done_icon_group: "👋",
+    done_icon_test:  "✏️",
+    done_text_work:  "Arbeidsøkten er ferdig!",
+    done_text_group: "Tid er ute!",
+    done_text_test:  "Prøvetiden er over!",
+    done_sub_work:   "Legg bort alt og lyt.",
+    done_sub_group:  "Avslutt og oppsummer.",
+    done_sub_test:   "Legg ned pennen.",
+    dismiss:         "OK",
+    presets:         [5, 10, 15, 20, 30],
+  },
+  en: {
+    tab_work:    "⏱ Work session",
+    tab_group:   "👥 Group work",
+    tab_test:    "📝 Test",
+    label_work:  "WORK SESSION",
+    label_group: "GROUP WORK",
+    label_test:  "TEST TIME",
+    start:       "▶ Start",
+    pause:       "⏸ Pause",
+    resume:      "▶ Resume",
+    reset:       "↺ Reset",
+    custom_lbl:  "Custom:",
+    min_lbl:     "min",
+    custom_set:  "Set →",
+    done_icon_work:  "⏰",
+    done_icon_group: "👋",
+    done_icon_test:  "✏️",
+    done_text_work:  "Work session complete!",
+    done_text_group: "Time's up!",
+    done_text_test:  "Test time is over!",
+    done_sub_work:   "Put everything away and listen.",
+    done_sub_group:  "Wrap up and summarise.",
+    done_sub_test:   "Put down your pen.",
+    dismiss:         "OK",
+    presets:         [5, 10, 15, 20, 30],
+  }
+};
+
+let lang = localStorage.getItem('clashroom_lang') || 'no';
+const L = () => LANG[lang];
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.getElementById('lang-flag').textContent = lang === 'no' ? '🇳🇴' : '🇬🇧';
+  document.getElementById('lang-txt').textContent  = lang === 'no' ? 'Norsk' : 'English';
+  const t = (id, v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  t('tab-work',       L().tab_work);
+  t('tab-group',      L().tab_group);
+  t('tab-test',       L().tab_test);
+  t('t-reset-btn',    L().reset);
+  t('t-custom-label', L().custom_lbl);
+  t('t-min-label',    L().min_lbl);
+  t('t-custom-set',   L().custom_set);
+  t('t-dismiss-btn',  L().dismiss);
+  updateModeLabel();
+  updateStartBtn();
+  renderPresets();
+}
+
+function toggleLang() {
+  lang = lang === 'no' ? 'en' : 'no';
+  localStorage.setItem('clashroom_lang', lang);
+  applyLang();
+}
+
+// ─── STATE ────────────────────────────────────────────────────
+let mode        = 'work';
+let totalSecs   = 0;
+let remainSecs  = 0;
+let running     = false;
+let interval    = null;
+let selectedMin = 5;
+
+// ─── MODE ────────────────────────────────────────────────────
+const ACCENT = { work:'var(--work-accent)', group:'var(--group-accent)', test:'var(--test-accent)' };
+
+function setMode(m) {
+  mode = m;
+  document.body.className = m === 'work' ? '' : `mode-${m}`;
+  ['work','group','test'].forEach(x => {
+    const tab = document.getElementById(`tab-${x}`);
+    tab.className = 'mode-tab' + (x===m ? ` active-${x}` : '');
+  });
+  document.querySelector('.big-time').className = `big-time ${m}-color`;
+  document.querySelector('.progress-bar').style.background = `var(--${m}-accent)`;
+  document.getElementById('btn-start').className = `ctrl-btn btn-start ${m==='work'?'':m}`;
+  document.querySelector('.logo span').style.color = `var(--${m}-accent)`;
+  updateModeLabel();
+  renderPresets();
+}
+
+function updateModeLabel() {
+  const labels = { work:L().label_work, group:L().label_group, test:L().label_test };
+  document.getElementById('mode-label').textContent = labels[mode] || '';
+}
+
+// ─── PRESETS ─────────────────────────────────────────────────
+function renderPresets() {
+  const wrap = document.getElementById('presets');
+  wrap.innerHTML = '';
+  L().presets.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn' + (m===selectedMin ? ` active-p ap-${mode}` : '');
+    btn.textContent = `${m} min`;
+    btn.onclick = () => selectPreset(m);
+    wrap.appendChild(btn);
+  });
+}
+
+function selectPreset(min) {
+  selectedMin = min;
+  setTime(min * 60);
+  renderPresets();
+}
+
+function setCustom() {
+  const raw = parseInt(document.getElementById('custom-input').value, 10);
+  if (!raw || raw < 1 || raw > 99) return;
+  selectedMin = raw;
+  setTime(raw * 60);
+  renderPresets();
+}
+
+function setTime(secs) {
+  if (running) stopTimer();
+  totalSecs  = secs;
+  remainSecs = secs;
+  running    = false;
+  updateDisplay();
+  updateProgress();
+  updateStartBtn();
+}
+
+// ─── TIMER ───────────────────────────────────────────────────
+function startPause() {
+  if (totalSecs === 0) { selectPreset(selectedMin); return; }
+  if (running) {
+    stopTimer();
+  } else {
+    if (remainSecs <= 0) { setTime(totalSecs); return; }
+    running = true;
+    interval = setInterval(tick, 1000);
+    updateStartBtn();
+  }
+}
+
+function stopTimer() {
+  clearInterval(interval);
+  running = false;
+  updateStartBtn();
+}
+
+function resetTimer() {
+  stopTimer();
+  remainSecs = totalSecs;
+  updateDisplay();
+  updateProgress();
+  document.querySelector('.big-time').classList.remove('urgent','done');
+}
+
+function tick() {
+  remainSecs--;
+  updateDisplay();
+  updateProgress();
+  if (remainSecs <= 10 && remainSecs > 0) {
+    document.querySelector('.big-time').classList.add('urgent');
+    beep(880, 0.08, 0.06);
+  }
+  if (remainSecs <= 0) {
+    stopTimer();
+    document.querySelector('.big-time').classList.remove('urgent');
+    document.querySelector('.big-time').classList.add('done');
+    showDone();
+    beepDone();
+  }
+}
+
+function updateDisplay() {
+  const s = Math.max(0, remainSecs);
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  document.getElementById('big-time').textContent =
+    String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+}
+
+function updateProgress() {
+  const pct = totalSecs > 0 ? (remainSecs / totalSecs) * 100 : 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function updateStartBtn() {
+  const btn = document.getElementById('btn-start');
+  if (running)        btn.textContent = L().pause;
+  else if (remainSecs < totalSecs && remainSecs > 0) btn.textContent = L().resume;
+  else                btn.textContent = L().start;
+}
+
+// ─── AUDIO ───────────────────────────────────────────────────
+let audioCtx = null;
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function beep(freq, vol, dur) {
+  try {
+    const ctx = getCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sine'; osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+
+function beepDone() {
+  const notes = mode==='test' ? [523,659,784,1047] : [784,988,1175];
+  notes.forEach((f,i) => setTimeout(() => beep(f, 0.22, 0.45), i*220));
+}
+
+// ─── DONE OVERLAY ────────────────────────────────────────────
+function showDone() {
+  const icons = { work:L().done_icon_work, group:L().done_icon_group, test:L().done_icon_test };
+  const texts = { work:L().done_text_work, group:L().done_text_group, test:L().done_text_test };
+  const subs  = { work:L().done_sub_work,  group:L().done_sub_group,  test:L().done_sub_test  };
+  document.getElementById('done-icon').textContent = icons[mode];
+  document.getElementById('done-text').textContent = texts[mode];
+  document.getElementById('done-sub').textContent  = subs[mode];
+  document.getElementById('done-banner').className = 'done-banner show';
+}
+
+function dismissDone() {
+  document.getElementById('done-banner').className = 'done-banner';
+  document.querySelector('.big-time').classList.remove('done');
+  updateDisplay();
+}
+
+// ─── FULLSCREEN (click on time) ───────────────────────────────
+document.getElementById('big-time').addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(()=>{});
+  } else {
+    document.exitFullscreen().catch(()=>{});
+  }
+});
+
+// ─── KEYBOARD SHORTCUTS ──────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); startPause(); }
+  if (e.key === 'r' || e.key === 'R')     resetTimer();
+  if (e.key === 'Escape')                  dismissDone();
+});
+
+// ─── INIT ────────────────────────────────────────────────────
+setMode('work');
+selectPreset(5);
+applyLang();
+</script>
+</body>
+</html>
