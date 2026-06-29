@@ -11,18 +11,53 @@
     --accent-dim: rgba(230,57,70,0.14);
     --accent-border: rgba(230,57,70,0.35);
   }
-  .heist-alert {
-    width: 100%;
-    background: rgba(230,57,70,0.1);
-    border: 1px solid rgba(230,57,70,0.25);
-    border-radius: 12px;
-    padding: 10px 16px;
-    font-size: 0.8rem;
-    color: #ff8a93;
-    text-align: center;
-    font-weight: 500;
-  }
   .word-display { font-size: 3rem; }
+  .room-code-box {
+    width: 100%;
+    background: var(--card);
+    border: 2px dashed var(--accent-border);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+  }
+  .room-code-box .label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .room-code-box .code {
+    font-family: 'DM Mono', monospace;
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+  }
+  .room-code-box .hint {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  #room-code-input {
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-weight: 700;
+  }
+  .join-error {
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    text-align: center;
+    display: none;
+  }
+  .join-error.show { display: block; }
+  .answered-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.83rem;
+    color: var(--muted);
+  }
 </style>
 </head>
 <body>
@@ -51,6 +86,10 @@
   </div>
   <div class="card" style="display:flex;flex-direction:column;gap:12px;">
     <input type="text" id="name-input" maxlength="20" />
+    <div id="room-code-wrap">
+      <input type="text" id="room-code-input" maxlength="5" />
+    </div>
+    <div class="join-error" id="join-error"></div>
     <button class="btn-primary" onclick="joinGame()" id="t-join-btn">Join the heist →</button>
   </div>
   <p class="sub" style="font-size:0.75rem;" id="t-share-hint">Share this page with your class — everyone joins on their own device</p>
@@ -59,6 +98,11 @@
 <!-- LOBBY -->
 <div class="screen" id="screen-lobby">
   <h1 id="t-lobby-title">Waiting for<br><em>the crew...</em></h1>
+  <div class="room-code-box">
+    <div class="label" id="t-room-code-label">ROOM CODE</div>
+    <div class="code" id="room-code-display"></div>
+    <div class="hint" id="t-room-code-share">Share this code with your students</div>
+  </div>
   <p class="sub" id="lobby-count">0 players ready</p>
   <div class="card" style="display:flex;flex-direction:column;gap:10px;">
     <div class="player-list" id="player-list"></div>
@@ -84,9 +128,10 @@
 <div class="screen" id="screen-game">
   <div style="width:100%;display:flex;justify-content:space-between;align-items:center;">
     <div class="round-tag">Round <span id="round-num">1</span>/15</div>
-    <div style="font-family:'DM Mono',monospace;font-size:0.85rem;color:var(--gold)">
+    <div id="my-score-wrap" style="font-family:'DM Mono',monospace;font-size:0.85rem;color:var(--gold)">
       💰 <span id="my-score-live">0</span> pts
     </div>
+    <div id="answered-wrap" class="answered-tag" style="display:none;">✓ <span id="answered-num">0</span>/<span id="total-players-num">0</span></div>
   </div>
 
   <div class="word-stage">
@@ -98,17 +143,17 @@
       <div class="ring-num" id="ring-num">12</div>
     </div>
     <div class="word-eyebrow" id="t-word-label">Translate to English</div>
-    <div class="word-display" id="current-word">hund</div>
+    <div class="word-display" id="current-word"></div>
     <div class="word-hint" id="word-hint"></div>
   </div>
 
-  <div class="answer-wrap">
+  <div class="answer-wrap" id="answer-wrap">
     <input class="answer-input" type="text" id="answer-input"
       autocomplete="off" autocorrect="off" spellcheck="false" />
     <button class="send-btn" onclick="submitAnswer()">→</button>
   </div>
 
-  <div class="flash" id="heist-flash">You stole 50 pts! 💰</div>
+  <div class="flash" id="heist-flash"></div>
 
   <div class="live-board">
     <div class="board-lbl" id="t-board-lbl">🏆 Live Scoreboard</div>
@@ -118,7 +163,7 @@
 
 <!-- BETWEEN ROUNDS -->
 <div class="screen" id="screen-between">
-  <h1 id="between-title">Answer: <em id="correct-word">dog</em></h1>
+  <h1 id="between-title">Answer: <em id="correct-word"></em></h1>
   <div id="between-flash" class="flash show neutral"></div>
   <div style="width:100%;display:flex;flex-direction:column;gap:6px;" id="between-board"></div>
 </div>
@@ -129,22 +174,31 @@
   <div class="podium" id="podium"></div>
   <div style="width:100%;display:flex;flex-direction:column;gap:6px;margin-top:8px;" id="final-board"></div>
   <button class="btn-primary" onclick="resetGame()" id="t-play-again">🔄 New Heist</button>
-  <button class="btn-secondary" onclick="showScreen('screen-role')" id="t-change-settings">Change settings</button>
+  <button class="btn-secondary" onclick="backToStart()" id="t-change-settings">Change settings</button>
   <a class="home-link" href="index.html" id="t-back-link">← Back to Clashroom</a>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
 <script src="shared.js"></script>
 <script>
 // ─── TRANSLATIONS ─────────────────────────────────────────────
-const LANG = {
+var LANG = {
   no: {
-    subtitle:     'Oversett norske ord til engelsk raskere enn alle andre — og stjel poengene deres.',
+    subtitle:      'Oversett norske ord til engelsk raskere enn alle andre — og stjel poengene deres.',
     role_student:  '🎮 Elev',
     role_teacher:  '🏫 Lærer',
     name_ph:       'Navnet ditt...',
+    room_code_ph:  'Romkode...',
     join_btn:      'Bli med i kuppet →',
+    create_btn:    'Opprett rom →',
     share_hint:    'Del denne siden med klassen — alle kobler seg på med sin egen enhet',
-    lobby_title:   'Venter på<br><em>crewet...</em>',
+    room_code_label: 'ROMKODE',
+    room_code_share: 'Del denne koden med elevene',
+    room_not_found:  'Fant ikke rommet. Sjekk koden og prøv igjen.',
+    lobby_teacher: 'Rommet er<br><em>klart!</em>',
+    lobby_student: 'Venter på<br><em>crewet...</em>',
     start_btn:     '▶ Start kuppet',
     game_info:     '15 ord · 12 sek hvert',
     get_ready:     'Gjør deg klar til å stjele om...',
@@ -153,29 +207,36 @@ const LANG = {
     board_lbl:     '🏆 Live poengtavle',
     results_title: 'Kuppet<br><em>er fullført!</em>',
     play_again:    '🔄 Nytt kupp',
-    change:        'Endre innstillinger',
+    change:        'Nytt rom',
     back:          '← Tilbake til Clashroom',
     you_suffix:    ' (deg)',
-    players_ready: n => `${n} spiller${n!==1?'e':''} klar`,
-    players_count: n => `${n} spillere`,
-    heist_steal:   (pts,n) => `💰 Kupp! +${pts} pts stjålet fra ${n} spiller${n!==1?'e':''}!`,
-    heist_correct: pts => `✓ Riktig! +${pts} pts`,
-    heist_wrong:   (pts,w) => `✗ Feil! -${pts} pts. Svar: ${w}`,
-    heist_timeout: w => `⏱ Tiden er ute! Svar: ${w}`,
-    chg_pos:       pts => `💰 Du fikk +${pts} pts!`,
-    chg_neg:       pts => `💸 Du mistet ${pts} pts`,
-    chg_none:      '⏱ Ingen endring denne runden',
-    remaining:     n => `Svar: `,
-    last_one:      'Siste: ',
+    sent_msg:      'Sendt! ⏳',
+    timeout_msg:   '⏱ Tiden er ute!',
+    players_ready: function(n) { return n + ' spiller' + (n !== 1 ? 'e' : '') + ' klar'; },
+    players_count: function(n) { return n + ' spillere'; },
+    heist_steal:   function(pts, n) { return '💰 Kupp! +' + pts + ' pts stjålet fra ' + n + ' spiller' + (n !== 1 ? 'e' : '') + '!'; },
+    heist_correct: function(pts) { return '✓ Riktig! +' + pts + ' pts'; },
+    heist_wrong:   function(pts) { return '✗ Feil! -' + pts + ' pts'; },
+    heist_none:    '⏱ Ingen endring denne runden',
+    between_winner:function(name, pts) { return '💰 ' + name + ' stjal ' + pts + ' pts!'; },
+    between_none:  'Ingen fikk det til denne runden',
+    answer_prefix: 'Svar: ',
+    last_prefix:   'Siste: ',
   },
   en: {
-    subtitle:     'Translate Norwegian words to English faster than everyone else — and steal their points.',
+    subtitle:      'Translate Norwegian words to English faster than everyone else — and steal their points.',
     role_student:  '🎮 Student',
     role_teacher:  '🏫 Teacher',
     name_ph:       'Your name...',
+    room_code_ph:  'Room code...',
     join_btn:      'Join the heist →',
+    create_btn:    'Create room →',
     share_hint:    'Share this page with your class — everyone joins on their own device',
-    lobby_title:   'Waiting for<br><em>the crew...</em>',
+    room_code_label: 'ROOM CODE',
+    room_code_share: 'Share this code with your students',
+    room_not_found:  'Room not found. Check the code and try again.',
+    lobby_teacher: 'Room is<br><em>ready!</em>',
+    lobby_student: 'Waiting for<br><em>the crew...</em>',
     start_btn:     '▶ Start the heist',
     game_info:     '15 words · 12 sec each',
     get_ready:     'Get ready to steal in...',
@@ -184,39 +245,41 @@ const LANG = {
     board_lbl:     '🏆 Live Scoreboard',
     results_title: 'Heist<br><em>Complete!</em>',
     play_again:    '🔄 New Heist',
-    change:        'Change settings',
+    change:        'New room',
     back:          '← Back to Clashroom',
     you_suffix:    ' (you)',
-    players_ready: n => `${n} player${n!==1?'s':''} ready`,
-    players_count: n => `${n} players`,
-    heist_steal:   (pts,n) => `💰 Heist! +${pts} pts stolen from ${n} player${n!==1?'s':''}!`,
-    heist_correct: pts => `✓ Correct! +${pts} pts`,
-    heist_wrong:   (pts,w) => `✗ Wrong! -${pts} pts. Answer: ${w}`,
-    heist_timeout: w => `⏱ Time's up! Answer: ${w}`,
-    chg_pos:       pts => `💰 You earned +${pts} pts!`,
-    chg_neg:       pts => `💸 You lost ${pts} pts`,
-    chg_none:      '⏱ No change this round',
-    remaining:     n => `Answer: `,
-    last_one:      'Last one: ',
+    sent_msg:      'Sent! ⏳',
+    timeout_msg:   '⏱ Time\'s up!',
+    players_ready: function(n) { return n + ' player' + (n !== 1 ? 's' : '') + ' ready'; },
+    players_count: function(n) { return n + ' players'; },
+    heist_steal:   function(pts, n) { return '💰 Heist! +' + pts + ' pts stolen from ' + n + ' player' + (n !== 1 ? 's' : '') + '!'; },
+    heist_correct: function(pts) { return '✓ Correct! +' + pts + ' pts'; },
+    heist_wrong:   function(pts) { return '✗ Wrong! -' + pts + ' pts'; },
+    heist_none:    '⏱ No change this round',
+    between_winner:function(name, pts) { return '💰 ' + name + ' stole ' + pts + ' pts!'; },
+    between_none:  'Nobody got it this round',
+    answer_prefix: 'Answer: ',
+    last_prefix:   'Last one: ',
   }
 };
 
-const L = () => LANG[getLang()];
+var L = function() { return LANG[getLang()]; };
 
 function onLangChange() { applyLang(); }
 
 function applyLang() {
-  const set = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
-  const txt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  const ph = (id, val) => { const el = document.getElementById(id); if (el) el.placeholder = val; };
+  var set = function(id, val) { var el = document.getElementById(id); if (el) el.innerHTML = val; };
+  var txt = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+  var ph = function(id, val) { var el = document.getElementById(id); if (el) el.placeholder = val; };
 
   txt('t-subtitle', L().subtitle);
   txt('role-student', L().role_student);
   txt('role-teacher', L().role_teacher);
   ph('name-input', L().name_ph);
-  txt('t-join-btn', L().join_btn);
+  ph('room-code-input', L().room_code_ph);
   txt('t-share-hint', L().share_hint);
-  set('t-lobby-title', L().lobby_title);
+  txt('t-room-code-label', L().room_code_label);
+  txt('t-room-code-share', L().room_code_share);
   txt('t-start-btn', L().start_btn);
   txt('t-game-info', L().game_info);
   txt('t-get-ready', L().get_ready);
@@ -228,12 +291,13 @@ function applyLang() {
   txt('t-change-settings', L().change);
   txt('t-back-link', L().back);
   ph('answer-input', getLang() === 'no' ? 'Engelsk ord...' : 'English word...');
-
-  if (state.players.length > 0) renderLobby();
+  set('t-lobby-title', state.isTeacher ? L().lobby_teacher : L().lobby_student);
+  txt('t-join-btn', state.role === 'teacher' ? L().create_btn : L().join_btn);
+  renderPlayerList();
 }
 
 // ─── WORD BANK ───────────────────────────────────────────────
-const WORDS = [
+var WORDS = [
   { no: "hund", en: ["dog"], hint: "man's best friend" },
   { no: "katt", en: ["cat"], hint: "it purrs" },
   { no: "hus", en: ["house", "home"], hint: "you live here" },
@@ -277,303 +341,537 @@ const WORDS = [
 ];
 
 // ─── STATE ───────────────────────────────────────────────────
-let state = {
+var state = {
   role: 'student',
   myName: '',
+  myKey: '',
   isTeacher: false,
-  players: [],
-  scores: {},
-  lastChange: {},
-  gameWords: [],
-  currentRound: 0,
+  roomCode: '',
   totalRounds: 15,
+  timerDuration: 12,
+  gameWords: [],
   answered: false,
   timerInterval: null,
+  countdownInterval: null,
   timeLeft: 12,
-  timeMax: 12,
-  roundWinner: null,
-  stolenFrom: [],
 };
+
+var fbPlayers = {};
+var fbRound = 0;
+var fbStatus = '';
+var roomListener = null;
 
 // ─── ROLE SELECT ─────────────────────────────────────────────
 function selectRole(role) {
   state.role = role;
   document.getElementById('role-student').classList.toggle('active', role === 'student');
   document.getElementById('role-teacher').classList.toggle('active', role === 'teacher');
+  document.getElementById('room-code-wrap').style.display = role === 'student' ? 'block' : 'none';
+  document.getElementById('t-join-btn').textContent = role === 'teacher' ? L().create_btn : L().join_btn;
+  document.getElementById('join-error').className = 'join-error';
 }
 
 function joinGame() {
-  const name = document.getElementById('name-input').value.trim();
+  var name = document.getElementById('name-input').value.trim();
   if (!name) { document.getElementById('name-input').focus(); return; }
 
   state.myName = name;
+  state.myKey = sanitizeKey(name);
   state.isTeacher = state.role === 'teacher';
 
-  if (!state.players.includes(name)) {
-    state.players.push(name);
-    state.scores[name] = 0;
-    state.lastChange[name] = 0;
+  if (state.isTeacher) {
+    createRoom();
+  } else {
+    joinExistingRoom();
+  }
+}
+
+// ─── FIREBASE ROOM ──────────────────────────────────────────
+function createRoom() {
+  state.roomCode = generateRoomCode();
+  roomRef(state.roomCode).set({
+    gameType: 'wordheist',
+    status: 'lobby',
+    round: 0,
+    totalRounds: state.totalRounds,
+    timerDuration: state.timerDuration,
+    prompt: '',
+    promptHint: '',
+    correctAnswer: '',
+    roundWinner: '',
+    stolenTotal: 0,
+    startedAt: 0,
+  }).then(function() {
+    document.getElementById('room-code-display').textContent = state.roomCode;
+    document.getElementById('header-info').textContent = 'Room: ' + state.roomCode;
+    document.getElementById('teacher-controls').style.display = 'flex';
+    applyLang();
+    setupListener();
+    showScreen('screen-lobby');
+  });
+}
+
+function joinExistingRoom() {
+  var code = document.getElementById('room-code-input').value.trim().toUpperCase();
+  if (!code || code.length < 4) {
+    document.getElementById('room-code-input').focus();
+    return;
+  }
+  state.roomCode = code;
+
+  roomRef(code).once('value').then(function(snap) {
+    if (!snap.exists() || snap.val().gameType !== 'wordheist') {
+      var err = document.getElementById('join-error');
+      err.textContent = L().room_not_found;
+      err.className = 'join-error show';
+      return;
+    }
+    roomRef(code).child('players/' + state.myKey).set({
+      name: state.myName, score: 0, change: 0
+    }).then(function() {
+      document.getElementById('room-code-display').textContent = state.roomCode;
+      document.getElementById('header-info').textContent = 'Room: ' + state.roomCode;
+      applyLang();
+      setupListener();
+      showScreen('screen-lobby');
+    });
+  });
+}
+
+function setupListener() {
+  roomListener = roomRef(state.roomCode).on('value', function(snap) {
+    var room = snap.val();
+    if (!room) return;
+    onRoomData(room);
+  });
+}
+
+function onRoomData(room) {
+  fbPlayers = room.players || {};
+  renderPlayerList();
+
+  if (room.status !== fbStatus) {
+    fbStatus = room.status;
+    handleStatus(room);
   }
 
-  renderLobby();
-  showScreen('screen-lobby');
-  if (state.isTeacher) {
-    document.getElementById('teacher-controls').style.display = 'flex';
+  if (fbStatus === 'playing') {
+    if (state.isTeacher) {
+      var answered = Object.keys(room.answers || {}).length;
+      var total = Object.keys(fbPlayers).length;
+      document.getElementById('answered-num').textContent = answered;
+      document.getElementById('total-players-num').textContent = total;
+    }
+    renderLiveScoreboard();
+  }
+}
+
+function handleStatus(room) {
+  clearInterval(state.timerInterval);
+  clearInterval(state.countdownInterval);
+
+  switch (fbStatus) {
+    case 'lobby':
+      showScreen('screen-lobby');
+      break;
+    case 'countdown':
+      showScreen('screen-countdown');
+      runCountdown();
+      break;
+    case 'playing':
+      startRoundUI(room);
+      break;
+    case 'between':
+      showBetweenScreen(room);
+      break;
+    case 'results':
+      showResultsScreen();
+      break;
   }
 }
 
 // ─── LOBBY ───────────────────────────────────────────────────
-function renderLobby() {
-  const list = document.getElementById('player-list');
+function renderPlayerList() {
+  var list = document.getElementById('player-list');
+  if (!list) return;
+  var keys = Object.keys(fbPlayers);
   list.innerHTML = '';
-  state.players.forEach(p => {
-    const el = document.createElement('div');
+  keys.forEach(function(key) {
+    var p = fbPlayers[key];
+    var el = document.createElement('div');
     el.className = 'player-item';
-    el.innerHTML = `${avHtml(p,32)}<div class="p-name">${esc(p)}</div><div class="p-pts">💰 ${state.scores[p] || 0}</div>`;
+    el.innerHTML = avHtml(p.name, 32) + '<div class="p-name">' + esc(p.name) + '</div><div class="p-pts">💰 ' + (p.score || 0) + '</div>';
     list.appendChild(el);
   });
-  document.getElementById('lobby-count').textContent = L().players_ready(state.players.length);
-  document.getElementById('player-count-label').textContent = L().players_count(state.players.length);
-  document.getElementById('header-info').textContent = `${state.players.length} in lobby`;
+  var countEl = document.getElementById('lobby-count');
+  if (countEl) countEl.textContent = L().players_ready(keys.length);
+  var labelEl = document.getElementById('player-count-label');
+  if (labelEl) labelEl.textContent = L().players_count(keys.length);
 }
 
 // ─── COUNTDOWN ───────────────────────────────────────────────
 function startCountdown() {
+  if (Object.keys(fbPlayers).length === 0) return;
   state.gameWords = shuffle(WORDS).slice(0, state.totalRounds);
-  state.currentRound = 0;
-  state.players.forEach(p => { state.scores[p] = 0; state.lastChange[p] = 0; });
+  roomRef(state.roomCode).update({ status: 'countdown' });
+}
 
-  showScreen('screen-countdown');
-  let n = 3;
+function runCountdown() {
+  var n = 3;
   document.getElementById('countdown-num').textContent = n;
-
-  const iv = setInterval(() => {
+  state.countdownInterval = setInterval(function() {
     n--;
-    if (n <= 0) { clearInterval(iv); startRound(); }
-    else document.getElementById('countdown-num').textContent = n;
+    if (n <= 0) {
+      clearInterval(state.countdownInterval);
+      if (state.isTeacher) {
+        fbRound = 0;
+        teacherStartRound(0);
+      }
+    } else {
+      document.getElementById('countdown-num').textContent = n;
+    }
   }, 1000);
 }
 
-// ─── GAME ROUND ──────────────────────────────────────────────
-function startRound() {
-  if (state.currentRound >= state.totalRounds) { showResults(); return; }
+// ─── GAME ────────────────────────────────────────────────────
+function teacherStartRound(roundNum) {
+  var word = state.gameWords[roundNum];
+  var updates = {
+    status: 'playing',
+    round: roundNum,
+    prompt: word.no,
+    promptHint: word.hint,
+    correctAnswer: '',
+    roundWinner: '',
+    stolenTotal: 0,
+    startedAt: SERVER_TS,
+    answers: null,
+  };
+  var keys = Object.keys(fbPlayers);
+  keys.forEach(function(k) {
+    updates['players/' + k + '/change'] = 0;
+  });
+  roomRef(state.roomCode).update(updates);
+}
 
-  const word = state.gameWords[state.currentRound];
+function startRoundUI(room) {
   state.answered = false;
-  state.roundWinner = null;
-  state.stolenFrom = [];
-  state.timeLeft = state.timeMax;
+  state.timeLeft = room.timerDuration || state.timerDuration;
+  fbRound = room.round || 0;
 
-  document.getElementById('round-num').textContent = state.currentRound + 1;
-  document.getElementById('current-word').textContent = word.no;
-  document.getElementById('word-hint').textContent = `💡 ${word.hint}`;
-  document.getElementById('answer-input').value = '';
-  document.getElementById('answer-input').disabled = false;
-  document.getElementById('heist-flash').className = 'flash';
-  document.getElementById('my-score-live').textContent = state.scores[state.myName] || 0;
-  document.getElementById('header-info').textContent = `Round ${state.currentRound + 1}/${state.totalRounds}`;
+  document.getElementById('round-num').textContent = fbRound + 1;
+  document.getElementById('current-word').textContent = room.prompt || '';
+  document.getElementById('word-hint').textContent = room.promptHint ? '💡 ' + room.promptHint : '';
+  document.getElementById('header-info').textContent = 'Round ' + (fbRound + 1) + '/' + (room.totalRounds || state.totalRounds);
+
+  if (state.isTeacher) {
+    document.getElementById('answer-wrap').style.display = 'none';
+    document.getElementById('my-score-wrap').style.display = 'none';
+    document.getElementById('answered-wrap').style.display = 'block';
+    document.getElementById('answered-num').textContent = '0';
+    document.getElementById('total-players-num').textContent = Object.keys(fbPlayers).length;
+  } else {
+    document.getElementById('answer-wrap').style.display = 'flex';
+    document.getElementById('my-score-wrap').style.display = 'block';
+    document.getElementById('answered-wrap').style.display = 'none';
+    document.getElementById('answer-input').value = '';
+    document.getElementById('answer-input').disabled = false;
+    document.getElementById('heist-flash').className = 'flash';
+    var me = fbPlayers[state.myKey];
+    if (me) document.getElementById('my-score-live').textContent = me.score || 0;
+  }
 
   renderLiveScoreboard();
   showScreen('screen-game');
-  document.getElementById('answer-input').focus();
+  if (!state.isTeacher) document.getElementById('answer-input').focus();
 
-  const ringEl = document.getElementById('ring-prog');
-  updateRing(12, 12, ringEl);
+  var ringEl = document.getElementById('ring-prog');
+  var dur = room.timerDuration || state.timerDuration;
+  updateRing(dur, dur, ringEl);
   ringEl.style.stroke = 'var(--gold)';
-  document.getElementById('ring-num').textContent = 12;
+  document.getElementById('ring-num').textContent = dur;
 
   clearInterval(state.timerInterval);
-  state.timerInterval = setInterval(() => {
+  state.timerInterval = setInterval(function() {
     state.timeLeft--;
     document.getElementById('ring-num').textContent = state.timeLeft;
-    updateRing(state.timeLeft, state.timeMax, ringEl);
+    updateRing(state.timeLeft, dur, ringEl);
     if (state.timeLeft <= 4) ringEl.style.stroke = 'var(--red)';
     else if (state.timeLeft <= 7) ringEl.style.stroke = 'var(--gold)';
-    if (state.timeLeft <= 0) { clearInterval(state.timerInterval); if (!state.answered) timeOut(); }
+
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timerInterval);
+      if (state.isTeacher) {
+        processRound();
+      } else if (!state.answered) {
+        state.answered = true;
+        document.getElementById('answer-input').disabled = true;
+        var flash = document.getElementById('heist-flash');
+        flash.textContent = L().timeout_msg;
+        flash.className = 'flash show neutral';
+      }
+    }
   }, 1000);
 }
 
 function submitAnswer() {
-  if (state.answered) return;
-  const input = document.getElementById('answer-input').value.trim().toLowerCase();
+  if (state.answered || state.isTeacher) return;
+  var input = document.getElementById('answer-input').value.trim();
   if (!input) return;
 
-  clearInterval(state.timerInterval);
   state.answered = true;
   document.getElementById('answer-input').disabled = true;
-
-  const word = state.gameWords[state.currentRound];
-  const isCorrect = checkAnswer(input, word.en);
-
-  if (isCorrect) {
-    const stealPerPlayer = 30;
-    const timeBonus = Math.round((state.timeLeft / state.timeMax) * 70);
-    let totalStolen = timeBonus;
-
-    state.players.forEach(p => {
-      if (p !== state.myName && (state.scores[p] || 0) > 0) {
-        const stolen = Math.min(stealPerPlayer, state.scores[p]);
-        state.scores[p] = (state.scores[p] || 0) - stolen;
-        state.lastChange[p] = -stolen;
-        totalStolen += stolen;
-        state.stolenFrom.push(p);
-      } else if (p !== state.myName) {
-        state.lastChange[p] = 0;
-      }
-    });
-
-    state.scores[state.myName] = (state.scores[state.myName] || 0) + totalStolen;
-    state.lastChange[state.myName] = totalStolen;
-    state.roundWinner = state.myName;
-
-    const flash = document.getElementById('heist-flash');
-    if (state.stolenFrom.length > 0) {
-      flash.textContent = L().heist_steal(totalStolen, state.stolenFrom.length);
-      flash.className = 'flash show win';
-    } else {
-      flash.textContent = L().heist_correct(totalStolen);
-      flash.className = 'flash show win';
-    }
-  } else {
-    const penalty = 20;
-    state.scores[state.myName] = Math.max(0, (state.scores[state.myName] || 0) - penalty);
-    state.lastChange[state.myName] = -penalty;
-    state.players.forEach(p => { if (p !== state.myName) state.lastChange[p] = 0; });
-
-    const flash = document.getElementById('heist-flash');
-    flash.textContent = L().heist_wrong(penalty, word.en[0]);
-    flash.className = 'flash show lose';
-  }
-
-  document.getElementById('my-score-live').textContent = state.scores[state.myName] || 0;
-  renderLiveScoreboard();
-  setTimeout(() => showBetween(word.en[0]), 1400);
-}
-
-function timeOut() {
-  state.answered = true;
-  document.getElementById('answer-input').disabled = true;
-  const word = state.gameWords[state.currentRound];
-  state.players.forEach(p => { state.lastChange[p] = 0; });
-
-  const flash = document.getElementById('heist-flash');
-  flash.textContent = L().heist_timeout(word.en[0]);
+  var flash = document.getElementById('heist-flash');
+  flash.textContent = L().sent_msg;
   flash.className = 'flash show neutral';
 
-  renderLiveScoreboard();
-  setTimeout(() => showBetween(word.en[0]), 1400);
+  roomRef(state.roomCode).child('answers/' + state.myKey).set({
+    answer: input,
+    ts: SERVER_TS,
+  });
 }
 
 function renderLiveScoreboard() {
-  const sorted = [...state.players].sort((a, b) => (state.scores[b] || 0) - (state.scores[a] || 0));
-  const container = document.getElementById('live-scoreboard');
+  var sorted = getSortedPlayers();
+  var container = document.getElementById('live-scoreboard');
   container.innerHTML = '';
-  sorted.slice(0, 6).forEach((p, i) => {
-    const change = state.lastChange[p] || 0;
-    const isMe = p === state.myName;
-    const el = document.createElement('div');
+  sorted.slice(0, 6).forEach(function(p, i) {
+    var change = p.change || 0;
+    var isMe = p.key === state.myKey;
+    var el = document.createElement('div');
     el.className = 'board-row' + (i === 0 ? ' leader' : '') + (isMe ? ' me' : '');
-    el.innerHTML = `
-      <div class="b-rank ${i === 0 ? 'gold' : ''}">${i === 0 ? '👑' : i + 1}</div>
-      ${avHtml(p,26)}
-      <div class="b-name">${esc(p)}${isMe ? L().you_suffix : ''}</div>
-      <div class="b-pts">${state.scores[p] || 0}</div>
-      <div class="b-chg ${change > 0 ? 'up' : change < 0 ? 'down' : ''}">${change > 0 ? '+' + change : change < 0 ? change : ''}</div>
-    `;
+    el.innerHTML =
+      '<div class="b-rank ' + (i === 0 ? 'gold' : '') + '">' + (i === 0 ? '👑' : i + 1) + '</div>' +
+      avHtml(p.name, 26) +
+      '<div class="b-name">' + esc(p.name) + (isMe ? L().you_suffix : '') + '</div>' +
+      '<div class="b-pts">' + (p.score || 0) + '</div>' +
+      '<div class="b-chg ' + (change > 0 ? 'up' : change < 0 ? 'down' : '') + '">' + (change > 0 ? '+' + change : change < 0 ? change : '') + '</div>';
     container.appendChild(el);
   });
 }
 
+function processRound() {
+  var ref = roomRef(state.roomCode);
+  var word = state.gameWords[fbRound];
+
+  ref.once('value').then(function(snap) {
+    var room = snap.val();
+    if (!room) return;
+    var answers = room.answers || {};
+    var players = room.players || {};
+    var startedAt = room.startedAt || 0;
+    var dur = room.timerDuration || state.timerDuration;
+    var updates = {};
+
+    var sortedSubs = [];
+    Object.keys(answers).forEach(function(key) {
+      var sub = answers[key];
+      if (sub && sub.answer) sortedSubs.push({ key: key, answer: sub.answer, ts: sub.ts || Infinity });
+    });
+    sortedSubs.sort(function(a, b) { return a.ts - b.ts; });
+
+    var firstKey = null;
+    for (var i = 0; i < sortedSubs.length; i++) {
+      if (checkAnswer(sortedSubs[i].answer, word.en)) {
+        firstKey = sortedSubs[i].key;
+        break;
+      }
+    }
+
+    var playerKeys = Object.keys(players);
+    var changes = {};
+    var totalStolen = 0;
+    var stolenCount = 0;
+
+    playerKeys.forEach(function(key) { changes[key] = 0; });
+
+    if (firstKey) {
+      playerKeys.forEach(function(key) {
+        if (key !== firstKey) {
+          var score = players[key].score || 0;
+          var steal = Math.min(30, score);
+          if (steal > 0) {
+            changes[key] -= steal;
+            totalStolen += steal;
+            stolenCount++;
+          }
+        }
+      });
+      var winnerSub = answers[firstKey];
+      var elapsed = startedAt > 0 && winnerSub.ts > 0 ? (winnerSub.ts - startedAt) / 1000 : dur;
+      var timeBonus = Math.max(0, Math.round((dur - elapsed) / dur * 70));
+      changes[firstKey] = totalStolen + timeBonus;
+    }
+
+    sortedSubs.forEach(function(sub) {
+      if (sub.key === firstKey) return;
+      if (checkAnswer(sub.answer, word.en)) {
+        changes[sub.key] += 50;
+      } else {
+        changes[sub.key] -= 20;
+      }
+    });
+
+    playerKeys.forEach(function(key) {
+      var newScore = Math.max(0, (players[key].score || 0) + changes[key]);
+      updates['players/' + key + '/score'] = newScore;
+      updates['players/' + key + '/change'] = changes[key];
+    });
+
+    updates['correctAnswer'] = word.en[0];
+    updates['roundWinner'] = firstKey && players[firstKey] ? players[firstKey].name : '';
+    updates['stolenTotal'] = totalStolen;
+    updates['status'] = 'between';
+    updates['answers'] = null;
+
+    ref.update(updates);
+
+    setTimeout(function() { advanceRound(); }, 2500);
+  });
+}
+
+function advanceRound() {
+  var nextRound = fbRound + 1;
+  if (nextRound >= state.totalRounds) {
+    roomRef(state.roomCode).update({ status: 'results', round: nextRound });
+  } else {
+    fbRound = nextRound;
+    teacherStartRound(nextRound);
+  }
+}
+
 // ─── BETWEEN ROUNDS ──────────────────────────────────────────
-function showBetween(correctAnswer) {
+function showBetweenScreen(room) {
+  var correctAnswer = room.correctAnswer || '';
   document.getElementById('correct-word').textContent = correctAnswer;
 
-  const myChange = state.lastChange[state.myName] || 0;
-  const betweenFlash = document.getElementById('between-flash');
-  if (myChange > 0) {
-    betweenFlash.textContent = L().chg_pos(myChange);
-    betweenFlash.className = 'flash show win';
-  } else if (myChange < 0) {
-    betweenFlash.textContent = L().chg_neg(Math.abs(myChange));
-    betweenFlash.className = 'flash show lose';
+  var remaining = (room.totalRounds || state.totalRounds) - (room.round || 0) - 1;
+  var prefix = remaining > 0 ? L().answer_prefix : L().last_prefix;
+  document.getElementById('between-title').innerHTML = prefix + '<em>' + esc(correctAnswer) + '</em>';
+
+  var betweenFlash = document.getElementById('between-flash');
+  if (state.isTeacher) {
+    if (room.roundWinner) {
+      betweenFlash.textContent = L().between_winner(room.roundWinner, room.stolenTotal || 0);
+      betweenFlash.className = 'flash show win';
+    } else {
+      betweenFlash.textContent = L().between_none;
+      betweenFlash.className = 'flash show neutral';
+    }
   } else {
-    betweenFlash.textContent = L().chg_none;
-    betweenFlash.className = 'flash show neutral';
+    var me = fbPlayers[state.myKey];
+    var myChange = me ? me.change || 0 : 0;
+    var isWinner = room.roundWinner && me && me.name === room.roundWinner;
+    if (isWinner) {
+      var stolenFrom = Object.keys(fbPlayers).length - 1;
+      betweenFlash.textContent = L().heist_steal(myChange, stolenFrom);
+      betweenFlash.className = 'flash show win';
+    } else if (myChange > 0) {
+      betweenFlash.textContent = L().heist_correct(myChange);
+      betweenFlash.className = 'flash show win';
+    } else if (myChange < 0) {
+      betweenFlash.textContent = L().heist_wrong(Math.abs(myChange));
+      betweenFlash.className = 'flash show lose';
+    } else {
+      betweenFlash.textContent = L().heist_none;
+      betweenFlash.className = 'flash show neutral';
+    }
   }
 
-  const sorted = [...state.players].sort((a, b) => (state.scores[b] || 0) - (state.scores[a] || 0));
-  const board = document.getElementById('between-board');
+  var sorted = getSortedPlayers();
+  var board = document.getElementById('between-board');
   board.innerHTML = '';
-  sorted.slice(0, 6).forEach((p, i) => {
-    const el = document.createElement('div');
+  sorted.slice(0, 6).forEach(function(p, i) {
+    var change = p.change || 0;
+    var el = document.createElement('div');
     el.className = 'board-row' + (i === 0 ? ' leader' : '');
-    el.innerHTML = `
-      <div class="b-rank ${i === 0 ? 'gold' : ''}">${i === 0 ? '👑' : i + 1}</div>
-      ${avHtml(p,26)}
-      <div class="b-name">${esc(p)}</div>
-      <div class="b-pts">${state.scores[p] || 0} pts</div>
-    `;
+    el.innerHTML =
+      '<div class="b-rank ' + (i === 0 ? 'gold' : '') + '">' + (i === 0 ? '👑' : i + 1) + '</div>' +
+      avHtml(p.name, 26) +
+      '<div class="b-name">' + esc(p.name) + '</div>' +
+      '<div class="b-pts">' + (p.score || 0) + ' pts</div>' +
+      '<div class="b-chg ' + (change > 0 ? 'up' : change < 0 ? 'down' : '') + '">' + (change > 0 ? '+' + change : change < 0 ? '' + change : '') + '</div>';
     board.appendChild(el);
   });
 
-  const remaining = state.totalRounds - state.currentRound - 1;
-  document.getElementById('between-title').innerHTML = remaining > 0
-    ? `${L().remaining()} <em>${correctAnswer}</em>`
-    : `${L().last_one} <em>${correctAnswer}</em>`;
-
   showScreen('screen-between');
-  state.currentRound++;
-
-  setTimeout(() => {
-    if (state.currentRound >= state.totalRounds) showResults();
-    else startRound();
-  }, 2500);
 }
 
 // ─── RESULTS ─────────────────────────────────────────────────
-function showResults() {
-  const sorted = [...state.players].sort((a, b) => (state.scores[b] || 0) - (state.scores[a] || 0));
+function showResultsScreen() {
+  var sorted = getSortedPlayers();
 
-  const podium = document.getElementById('podium');
+  var podium = document.getElementById('podium');
   podium.innerHTML = '';
-  [[1,'pod2'],[0,'pod1'],[2,'pod3']].forEach(([idx, cls]) => {
-    const p = sorted[idx]; if (!p) return;
-    const d = document.createElement('div');
-    d.className = `pod ${cls}`;
-    d.innerHTML = `<div class="pod-emoji">${['🥇','🥈','🥉'][idx]}</div><div>${esc(p.split(' ')[0])}</div><div style="color:var(--gold);font-family:'DM Mono',monospace;font-size:0.8rem">${state.scores[p] || 0}</div>`;
+  [[1,'pod2'],[0,'pod1'],[2,'pod3']].forEach(function(pair) {
+    var idx = pair[0], cls = pair[1];
+    var p = sorted[idx];
+    if (!p) return;
+    var d = document.createElement('div');
+    d.className = 'pod ' + cls;
+    d.innerHTML = '<div class="pod-emoji">' + ['🥇','🥈','🥉'][idx] + '</div><div>' + esc(p.name.split(' ')[0]) + '</div><div style="color:var(--gold);font-family:\'DM Mono\',monospace;font-size:0.8rem">' + (p.score || 0) + '</div>';
     podium.appendChild(d);
   });
 
-  const final = document.getElementById('final-board');
+  var final = document.getElementById('final-board');
   final.innerHTML = '';
-  sorted.forEach((p, i) => {
-    const el = document.createElement('div');
+  sorted.forEach(function(p, i) {
+    var el = document.createElement('div');
     el.className = 'board-row' + (i === 0 ? ' leader' : '');
-    el.innerHTML = `
-      <div class="b-rank ${i === 0 ? 'gold' : ''}">${i + 1}</div>
-      ${avHtml(p,30)}
-      <div class="b-name">${esc(p)}</div>
-      <div class="b-pts">💰 ${state.scores[p] || 0}</div>
-    `;
+    el.innerHTML =
+      '<div class="b-rank ' + (i === 0 ? 'gold' : '') + '">' + (i + 1) + '</div>' +
+      avHtml(p.name, 30) +
+      '<div class="b-name">' + esc(p.name) + '</div>' +
+      '<div class="b-pts">💰 ' + (p.score || 0) + '</div>';
     final.appendChild(el);
   });
 
   showScreen('screen-results');
 }
 
+function getSortedPlayers() {
+  return Object.keys(fbPlayers).map(function(key) {
+    return { key: key, name: fbPlayers[key].name, score: fbPlayers[key].score || 0, change: fbPlayers[key].change || 0 };
+  }).sort(function(a, b) { return b.score - a.score; });
+}
+
 function resetGame() {
-  state.players.forEach(p => { state.scores[p] = 0; state.lastChange[p] = 0; });
-  state.currentRound = 0;
-  renderLobby();
-  showScreen('screen-lobby');
+  if (state.isTeacher) {
+    var updates = { status: 'lobby', round: 0, prompt: '', promptHint: '', correctAnswer: '', roundWinner: '', stolenTotal: 0, answers: null };
+    Object.keys(fbPlayers).forEach(function(k) {
+      updates['players/' + k + '/score'] = 0;
+      updates['players/' + k + '/change'] = 0;
+    });
+    state.gameWords = [];
+    roomRef(state.roomCode).update(updates);
+  }
+}
+
+function backToStart() {
+  clearInterval(state.timerInterval);
+  clearInterval(state.countdownInterval);
+  if (roomListener) {
+    roomRef(state.roomCode).off('value', roomListener);
+    roomListener = null;
+  }
+  if (!state.isTeacher && state.roomCode && state.myKey) {
+    roomRef(state.roomCode).child('players/' + state.myKey).remove();
+  }
+  fbPlayers = {};
+  fbRound = 0;
+  fbStatus = '';
+  state.roomCode = '';
+  state.gameWords = [];
+  document.getElementById('header-info').textContent = 'Clashroom';
+  showScreen('screen-role');
 }
 
 // ─── KEYBOARD ────────────────────────────────────────────────
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
-    const active = document.querySelector('.screen.active');
-    if (active?.id === 'screen-game') submitAnswer();
-    if (active?.id === 'screen-role') joinGame();
+    var active = document.querySelector('.screen.active');
+    if (active && active.id === 'screen-game') submitAnswer();
+    if (active && active.id === 'screen-role') joinGame();
   }
 });
 
