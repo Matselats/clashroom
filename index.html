@@ -1,529 +1,387 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clashroom – Game-Based Learning</title>
+<title>Clashroom — Gratis klasseromsspill for ungdomsskolen</title>
+<meta name="description" content="Gratis klasseromsspill for ungdomsskolen. Under utvikling.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
+:root {
+  --bg: #faf9f5;
+  --ink: #1a1a1a;
+  --accent: #c26b47;
+  --accent-h: #a85a39;
+  --muted: #71706a;
+  --faint: #b0afa8;
+  --border: #e3dfd6;
+}
 
-  :root {
-    --bg: #f0f0ff;
-    --ink: #1a1a2e;
-    --purple: #6c31e3;
-    --pink: #e63a8a;
-    --orange: #f77f00;
-    --green: #22c55e;
-    --blue: #2176ae;
-    --teal: #0d9488;
-    --red: #e63946;
-    --white: #ffffff;
-    --muted: #6b7280;
-    --border: #e5e7eb;
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── NAV ───────────────────────────── */
+nav{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:20px 40px;position:sticky;top:0;
+  background:var(--bg);z-index:100;
+}
+.logo{
+  font-family:'Bricolage Grotesque',sans-serif;font-weight:700;
+  font-size:1.15rem;color:var(--ink);text-decoration:none;
+  transition:color .15s;
+}
+.logo:hover{color:var(--accent)}
+.nav-r{display:flex;align-items:center;gap:4px}
+.lang-btn{
+  padding:5px 10px;border:none;background:none;
+  color:var(--faint);cursor:pointer;
+  font-family:'Inter',sans-serif;font-weight:500;font-size:.8rem;
+  border-radius:6px;transition:all .15s;
+}
+.lang-btn.on{color:var(--ink);background:rgba(0,0,0,.06)}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    min-height: 100vh;
-  }
+/* ── HERO ──────────────────────────── */
+.hero{
+  max-width:740px;
+  padding:100px 40px 96px;
+}
+.hero h1{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;
+  font-size:clamp(2.2rem,5vw,3.4rem);
+  line-height:1.06;letter-spacing:-.025em;
+  margin-bottom:28px;
+}
+.hero h1 .ul{
+  background-image:linear-gradient(var(--accent),var(--accent));
+  background-position:0 88%;
+  background-size:100% .12em;
+  background-repeat:no-repeat;
+  transition:background-size .3s ease;
+}
+.hero:hover h1 .ul{background-size:100% .25em}
 
-  nav {
-    background: var(--purple);
-    padding: 0 32px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 64px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 12px rgba(108,49,227,0.3);
-  }
+.hero-p{
+  font-size:1.05rem;line-height:1.7;color:var(--muted);
+  max-width:520px;margin-bottom:36px;
+}
+.launch{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.85rem;font-weight:500;color:var(--accent);
+}
+.launch svg{flex-shrink:0}
 
-  .logo {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.5rem;
-    letter-spacing: -0.04em;
-    color: white;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+/* ── SECTION LABEL ─────────────────── */
+.label{
+  font-size:.72rem;font-weight:500;
+  text-transform:uppercase;letter-spacing:.12em;
+  color:var(--faint);margin-bottom:32px;
+}
 
-  .logo-icon {
-    background: white;
-    color: var(--purple);
-    width: 34px; height: 34px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    font-weight: 800;
-  }
+/* ── GAME LIST ─────────────────────── */
+.games{padding:0 40px 96px;max-width:900px}
 
-  .nav-tag {
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.75);
-    background: rgba(255,255,255,0.15);
-    padding: 5px 14px;
-    border-radius: 20px;
-    font-weight: 500;
-  }
+.g-list{list-style:none}
 
-  .hero {
-    background: linear-gradient(135deg, var(--purple) 0%, #9333ea 50%, var(--pink) 100%);
-    padding: 64px 24px 80px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
+.g-item{
+  display:block;text-decoration:none;color:var(--ink);
+  padding:26px 0;border-bottom:1px solid var(--border);
+  position:relative;transition:padding-left .3s ease;
+}
+.g-item:first-child{border-top:1px solid var(--border)}
 
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.05) 0%, transparent 50%),
-                      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.05) 0%, transparent 40%);
-  }
+.g-item::before{
+  content:'';position:absolute;left:-20px;top:50%;
+  transform:translateY(-50%);width:3px;height:0;
+  background:var(--accent);border-radius:2px;
+  transition:height .3s ease;
+}
+.g-item:hover{padding-left:16px}
+.g-item:hover::before{height:50%}
 
-  .hero-content { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
+.g-top{
+  display:flex;justify-content:space-between;align-items:baseline;
+  margin-bottom:4px;
+}
+.g-name{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:700;font-size:1.15rem;
+}
+.g-subj{font-size:.78rem;font-weight:500;color:var(--faint)}
 
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255,255,255,0.2);
-    color: white;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    margin-bottom: 20px;
-  }
+.g-bot{
+  display:flex;justify-content:space-between;align-items:center;
+}
+.g-desc{font-size:.88rem;color:var(--muted);line-height:1.5}
+.g-arrow{
+  flex-shrink:0;color:var(--faint);
+  transition:all .3s ease;margin-left:16px;
+}
+.g-item:hover .g-arrow{color:var(--accent);transform:translateX(5px)}
 
-  .hero h1 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: clamp(2.4rem, 7vw, 4rem);
-    letter-spacing: -0.05em;
-    color: white;
-    line-height: 1.0;
-    margin-bottom: 16px;
-  }
+/* ── TOOLS ─────────────────────────── */
+.tools{padding:0 40px 96px;max-width:900px}
 
-  .hero-sub {
-    font-size: 1.05rem;
-    color: rgba(255,255,255,0.85);
-    line-height: 1.6;
-    max-width: 460px;
-    margin: 0 auto 36px;
-  }
+.t-item{
+  display:flex;align-items:flex-start;gap:16px;
+  text-decoration:none;color:var(--ink);
+  padding:26px 0;border-bottom:1px solid var(--border);
+  transition:padding-left .3s ease;position:relative;
+}
+.t-item:first-child{border-top:1px solid var(--border)}
+.t-item::before{
+  content:'';position:absolute;left:-20px;top:50%;
+  transform:translateY(-50%);width:3px;height:0;
+  background:var(--accent);border-radius:2px;
+  transition:height .3s ease;
+}
+.t-item:hover{padding-left:16px}
+.t-item:hover::before{height:50%}
 
-  .hero-stats {
-    display: inline-flex;
-    gap: 32px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 16px;
-    padding: 16px 28px;
-  }
+.t-icon{
+  flex-shrink:0;width:40px;height:40px;
+  border:1.5px solid var(--border);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);transition:all .3s ease;
+}
+.t-item:hover .t-icon{border-color:var(--accent);color:var(--accent)}
 
-  .hstat { text-align: center; }
-  .hstat-num { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: white; display: block; }
-  .hstat-label { font-size: 0.75rem; color: rgba(255,255,255,0.7); margin-top: 2px; }
+.t-body{flex:1;min-width:0}
+.t-name{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:700;font-size:1.05rem;margin-bottom:3px;
+}
+.t-desc{font-size:.85rem;color:var(--muted);line-height:1.5}
+.t-arrow{
+  flex-shrink:0;align-self:center;color:var(--faint);
+  transition:all .3s ease;
+}
+.t-item:hover .t-arrow{color:var(--accent);transform:translateX(5px)}
 
-  .wave {
-    display: block;
-    width: 100%;
-    height: 50px;
-    background: var(--bg);
-    clip-path: ellipse(55% 100% at 50% 100%);
-    margin-top: -1px;
-  }
+/* ── WHY ───────────────────────────── */
+.why{padding:80px 40px 96px;max-width:620px}
+.why h2{
+  font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:700;font-size:1.5rem;line-height:1.15;
+  margin-bottom:20px;
+}
+.why p{
+  font-size:.95rem;color:var(--muted);line-height:1.75;
+  margin-bottom:16px;
+}
+.why p:last-of-type{margin-bottom:0}
 
-  main { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+/* ── TRY ───────────────────────────── */
+.try{
+  padding:48px 40px 64px;max-width:620px;
+  font-size:1rem;color:var(--muted);
+}
+.try a{
+  color:var(--accent);text-decoration:none;font-weight:500;
+  border-bottom:1.5px solid transparent;
+  transition:border-color .2s;
+}
+.try a:hover{border-color:var(--accent)}
 
-  .section-head { margin-bottom: 20px; }
-  .section-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; letter-spacing: -0.03em; }
-  .section-sub { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
+/* ── FOOTER ────────────────────────── */
+footer{
+  padding:40px;border-top:1px solid var(--border);
+  font-size:.82rem;color:var(--faint);
+}
+footer a{color:var(--muted);text-decoration:none}
+footer a:hover{color:var(--ink)}
 
-  .subject-tabs {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 28px;
-  }
+/* ── SCROLL REVEAL ─────────────────── */
+.sr{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.sr.v{opacity:1;transform:translateY(0)}
+.g-list .sr:nth-child(2){transition-delay:.06s}
+.g-list .sr:nth-child(3){transition-delay:.12s}
+.g-list .sr:nth-child(4){transition-delay:.14s}
+.g-list .sr:nth-child(5){transition-delay:.18s}
+.g-list .sr:nth-child(6){transition-delay:.22s}
 
-  .tab {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 18px;
-    border-radius: 12px;
-    border: 2px solid var(--border);
-    background: white;
-    font-weight: 600;
-    font-size: 0.88rem;
-    cursor: pointer;
-    transition: all 0.18s;
-    color: var(--ink);
-    font-family: 'DM Sans', sans-serif;
-  }
-  .tab:hover { border-color: var(--purple); color: var(--purple); }
-  .tab.active { background: var(--purple); border-color: var(--purple); color: white; }
-
-  .games-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 16px;
-  }
-
-  .game-card {
-    background: white;
-    border-radius: 20px;
-    overflow: hidden;
-    text-decoration: none;
-    color: var(--ink);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    transition: all 0.22s;
-    border: 2px solid transparent;
-    display: flex;
-    flex-direction: column;
-  }
-  .game-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
-    border-color: var(--cc, var(--purple));
-  }
-
-  .card-top {
-    height: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3.5rem;
-    position: relative;
-    background: var(--cb, #f3f0ff);
-  }
-
-  .card-subject-tag {
-    position: absolute;
-    top: 12px; right: 12px;
-    font-size: 0.68rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 3px 10px;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.9);
-    color: var(--cc, var(--purple));
-  }
-
-  .card-type-tag {
-    position: absolute;
-    top: 12px; left: 12px;
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 8px;
-    background: rgba(0,0,0,0.18);
-    color: white;
-  }
-
-  .card-body {
-    padding: 18px 20px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex: 1;
-  }
-
-  .card-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.02em; }
-  .card-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.5; flex: 1; }
-
-  .card-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
-  .meta-chip { font-size: 0.72rem; color: var(--muted); background: #f3f4f6; padding: 3px 9px; border-radius: 6px; font-weight: 500; }
-
-  .play-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--border);
-  }
-
-  .play-label { font-weight: 700; font-size: 0.85rem; color: var(--cc, var(--purple)); }
-
-  .play-arrow {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    background: var(--cc, var(--purple));
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.9rem;
-    transition: transform 0.15s;
-  }
-  .game-card:hover .play-arrow { transform: translateX(3px); }
-
-  .game-card.coming { opacity: 0.5; pointer-events: none; }
-  .coming-banner { background: #f3f4f6; color: var(--muted); font-size: 0.72rem; font-weight: 700; text-align: center; padding: 7px; text-transform: uppercase; letter-spacing: 0.1em; }
-
-  .subject-section { display: none; }
-  .subject-section.active { display: block; }
-
-  .how-section {
-    background: white;
-    border-radius: 24px;
-    padding: 40px 32px;
-    margin-top: 48px;
-    border: 2px solid var(--border);
-  }
-
-  .how-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.03em; margin-bottom: 28px; text-align: center; }
-
-  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; }
-
-  .step { text-align: center; padding: 20px 14px; border-radius: 16px; background: var(--bg); }
-  .step-num { width: 44px; height: 44px; border-radius: 50%; background: var(--purple); color: white; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
-  .step-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; }
-  .step-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
-
-  footer { background: var(--ink); color: rgba(255,255,255,0.5); text-align: center; padding: 28px 24px; font-size: 0.82rem; }
-  footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
-  footer strong { color: white; }
-
-  @media (max-width: 480px) {
-    .hero { padding: 48px 20px 64px; }
-    .hero-stats { gap: 20px; padding: 14px 20px; }
-    .games-grid { grid-template-columns: 1fr; }
-    nav { padding: 0 16px; }
-  }
+/* ── RESPONSIVE ────────────────────── */
+@media(max-width:700px){
+  nav{padding:16px 20px}
+  .hero{padding:64px 20px 64px}
+  .games,.tools{padding:0 20px 72px}
+  .why{padding:56px 20px 72px}
+  .try{padding:0 20px 48px}
+  footer{padding:32px 20px}
+  .g-item::before,.t-item::before{left:-12px}
+}
 </style>
 </head>
 <body>
 
 <nav>
-  <a class="logo" href="#">
-    <div class="logo-icon">C</div>
-    Clashroom
-  </a>
-  <span class="nav-tag">🆓 Free for teachers</span>
+  <a class="logo" href="#">Clashroom</a>
+  <div class="nav-r">
+    <button class="lang-btn on" onclick="setLang('no')">NO</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+  </div>
 </nav>
 
-<div class="hero">
-  <div class="hero-content">
-    <div class="hero-badge">⚡ Game-based learning for Norwegian classrooms</div>
-    <h1>Learning that hits different.</h1>
-    <p class="hero-sub">Free classroom games that make students compete to learn. No login. No download. Just share the link.</p>
-    <div class="hero-stats">
-      <div class="hstat"><span class="hstat-num">5</span><div class="hstat-label">Games live</div></div>
-      <div class="hstat"><span class="hstat-num">30</span><div class="hstat-label">Players/game</div></div>
-      <div class="hstat"><span class="hstat-num">100%</span><div class="hstat-label">Free</div></div>
-    </div>
-  </div>
-</div>
-<div class="wave"></div>
+<section class="hero">
+  <h1 data-no="Vi bygger <span class='ul'>gratis</span> klasseromsspill for ungdomsskolen."
+      data-en="We're building <span class='ul'>free</span> classroom games for Norwegian middle school.">Vi bygger <span class="ul">gratis</span> klasseromsspill for ungdomsskolen.</h1>
+  <p class="hero-p" data-no="Det finnes få gode, gratis verktøy for lærere som vil gjøre timene mer engasjerende. Vi prøver å fikse det&nbsp;— ett spill om gangen."
+     data-en="There are few good, free tools for teachers who want more engaging lessons. We're trying to fix that&nbsp;— one game at a time.">Det finnes få gode, gratis verktøy for lærere som vil gjøre timene mer engasjerende. Vi prøver å fikse det&nbsp;— ett spill om gangen.</p>
+  <p class="launch" data-no="<svg width='8' height='8' viewBox='0 0 8 8'><circle cx='4' cy='4' r='4' fill='currentColor'/></svg> Lanseres høsten 2026"
+     data-en="<svg width='8' height='8' viewBox='0 0 8 8'><circle cx='4' cy='4' r='4' fill='currentColor'/></svg> Launching fall 2026"><svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="currentColor"/></svg> Lanseres høsten 2026</p>
+</section>
 
-<main>
-  <div class="section-head">
-    <div class="section-title">Browse by subject</div>
-    <div class="section-sub">Pick a subject to find the right game for your class</div>
-  </div>
+<section class="games" id="spill">
+  <div class="label" data-no="Spill" data-en="Games">Spill</div>
+  <ul class="g-list">
 
-  <div class="subject-tabs">
-    <button class="tab active" onclick="filterSubject('all', this)">🎮 All games</button>
-    <button class="tab" onclick="filterSubject('norsk', this)">📝 Norsk</button>
-    <button class="tab" onclick="filterSubject('english', this)">🇬🇧 English</button>
-    <button class="tab" onclick="filterSubject('maths', this)">🔢 Maths</button>
-    <button class="tab" onclick="filterSubject('tools', this)">🛠️ Lærerverktøy</button>
-  </div>
-
-  <div class="subject-section active" id="section-all">
-    <div class="games-grid">
-      <a class="game-card" href="stavekrig.html" style="--cc:#22c55e;--cb:#f0fdf4;">
-        <div class="card-top"><div class="card-type-tag">👥 Multiplayer</div><div class="card-subject-tag">Norsk</div>⚔️</div>
-        <div class="card-body">
-          <div class="card-title">Stavekrig</div>
-          <div class="card-desc">Oversett bokmål til nynorsk raskere enn motstanderne og klatr til topps på poengtavlen.</div>
-          <div class="card-meta"><span class="meta-chip">⏱ 15 sek/ord</span><span class="meta-chip">📚 8. trinn</span><span class="meta-chip">🎯 10 ord</span></div>
-          <div class="play-row"><span class="play-label">Spill nå</span><div class="play-arrow">→</div></div>
-        </div>
-      </a>
-      <a class="game-card" href="detective.html" style="--cc:#f77f00;--cb:#fff7ed;">
-        <div class="card-top"><div class="card-type-tag">🎯 Solo</div><div class="card-subject-tag">English</div>🔍</div>
-        <div class="card-body">
-          <div class="card-title">Clashroom Detective</div>
-          <div class="card-desc">Read crime reports, collect clues, and solve five mysteries. Reading comprehension in disguise.</div>
-          <div class="card-meta"><span class="meta-chip">📖 5 cases</span><span class="meta-chip">📚 8–10th grade</span><span class="meta-chip">🔍 Clues</span></div>
-          <div class="play-row"><span class="play-label">Play now</span><div class="play-arrow">→</div></div>
-        </div>
-      </a>
-      <a class="game-card" href="wordheist.html" style="--cc:#e63a8a;--cb:#fdf2f8;">
-        <div class="card-top"><div class="card-type-tag">👥 Multiplayer</div><div class="card-subject-tag">English</div>💰</div>
-        <div class="card-body">
-          <div class="card-title">Word Heist</div>
-          <div class="card-desc">Translate Norwegian to English fastest — and steal points from every other player in the room.</div>
-          <div class="card-meta"><span class="meta-chip">⚡ 12 sek/ord</span><span class="meta-chip">📚 8–10th grade</span><span class="meta-chip">🏆 30 players</span></div>
-          <div class="play-row"><span class="play-label">Play now</span><div class="play-arrow">→</div></div>
-        </div>
-      </a>
-      <a class="game-card" href="grammarduell.html" style="--cc:#2176ae;--cb:#eff6ff;">
-        <div class="card-top"><div class="card-type-tag">👥 Multiplayer</div><div class="card-subject-tag">English</div>🧠</div>
-        <div class="card-body">
-          <div class="card-title">Grammar Duel</div>
-          <div class="card-desc">Pick the correct verb form faster than your classmates. Tenses, conditionals, perfect forms — all in one battle.</div>
-          <div class="card-meta"><span class="meta-chip">⚡ 15 sek/spørsmål</span><span class="meta-chip">📚 9. trinn</span><span class="meta-chip">🎯 Verb tenses</span></div>
-          <div class="play-row"><span class="play-label">Play now</span><div class="play-arrow">→</div></div>
-        </div>
-      </a>
-      <a class="game-card" href="mathblitz.html" style="--cc:#0d9488;--cb:#f0fdfa;">
-        <div class="card-top"><div class="card-type-tag">👥 Multiplayer</div><div class="card-subject-tag">Maths</div>🔢</div>
-        <div class="card-body">
-          <div class="card-title">Math Blitz</div>
-          <div class="card-desc">Mental arithmetic at full speed. Race your classmates to the answer before time runs out.</div>
-          <div class="card-meta"><span class="meta-chip">⚡ 10 sek/oppgave</span><span class="meta-chip">📚 8–10. trinn</span><span class="meta-chip">🔢 Maths</span></div>
-          <div class="play-row"><span class="play-label">Play now</span><div class="play-arrow">→</div></div>
-        </div>
-      </a>
-      <div class="game-card coming" style="--cc:#22c55e;--cb:#f0fdf4;">
-        <div class="card-top"><div class="card-type-tag">🎯 Solo</div><div class="card-subject-tag">Norsk</div>📖</div>
-        <div class="card-body">
-          <div class="card-title">Sjanger-jakten</div>
-          <div class="card-desc">Les tekstutdrag og avgjør hvilken sjanger det er. Novelle, kåseri, artikkel eller dikt?</div>
-          <div class="card-meta"><span class="meta-chip">📚 Norsk</span><span class="meta-chip">🎯 Sjanger</span></div>
-        </div>
-        <div class="coming-banner">Coming soon</div>
+    <li class="sr"><a class="g-item" href="stavekrig.html">
+      <div class="g-top">
+        <span class="g-name">Stavekrig</span>
+        <span class="g-subj" data-no="Norsk" data-en="Norwegian">Norsk</span>
       </div>
-    </div>
-  </div>
-
-  <div class="subject-section" id="section-norsk">
-    <div class="games-grid">
-      <a class="game-card" href="stavekrig.html" style="--cc:#22c55e;--cb:#f0fdf4;">
-        <div class="card-top"><div class="card-type-tag">👥 Multiplayer</div><div class="card-subject-tag">Norsk</div>⚔️</div>
-        <div class="card-body">
-          <div class="card-title">Stavekrig</div>
-          <div class="card-desc">Oversett bokmål til nynorsk raskere enn motstanderne.</div>
-          <div class="card-meta"><span class="meta-chip">⏱ 15 sek/ord</span><span class="meta-chip">📚 8. trinn</span></div>
-          <div class="play-row"><span class="play-label">Spill nå</span><div class="play-arrow">→</div></div>
-        </div>
-      </a>
-      <div class="game-card coming" style="--cc:#22c55e;--cb:#f0fdf4;">
-        <div class="card-top"><div class="card-type-tag">🎯 Solo</div><div class="card-subject-tag">Norsk</div>📖</div>
-        <div class="card-body">
-          <div class="card-title">Sjanger-jakten</div>
-          <div class="card-desc">Gjenkjenn sjanger fra tekstutdrag.</div>
-          <div class="card-meta"><span class="meta-chip">📚 Norsk</span></div>
-        </div>
-        <div class="coming-banner">Coming soon</div>
+      <div class="g-bot">
+        <span class="g-desc" data-no="Oversett bokmål til nynorsk raskere enn resten av klassen."
+              data-en="Translate bokmål to nynorsk faster than your classmates.">Oversett bokmål til nynorsk raskere enn resten av klassen.</span>
+        <svg class="g-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
       </div>
-    </div>
-  </div>
+    </a></li>
 
-  <div class="subject-section" id="section-english">
-    <div class="games-grid">
-      <a class="game-card" href="detective.html" style="--cc:#f77f00;--cb:#fff7ed;">
-        <div class="card-top"><div class="card-type-tag">🎯 Solo</div><div class="card-subject-tag">English</div>🔍</div>
-        <div class="card-body">
-          <div class="card-title">Clashroom Detective</div>
-          <div class="card-desc">Read crime reports, collect clues, and solve five mysteries.</div>
-          <div class="card-meta"><span class="meta-chip">📖 5 cases</span><span class="meta-chip">8–10th grade</span></div>
-          <div class="play-row"><span class="play-label">Play now</span><div class="play-arrow">→</div></div>
-        </div>
-      </a>
-      <a class="game-card" href="wordheist.html" style="--cc:#e63a8a;--cb:#fdf2f8;">
-        <div class="card-top"><div class="card-type-tag">👥 Multiplayer</div><div class="card-subject-tag">English</div>💰</div>
-        <div class="card-body">
-          <div class="card-title">Word Heist</div>
-          <div class="card-desc">Translate Norwegian to English fastest and steal points.</div>
-          <div class="card-meta"><span class="meta-chip">⚡ Fast-paced</span><span class="meta-chip">30 players</span></div>
-          <div class="play-row"><span class="play-label">Play now</span><div class="play-arrow">→</div></div>
-        </div>
-      </a>
-      <a class="game-card" href="grammarduell.html" style="--cc:#2176ae;--cb:#eff6ff;">
-        <div class="card-top"><div class="card-type-tag">👥 Multiplayer</div><div class="card-subject-tag">English</div>🧠</div>
-        <div class="card-body">
-          <div class="card-title">Grammar Duel</div>
-          <div class="card-desc">Pick the correct verb form faster than your classmates. Tenses, conditionals, perfect forms — all in one battle.</div>
-          <div class="card-meta"><span class="meta-chip">⚡ 15 sek/spørsmål</span><span class="meta-chip">📚 9. trinn</span><span class="meta-chip">🎯 Verb tenses</span></div>
-          <div class="play-row"><span class="play-label">Play now</span><div class="play-arrow">→</div></div>
-        </div>
-      </a>
-    </div>
-  </div>
+    <li class="sr"><a class="g-item" href="ordjakten.html">
+      <div class="g-top">
+        <span class="g-name">Ordjakten</span>
+        <span class="g-subj" data-no="Norsk" data-en="Norwegian">Norsk</span>
+      </div>
+      <div class="g-bot">
+        <span class="g-desc" data-no="Finn riktig synonym blant fire alternativer. 30 norske ord under tidspress."
+              data-en="Pick the right synonym from four options. 30 Norwegian words under time pressure.">Finn riktig synonym blant fire alternativer. 30 norske ord under tidspress.</span>
+        <svg class="g-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      </div>
+    </a></li>
 
-  <div class="subject-section" id="section-maths">
-    <div class="games-grid">
-      <a class="game-card" href="mathblitz.html" style="--cc:#0d9488;--cb:#f0fdfa;">
-        <div class="card-top"><div class="card-type-tag">👥 Multiplayer</div><div class="card-subject-tag">Maths</div>🔢</div>
-        <div class="card-body">
-          <div class="card-title">Math Blitz</div>
-          <div class="card-desc">Mental arithmetic at full speed. Race your classmates to the answer before time runs out.</div>
-          <div class="card-meta"><span class="meta-chip">⚡ 10 sek/oppgave</span><span class="meta-chip">📚 8–10. trinn</span></div>
-          <div class="play-row"><span class="play-label">Play now</span><div class="play-arrow">→</div></div>
-        </div>
-      </a>
-    </div>
-  </div>
+    <li class="sr"><a class="g-item" href="grammarduell.html">
+      <div class="g-top">
+        <span class="g-name">Grammar Duel</span>
+        <span class="g-subj">English</span>
+      </div>
+      <div class="g-bot">
+        <span class="g-desc" data-no="Velg riktig tempus og grammatikk under tidspress."
+              data-en="Pick the right tense and grammar before time runs out.">Velg riktig tempus og grammatikk under tidspress.</span>
+        <svg class="g-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      </div>
+    </a></li>
 
-  <div class="subject-section" id="section-tools">
-    <div class="section-head" style="margin-bottom:16px;">
-      <div class="section-sub">Tools for the teacher — not the students. No login, no fuss.</div>
-    </div>
-    <div class="games-grid">
-      <a class="game-card" href="klassekart.html" style="--cc:#6c31e3;--cb:#f3f0ff;">
-        <div class="card-top"><div class="card-type-tag">🛠️ Verktøy</div><div class="card-subject-tag">Alle fag</div>🪑</div>
-        <div class="card-body">
-          <div class="card-title">Klassekart</div>
-          <div class="card-desc">Lim inn elevnavn og få et tilfeldig sittekart på sekunder. Sett begrensninger og regenerer med ett klikk.</div>
-          <div class="card-meta"><span class="meta-chip">👥 Maks 32 elever</span><span class="meta-chip">🖨 Utskriftsvennlig</span></div>
-          <div class="play-row"><span class="play-label">Åpne verktøy</span><div class="play-arrow">→</div></div>
-        </div>
-      </a>
-      <a class="game-card" href="timer.html" style="--cc:#2176ae;--cb:#eff6ff;">
-        <div class="card-top"><div class="card-type-tag">🛠️ Verktøy</div><div class="card-subject-tag">Alle fag</div>⏱</div>
-        <div class="card-body">
-          <div class="card-title">Klassetimer</div>
-          <div class="card-desc">Fullskjerm nedtellingstimer for smartboard. Tre modi: arbeidsøkt, gruppearbeid og prøve — med ulikt fargetema.</div>
-          <div class="card-meta"><span class="meta-chip">🖥 Fullskjerm</span><span class="meta-chip">🔔 Lydsignal</span><span class="meta-chip">⌨ Tastatursnarvei</span></div>
-          <div class="play-row"><span class="play-label">Åpne verktøy</span><div class="play-arrow">→</div></div>
-        </div>
-      </a>
-    </div>
-  </div>
+    <li class="sr"><a class="g-item" href="wordheist.html">
+      <div class="g-top">
+        <span class="g-name">Word Heist</span>
+        <span class="g-subj">English</span>
+      </div>
+      <div class="g-bot">
+        <span class="g-desc" data-no="Oversett norsk til engelsk. Raskest svar stjeler poeng fra alle andre."
+              data-en="Translate Norwegian to English. Fastest answer steals points from everyone.">Oversett norsk til engelsk. Raskest svar stjeler poeng fra alle andre.</span>
+        <svg class="g-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      </div>
+    </a></li>
 
-  <div class="how-section">
-    <div class="how-title">🎮 How it works</div>
-    <div class="steps">
-      <div class="step"><div class="step-num">1</div><div class="step-title">Pick a game</div><div class="step-desc">Choose a game that fits your lesson topic and grade level.</div></div>
-      <div class="step"><div class="step-num">2</div><div class="step-title">Share the link</div><div class="step-desc">Students open it on their own device. No login needed.</div></div>
-      <div class="step"><div class="step-num">3</div><div class="step-title">Start the game</div><div class="step-desc">As teacher, press Start. Students compete in real time.</div></div>
-      <div class="step"><div class="step-num">4</div><div class="step-title">Watch them learn</div><div class="step-desc">Live leaderboard keeps energy high. Best answer wins!</div></div>
+    <li class="sr"><a class="g-item" href="detective.html">
+      <div class="g-top">
+        <span class="g-name">Clashroom Detective</span>
+        <span class="g-subj">English</span>
+      </div>
+      <div class="g-bot">
+        <span class="g-desc" data-no="Les krimrapporter, samle ledetråder og løs mysteriet."
+              data-en="Read crime reports, collect clues and solve the mystery.">Les krimrapporter, samle ledetråder og løs mysteriet.</span>
+        <svg class="g-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      </div>
+    </a></li>
+
+    <li class="sr"><a class="g-item" href="mathblitz.html">
+      <div class="g-top">
+        <span class="g-name">Math Blitz</span>
+        <span class="g-subj" data-no="Matte" data-en="Maths">Matte</span>
+      </div>
+      <div class="g-bot">
+        <span class="g-desc" data-no="Hoderegning mot klokka. Velg 8., 9. eller 10. trinn."
+              data-en="Mental maths against the clock. Choose grade 8, 9 or 10.">Hoderegning mot klokka. Velg 8., 9. eller 10. trinn.</span>
+        <svg class="g-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      </div>
+    </a></li>
+
+  </ul>
+</section>
+
+<section class="tools" id="verktoy">
+  <div class="label" data-no="Lærerverktøy" data-en="Teacher tools">Lærerverktøy</div>
+
+  <a class="t-item sr" href="klassekart.html">
+    <div class="t-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
     </div>
-  </div>
-</main>
+    <div class="t-body">
+      <div class="t-name" data-no="Klassekart" data-en="Seating chart">Klassekart</div>
+      <div class="t-desc" data-no="Lim inn elevnavn, få tilfeldig sittekart. Sett begrensninger for hvem som ikke kan sitte sammen."
+           data-en="Paste student names, get a random seating chart. Set constraints for who can't sit together.">Lim inn elevnavn, få tilfeldig sittekart. Sett begrensninger for hvem som ikke kan sitte sammen.</div>
+    </div>
+    <svg class="t-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+  </a>
+
+  <a class="t-item sr" href="timer.html">
+    <div class="t-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="13" r="9"/><path d="M12 9v4l2.5 1.5"/><path d="M9 1h6"/><path d="M12 1v3"/>
+      </svg>
+    </div>
+    <div class="t-body">
+      <div class="t-name" data-no="Klassetimer" data-en="Class timer">Klassetimer</div>
+      <div class="t-desc" data-no="Fullskjerm nedtelling for smartboard. Tre moduser med fargetema og lydsignal."
+           data-en="Full-screen countdown for the smartboard. Three modes with colour themes and audio alert.">Fullskjerm nedtelling for smartboard. Tre moduser med fargetema og lydsignal.</div>
+    </div>
+    <svg class="t-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+  </a>
+</section>
+
+<section class="why">
+  <h2 data-no="Hvorfor vi bygger dette" data-en="Why we're building this">Hvorfor vi bygger dette</h2>
+  <p data-no="De beste undervisningsverktøyene koster penger. De gratis alternativene er utdaterte eller dårlige. Lærere bruker for mye tid på ting spillene kan automatisere — poeng, retting, oppfølging — og for lite tid på det som faktisk betyr noe."
+     data-en="The best teaching tools cost money. The free alternatives are outdated or poor. Teachers spend too much time on things games can automate — scores, grading, follow-up — and too little time on what actually matters.">De beste undervisningsverktøyene koster penger. De gratis alternativene er utdaterte eller dårlige. Lærere bruker for mye tid på ting spillene kan automatisere — poeng, retting, oppfølging — og for lite tid på det som faktisk betyr noe.</p>
+  <p data-no="Clashroom er ikke ferdig. Men alt du ser her fungerer allerede, og vi legger til nye spill jevnlig. Målet er en komplett samling med klasseromsspill for ungdomsskolen — gratis, for alltid."
+     data-en="Clashroom isn't finished. But everything you see here works already, and we add new games regularly. The goal is a complete collection of classroom games for middle school — free, forever.">Clashroom er ikke ferdig. Men alt du ser her fungerer allerede, og vi legger til nye spill jevnlig. Målet er en komplett samling med klasseromsspill for ungdomsskolen — gratis, for alltid.</p>
+</section>
+
+<section class="try">
+  <p data-no="Vil du prøve? <a href='stavekrig.html'>Start med Stavekrig</a> — det tar under et minutt."
+     data-en="Want to try? <a href='stavekrig.html'>Start with Stavekrig</a> — it takes less than a minute.">Vil du prøve? <a href="stavekrig.html">Start med Stavekrig</a> — det tar under et minutt.</p>
+</section>
 
 <footer>
-  <strong>Clashroom</strong> · Built by a Norwegian teacher, for Norwegian teachers ·
-  <a href="mailto:hello@clashroom.dev">hello@clashroom.dev</a> · Always free
+  <span data-no="Clashroom · Laget for norske lærere · <a href='mailto:hello@clashroom.dev'>hello@clashroom.dev</a> · Alltid gratis"
+        data-en="Clashroom · Made for Norwegian teachers · <a href='mailto:hello@clashroom.dev'>hello@clashroom.dev</a> · Always free">Clashroom · Laget for norske lærere · <a href="mailto:hello@clashroom.dev">hello@clashroom.dev</a> · Alltid gratis</span>
 </footer>
 
 <script>
-function filterSubject(subject, btn) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.subject-section').forEach(s => s.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('section-' + subject).classList.add('active');
+function setLang(l){
+  localStorage.setItem('clashroom_lang',l);
+  document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('on',b.textContent.toLowerCase()===l)});
+  document.querySelectorAll('[data-'+l+']').forEach(function(el){el.innerHTML=el.getAttribute('data-'+l)});
 }
+
+var lang=localStorage.getItem('clashroom_lang')||'no';
+if(lang!=='no') setLang(lang);
+else document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('on',b.textContent==='NO')});
+
+var obs=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){e.target.classList.add('v');obs.unobserve(e.target)}
+  });
+},{threshold:0.15});
+document.querySelectorAll('.sr').forEach(function(el){obs.observe(el)});
 </script>
 </body>
 </html>
