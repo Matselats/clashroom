@@ -369,10 +369,11 @@ function startCountdown() {
   showScreen('screen-countdown');
   let n = 3;
   document.getElementById('countdown-num').textContent = n;
+  sfxCountdown();
   const iv = setInterval(() => {
     n--;
     if (n<=0) { clearInterval(iv); startRound(); }
-    else document.getElementById('countdown-num').textContent = n;
+    else { document.getElementById('countdown-num').textContent = n; sfxCountdown(); }
   }, 1000);
 }
 
@@ -401,7 +402,7 @@ function startRound() {
     G.timeLeft--;
     document.getElementById('ring-num').textContent = G.timeLeft;
     updateRing(G.timeLeft, TIME_MAX, document.getElementById('ring-prog'));
-    if (G.timeLeft<=3) document.getElementById('ring-prog').style.stroke='var(--red)';
+    if (G.timeLeft<=3) { document.getElementById('ring-prog').style.stroke='var(--red)'; sfxTick(); }
     else if (G.timeLeft<=6) document.getElementById('ring-prog').style.stroke='var(--gold)';
     if (G.timeLeft<=0) { clearInterval(G.timer); if(!G.answered) timeout(q); }
   }, 1000);
@@ -429,13 +430,15 @@ function submitAnswer() {
     G.lastChange[G.myName] = gained;
     G.players.forEach(p => { if (p!==G.myName) G.lastChange[p]=0; });
     flash.textContent = L().flash_correct(gained);
-    flash.className = 'flash show win';
+    flash.className = 'flash show win scale-pop';
+    sfxCorrect();
   } else {
     G.scores[G.myName] = Math.max(0,(G.scores[G.myName]||0)-PENALTY);
     G.lastChange[G.myName] = -PENALTY;
     G.players.forEach(p => { if (p!==G.myName) G.lastChange[p]=0; });
     flash.textContent = L().flash_wrong(PENALTY, q.answer);
-    flash.className = 'flash show lose';
+    flash.className = 'flash show lose shake';
+    sfxWrong();
   }
 
   document.getElementById('my-score-live').textContent = G.scores[G.myName]||0;

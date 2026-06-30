@@ -224,8 +224,8 @@ function startCountdown(){
   G.questions=shuffle(QS).slice(0,ROUNDS);G.round=0;
   G.players.forEach(p=>{G.scores[p]=0;G.lastChange[p]=0});
   showScreen('screen-countdown');let n=3;
-  document.getElementById('countdown-num').textContent=n;
-  const iv=setInterval(()=>{n--;if(n<=0){clearInterval(iv);startRound()}else document.getElementById('countdown-num').textContent=n},1000);
+  document.getElementById('countdown-num').textContent=n;sfxCountdown();
+  const iv=setInterval(()=>{n--;if(n<=0){clearInterval(iv);startRound()}else{document.getElementById('countdown-num').textContent=n;sfxCountdown()}},1000);
 }
 
 function startRound(){
@@ -248,7 +248,7 @@ function startRound(){
   renderBoard();showScreen('screen-game');
   updateRing(TIME_MAX,TIME_MAX,document.getElementById('ring-prog'));document.getElementById('ring-prog').style.stroke='var(--gold)';
   clearInterval(G.timer);
-  G.timer=setInterval(()=>{G.timeLeft--;document.getElementById('ring-num').textContent=G.timeLeft;updateRing(G.timeLeft,TIME_MAX,document.getElementById('ring-prog'));if(G.timeLeft<=3)document.getElementById('ring-prog').style.stroke='var(--red)';else if(G.timeLeft<=6)document.getElementById('ring-prog').style.stroke='var(--gold)';if(G.timeLeft<=0){clearInterval(G.timer);if(!G.answered)timeout(q)}},1000);
+  G.timer=setInterval(()=>{G.timeLeft--;document.getElementById('ring-num').textContent=G.timeLeft;updateRing(G.timeLeft,TIME_MAX,document.getElementById('ring-prog'));if(G.timeLeft<=3){document.getElementById('ring-prog').style.stroke='var(--red)';sfxTick()}else if(G.timeLeft<=6)document.getElementById('ring-prog').style.stroke='var(--gold)';if(G.timeLeft<=0){clearInterval(G.timer);if(!G.answered)timeout(q)}},1000);
 }
 
 function pick(chosen,btn,q){
@@ -260,12 +260,12 @@ function pick(chosen,btn,q){
     btn.classList.add('correct');let gained=100+timeBonus;let stolen=0;const sf=[];
     G.players.forEach(p=>{if(p!==G.myName){if((G.scores[p]||0)>0){const s=Math.min(STEAL_EACH,G.scores[p]);G.scores[p]-=s;G.lastChange[p]=-s;stolen+=s;sf.push(p)}else G.lastChange[p]=0}});
     gained+=stolen;G.scores[G.myName]=(G.scores[G.myName]||0)+gained;G.lastChange[G.myName]=gained;
-    flash.textContent=sf.length>0?L().flash_steal(gained,sf.length):L().flash_correct(gained);flash.className='flash show win';
+    flash.textContent=sf.length>0?L().flash_steal(gained,sf.length):L().flash_correct(gained);flash.className='flash show win scale-pop';sfxCorrect();
   }else{
     btn.classList.add('wrong');document.querySelectorAll('.opt-btn').forEach(b=>{if(b.dataset.v===q.a)b.classList.add('reveal')});
     G.scores[G.myName]=Math.max(0,(G.scores[G.myName]||0)-PENALTY);G.lastChange[G.myName]=-PENALTY;
     G.players.forEach(p=>{if(p!==G.myName)G.lastChange[p]=0});
-    flash.textContent=L().flash_wrong(PENALTY,q.a);flash.className='flash show lose';
+    flash.textContent=L().flash_wrong(PENALTY,q.a);flash.className='flash show lose shake';sfxWrong();
   }
   document.getElementById('my-score-live').textContent=G.scores[G.myName]||0;renderBoard();
   setTimeout(()=>between(q.a),1600);

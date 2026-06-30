@@ -519,6 +519,7 @@ function startCountdown() {
 function runCountdown() {
   var n = 3;
   document.getElementById('countdown-num').textContent = n;
+  sfxCountdown();
   state.countdownInterval = setInterval(function() {
     n--;
     if (n <= 0) {
@@ -529,6 +530,7 @@ function runCountdown() {
       }
     } else {
       document.getElementById('countdown-num').textContent = n;
+      sfxCountdown();
     }
   }, 1000);
 }
@@ -596,7 +598,7 @@ function startRoundUI(room) {
     state.timeLeft--;
     document.getElementById('ring-num').textContent = state.timeLeft;
     updateRing(state.timeLeft, dur, ringEl);
-    if (state.timeLeft <= 4) ringEl.style.stroke = 'var(--red)';
+    if (state.timeLeft <= 4) { ringEl.style.stroke = 'var(--red)'; sfxTick(); }
     else if (state.timeLeft <= 7) ringEl.style.stroke = 'var(--gold)';
 
     if (state.timeLeft <= 0) {
@@ -765,13 +767,17 @@ function showBetweenScreen(room) {
     if (isWinner) {
       var stolenFrom = Object.keys(fbPlayers).length - 1;
       betweenFlash.textContent = L().heist_steal(myChange, stolenFrom);
-      betweenFlash.className = 'flash show win';
+      betweenFlash.className = 'flash show win scale-pop';
+      sfxSteal();
+      spawnConfetti(document.getElementById('screen-between'), 30);
     } else if (myChange > 0) {
       betweenFlash.textContent = L().heist_correct(myChange);
-      betweenFlash.className = 'flash show win';
+      betweenFlash.className = 'flash show win scale-pop';
+      sfxCorrect();
     } else if (myChange < 0) {
       betweenFlash.textContent = L().heist_wrong(Math.abs(myChange));
-      betweenFlash.className = 'flash show lose';
+      betweenFlash.className = 'flash show lose shake';
+      sfxWrong();
     } else {
       betweenFlash.textContent = L().heist_none;
       betweenFlash.className = 'flash show neutral';

@@ -522,6 +522,7 @@ function startCountdown() {
 function runCountdown() {
   var n = 3;
   document.getElementById('countdown-num').textContent = n;
+  sfxCountdown();
   state.countdownInterval = setInterval(function() {
     n--;
     if (n <= 0) {
@@ -532,6 +533,7 @@ function runCountdown() {
       }
     } else {
       document.getElementById('countdown-num').textContent = n;
+      sfxCountdown();
     }
   }, 1000);
 }
@@ -603,7 +605,7 @@ function startRoundUI(room) {
     state.timeLeft--;
     document.getElementById('ring-num').textContent = state.timeLeft;
     updateRing(state.timeLeft, dur, ringEl);
-    if (state.timeLeft <= 5) ringEl.style.stroke = 'var(--red)';
+    if (state.timeLeft <= 5) { ringEl.style.stroke = 'var(--red)'; sfxTick(); }
     else if (state.timeLeft <= 10) ringEl.style.stroke = 'var(--gold)';
 
     if (state.timeLeft <= 0) {
@@ -737,10 +739,15 @@ function showBetweenScreen(room) {
     personalEl.style.display = 'block';
     if (myChange > 0) {
       personalEl.textContent = L().correct_fb(myChange);
-      personalEl.className = 'feedback-banner show correct';
+      personalEl.className = 'feedback-banner show correct scale-pop';
+      sfxCorrect();
+      if ((fbPlayers[state.myKey].streak || 0) >= 3) {
+        spawnConfetti(document.getElementById('screen-between'), 25);
+      }
     } else {
       personalEl.textContent = L().wrong_fb;
-      personalEl.className = 'feedback-banner show wrong';
+      personalEl.className = 'feedback-banner show wrong shake';
+      sfxWrong();
     }
   } else {
     personalEl.style.display = 'none';

@@ -70,6 +70,95 @@ function checkAnswer(input, accepted) {
   return false;
 }
 
+// ─── GAME JUICE — WEB AUDIO API ─────────────────────────────
+
+var _audioCtx = null;
+function _ctx() {
+  if (!_audioCtx) {
+    try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e) { return null; }
+  }
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+
+function _tone(freq, type, dur, vol) {
+  var c = _ctx(); if (!c) return;
+  var o = c.createOscillator();
+  var g = c.createGain();
+  o.type = type || 'sine';
+  o.frequency.value = freq;
+  g.gain.value = vol || 0.12;
+  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(c.currentTime);
+  o.stop(c.currentTime + dur);
+}
+
+function sfxCorrect() {
+  _tone(880, 'sine', 0.12, 0.1);
+  setTimeout(function() { _tone(1100, 'sine', 0.18, 0.1); }, 80);
+}
+
+function sfxWrong() {
+  _tone(200, 'sawtooth', 0.25, 0.08);
+}
+
+function sfxTick() {
+  _tone(600, 'square', 0.05, 0.06);
+}
+
+function sfxSteal() {
+  var c = _ctx(); if (!c) return;
+  var o = c.createOscillator();
+  var g = c.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(300, c.currentTime);
+  o.frequency.exponentialRampToValueAtTime(1200, c.currentTime + 0.25);
+  g.gain.value = 0.1;
+  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.3);
+  o.connect(g); g.connect(c.destination);
+  o.start(c.currentTime);
+  o.stop(c.currentTime + 0.3);
+}
+
+function sfxCountdown() {
+  _tone(440, 'sine', 0.1, 0.08);
+}
+
+// ─── CONFETTI ───────────────────────────────────────────────
+
+function spawnConfetti(container, count) {
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  count = count || 20;
+  var colors = ['#e63946','#f5a623','#2a9d5c','#2176ae','#9b5de5','#f0f0f0'];
+  for (var i = 0; i < count; i++) {
+    var p = document.createElement('div');
+    p.className = 'confetti-particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.animationDuration = (1.2 + Math.random() * 1.2) + 's';
+    p.style.animationDelay = (Math.random() * 0.4) + 's';
+    container.appendChild(p);
+    (function(el) {
+      setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 3000);
+    })(p);
+  }
+}
+
+// ─── SCORE POP ──────────────────────────────────────────────
+
+function showScorePop(container, pts) {
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var el = document.createElement('div');
+  el.className = 'score-pop';
+  el.textContent = (pts >= 0 ? '+' : '') + pts;
+  if (pts < 0) el.classList.add('neg');
+  container.style.position = 'relative';
+  container.appendChild(el);
+  setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 900);
+}
+
 // ─── LANGUAGE ────────────────────────────────────────────────
 
 var _lang = localStorage.getItem('clashroom_lang') || 'no';
