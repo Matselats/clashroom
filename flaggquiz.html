@@ -81,6 +81,7 @@ textarea:focus{outline:none;border-color:var(--accent)}
 .home-link{margin-top:12px;color:var(--muted);font-size:.82rem;text-decoration:none}
 .home-link:hover{color:var(--paper)}
 
+button:focus-visible,.opt:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media(max-width:480px){
   .flag-display{font-size:4.5rem}
   .opts{grid-template-columns:1fr}
@@ -89,8 +90,11 @@ textarea:focus{outline:none;border-color:var(--accent)}
 </head>
 <body>
 
-<button class="lang-btn" onclick="toggleLang()" id="langBtn">EN</button>
+<a class="skip-link" href="#main-content" style="position:absolute;top:-40px;left:0;background:#e63946;color:#fff;padding:8px 16px;z-index:200;font-size:.85rem;text-decoration:none;border-radius:0 0 4px 0;transition:top .2s" onfocus="this.style.top='0'" onblur="this.style.top='-40px'">Hopp til innhold</a>
 
+<button class="lang-btn" onclick="toggleLang()" id="langBtn" aria-label="Bytt språk">EN</button>
+
+<main id="main-content">
 <!-- SETUP -->
 <div class="screen active" id="setup">
   <h1 data-no="Flaggquiz" data-en="Flag Quiz">Flaggquiz</h1>
@@ -335,5 +339,6 @@ function onLangChange(){
 }
 onLangChange();
 </script>
+</main>
 </body>
 </html>

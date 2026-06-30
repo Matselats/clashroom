@@ -477,6 +477,30 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   .score-pop { display: none; }
 }
 
+/* ── ACCESSIBILITY ── */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--accent);
+  color: white;
+  padding: 8px 16px;
+  z-index: 200;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 4px 0;
+  transition: top 0.2s;
+}
+.skip-link:focus { top: 0; }
+
+button:focus-visible, .opt-btn:focus-visible, .role-btn:focus-visible, .lang-btn:focus-visible, input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 400px) {
   .opts-grid { grid-template-columns: 1fr; }

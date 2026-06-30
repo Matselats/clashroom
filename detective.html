@@ -492,15 +492,44 @@
   }
 
   .fade-up { animation: fadeUp 0.4s ease forwards; }
+
+  button:focus-visible, input:focus-visible, select:focus-visible, .clue-span:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 2px;
+  }
+
+  .skip-link {
+    position: absolute; top: -40px; left: 0;
+    background: var(--amber); color: var(--ink);
+    padding: 8px 16px; z-index: 200;
+    font-size: 0.85rem; text-decoration: none;
+    border-radius: 0 0 4px 0; transition: top 0.2s;
+  }
+  .skip-link:focus { top: 0; }
+
+  @media (max-width: 480px) {
+    .board-grid { grid-template-columns: 1fr !important; }
+    .clue-card { padding: 14px; }
+    .guess-btn, .action-btn { font-size: 0.85rem; padding: 10px 16px; }
+    .suspect-card { padding: 14px; }
+    h2 { font-size: 1.3rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fade-up { animation: none; }
+  }
 </style>
 </head>
 <body>
 
+<a class="skip-link" href="#main-content">Skip to content</a>
+
 <header>
   <div class="logo">Clash<span>room</span> 🔍</div>
-  <div class="case-counter" id="header-progress">0 / 5 solved</div>
+  <div class="case-counter" id="header-progress" aria-live="polite">0 / 5 solved</div>
 </header>
 
+<main id="main-content">
 <!-- INTRO SCREEN -->
 <div class="screen active" id="screen-intro">
   <div class="intro-hero">
@@ -1093,5 +1122,6 @@ function resetAll() {
 renderCaseGrid();
 updateHeaderProgress();
 </script>
+</main>
 </body>
 </html>

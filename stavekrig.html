@@ -75,6 +75,8 @@
 </head>
 <body>
 
+<a class="skip-link" href="#main-content">Hopp til innhold</a>
+
 <header>
   <a class="logo" href="index.html">Stave<span>krig</span></a>
   <div class="header-right">
@@ -86,6 +88,7 @@
   </div>
 </header>
 
+<main id="main-content">
 <!-- SCREEN: ROLE SELECT -->
 <div class="screen active" id="screen-role">
   <div style="text-align:center;padding-top:16px;">
@@ -163,7 +166,7 @@
     <button class="send-btn" onclick="submitAnswer()" id="t-send-btn">Send</button>
   </div>
 
-  <div class="feedback-banner" id="feedback-banner"></div>
+  <div class="feedback-banner" id="feedback-banner" role="alert" aria-live="assertive"></div>
 
   <div class="info-row" id="student-info-row">
     <span><span id="t-you-label">Du</span>: <strong id="my-score-info">0 poeng</strong></span>
@@ -176,7 +179,7 @@
 <!-- SCREEN: BETWEEN ROUNDS -->
 <div class="screen" id="screen-between">
   <h1><span id="t-answer-label">Svar</span>: <em id="correct-answer-show"></em></h1>
-  <div class="feedback-banner show" id="between-personal" style="display:none;"></div>
+  <div class="feedback-banner show" id="between-personal" role="alert" aria-live="assertive" style="display:none;"></div>
   <p class="sub" id="between-msg">Neste ord kommer snart...</p>
   <div style="width:100%;display:flex;flex-direction:column;gap:8px;" id="mini-scoreboard"></div>
 </div>
@@ -858,5 +861,6 @@ document.addEventListener('keydown', function(e) {
 // ─── INIT ────────────────────────────────────────────────────
 applyLang();
 </script>
+</main>
 </body>
 </html>

@@ -159,6 +159,26 @@ function showScorePop(container, pts) {
   setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 900);
 }
 
+// ─── ACCESSIBILITY ──────────────────────────────────────────
+
+function setupA11y() {
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var active = document.querySelector('.screen.active');
+      if (active && active.id !== 'screen-setup' && active.id !== 'screen-start') {
+        var home = document.querySelector('.home-link');
+        if (home) home.click();
+      }
+    }
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupA11y);
+} else {
+  setupA11y();
+}
+
 // ─── LANGUAGE ────────────────────────────────────────────────
 
 var _lang = localStorage.getItem('clashroom_lang') || 'no';

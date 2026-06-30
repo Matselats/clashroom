@@ -11,6 +11,8 @@
 </head>
 <body>
 
+<a class="skip-link" href="#main-content">Hopp til innhold</a>
+
 <header>
   <a class="logo" href="index.html">Ord<span>jakten</span> 📖</a>
   <div class="header-right">
@@ -19,6 +21,7 @@
   </div>
 </header>
 
+<main id="main-content">
 <div class="screen active" id="screen-role">
   <div style="text-align:center;padding-top:16px"><div style="font-size:2.8rem;margin-bottom:14px">📖</div>
   <h1>Ord<em>jakten</em></h1>
@@ -66,7 +69,7 @@
     <div class="q-hint" id="q-hint"></div>
   </div>
   <div class="opts-grid" id="opts-grid"></div>
-  <div class="flash" id="game-flash"></div>
+  <div class="flash" id="game-flash" role="alert" aria-live="assertive"></div>
   <div class="live-board"><div class="board-lbl" id="t-board-lbl"></div><div id="live-scoreboard"></div></div>
 </div>
 
@@ -318,5 +321,6 @@ document.addEventListener('keydown',e=>{
 
 applyLang();
 </script>
+</main>
 </body>
 </html>

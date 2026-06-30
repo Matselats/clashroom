@@ -256,9 +256,15 @@
     .sidebar { width:100%; border-right:none; border-bottom:1px solid var(--border); }
     .desk { min-width:60px; }
   }
+
+  button:focus-visible, input:focus-visible, select:focus-visible { outline:2px solid var(--purple); outline-offset:2px; }
+  .skip-link { position:absolute;top:-40px;left:0;background:var(--purple);color:#fff;padding:8px 16px;z-index:200;font-size:.85rem;text-decoration:none;border-radius:0 0 4px 0;transition:top .2s; }
+  .skip-link:focus { top:0; }
 </style>
 </head>
 <body>
+
+<a class="skip-link" href="#main-content">Hopp til innhold</a>
 
 <header>
   <a class="logo" href="index.html">Klasse<span>kart</span> 🪑</a>
@@ -270,6 +276,7 @@
   </div>
 </header>
 
+<main id="main-content">
 <div class="main">
   <!-- SIDEBAR -->
   <div class="sidebar">
@@ -675,5 +682,6 @@ function clearAll() {
 applyLang();
 loadState();
 </script>
+</main>
 </body>
 </html>

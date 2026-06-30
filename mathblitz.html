@@ -44,6 +44,8 @@
 </head>
 <body>
 
+<a class="skip-link" href="#main-content">Hopp til innhold</a>
+
 <header>
   <a class="logo" href="index.html">Math<span>Blitz</span> 🔢</a>
   <div class="header-right">
@@ -55,6 +57,7 @@
   </div>
 </header>
 
+<main id="main-content">
 <!-- ROLE SELECT -->
 <div class="screen active" id="screen-role">
   <div style="text-align:center;padding-top:16px;">
@@ -131,7 +134,7 @@
     <button class="send-btn" onclick="submitAnswer()">→</button>
   </div>
 
-  <div class="flash" id="game-flash"></div>
+  <div class="flash" id="game-flash" role="alert" aria-live="assertive"></div>
 
   <div class="live-board">
     <div class="board-lbl" id="t-board-lbl"></div>
@@ -541,5 +544,6 @@ document.addEventListener('keydown', e => {
 
 applyLang();
 </script>
+</main>
 </body>
 </html>
