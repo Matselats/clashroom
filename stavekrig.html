@@ -4,287 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stavekrig – Nynorsk</title>
+<link rel="stylesheet" href="shared.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
-
   :root {
-    --ink: #1a1a2e;
-    --paper: #f7f5f0;
     --accent: #e63946;
-    --gold: #f4a832;
-    --green: #2a9d5c;
-    --blue: #2176ae;
-    --muted: #8a8a9a;
-    --card: #ffffff;
-    --border: #e0ddd8;
+    --accent-dim: rgba(230,57,70,0.14);
+    --accent-border: rgba(230,57,70,0.35);
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--ink);
-    color: var(--paper);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  /* HEADER */
-  header {
-    width: 100%;
-    padding: 18px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-
-  .logo {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.3rem;
-    letter-spacing: -0.03em;
-  }
-  .logo span { color: var(--accent); }
-
-  .badge {
-    background: rgba(255,255,255,0.08);
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.78rem;
-    color: var(--muted);
-  }
-
-  /* SCREENS */
-  .screen {
-    display: none;
-    width: 100%;
-    max-width: 480px;
-    padding: 32px 20px;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-  }
-  .screen.active { display: flex; }
-
-  h1 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 2rem;
-    text-align: center;
-    letter-spacing: -0.04em;
-    line-height: 1.1;
-  }
-  h1 em { color: var(--accent); font-style: normal; }
-
-  .sub {
-    color: var(--muted);
-    font-size: 0.92rem;
-    text-align: center;
-    line-height: 1.5;
-  }
-
-  .card {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    padding: 24px;
-    width: 100%;
-  }
-
-  input[type="text"] {
-    width: 100%;
-    padding: 14px 16px;
-    border-radius: 12px;
-    border: 2px solid rgba(255,255,255,0.15);
-    background: rgba(255,255,255,0.06);
-    color: var(--paper);
-    font-size: 1.1rem;
-    font-family: 'DM Sans', sans-serif;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  input[type="text"]:focus { border-color: var(--accent); }
-  input[type="text"]::placeholder { color: var(--muted); }
-
-  button {
-    width: 100%;
-    padding: 15px;
-    border-radius: 12px;
-    border: none;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-  }
-  button:hover { opacity: 0.88; transform: translateY(-1px); }
-  button:active { transform: translateY(0); }
-
-  .btn-primary { background: var(--accent); color: white; }
-  .btn-secondary { background: rgba(255,255,255,0.1); color: var(--paper); }
-  .btn-green { background: var(--green); color: white; }
-
-  /* LOBBY */
-  .player-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-  }
-
-  .player-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.08);
-    animation: slideIn 0.3s ease;
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(-10px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  .player-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.9rem;
-    flex-shrink: 0;
-  }
-
-  .player-name-text { font-weight: 600; font-size: 0.95rem; }
-  .player-ready { margin-left: auto; font-size: 0.8rem; color: var(--green); }
-
-  /* GAME */
-  .game-header {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0;
-  }
-
-  .round-badge {
-    background: var(--accent);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 700;
-  }
-
-  .timer-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .timer-circle {
-    width: 48px;
-    height: 48px;
-    position: relative;
-  }
-
-  .timer-circle svg {
-    transform: rotate(-90deg);
-    width: 48px;
-    height: 48px;
-  }
-
-  .timer-circle .track {
-    fill: none;
-    stroke: rgba(255,255,255,0.1);
-    stroke-width: 4;
-  }
-
-  .timer-circle .progress {
-    fill: none;
-    stroke: var(--gold);
-    stroke-width: 4;
-    stroke-linecap: round;
-    stroke-dasharray: 125.6;
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 1s linear, stroke 0.3s;
-  }
-
-  .timer-text {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 0.95rem;
-  }
-
-  .word-card {
-    width: 100%;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px;
-    padding: 32px 24px;
-    text-align: center;
-  }
-
-  .word-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--muted);
-    margin-bottom: 10px;
-  }
-
-  .bokmaal-word {
-    font-family: 'Syne', sans-serif;
-    font-size: 2.4rem;
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    color: var(--paper);
-  }
-
-  .answer-wrap {
-    width: 100%;
-    position: relative;
-  }
-
-  .answer-input {
-    width: 100%;
-    padding: 16px 60px 16px 18px;
-    border-radius: 14px;
-    border: 2px solid rgba(255,255,255,0.15);
-    background: rgba(255,255,255,0.06);
-    color: var(--paper);
-    font-size: 1.3rem;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .answer-input:focus { border-color: var(--blue); }
-
-  .send-btn {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: auto;
-    padding: 8px 16px;
-    font-size: 0.85rem;
-    border-radius: 10px;
-    background: var(--blue);
-    color: white;
-  }
-
+  .word-display { font-size: 2.4rem; }
   .feedback-banner {
     width: 100%;
     padding: 14px 20px;
@@ -296,184 +23,112 @@
   }
   .feedback-banner.correct { background: rgba(42,157,92,0.2); border: 1px solid var(--green); color: #5de097; }
   .feedback-banner.wrong { background: rgba(230,57,70,0.2); border: 1px solid var(--accent); color: #ff8a93; }
+  .feedback-banner.sent { background: rgba(33,118,174,0.2); border: 1px solid #2176ae; color: #64b5f6; }
   .feedback-banner.show { display: block; }
-
-  /* SCOREBOARD */
-  .score-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 16px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    transition: background 0.2s;
-  }
-  .score-row.top { background: rgba(244,168,50,0.12); border-color: rgba(244,168,50,0.3); }
-
-  .rank {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1rem;
-    width: 24px;
+  .room-code-box {
+    width: 100%;
+    background: var(--card);
+    border: 2px dashed var(--accent-border);
+    border-radius: 16px;
+    padding: 20px;
     text-align: center;
+  }
+  .room-code-box .label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
     color: var(--muted);
+    margin-bottom: 6px;
   }
-  .rank.gold { color: var(--gold); }
-
-  .score-name { font-weight: 600; flex: 1; }
-  .score-pts {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.1rem;
-    color: var(--gold);
-  }
-
-  .streak-badge {
-    background: rgba(230,57,70,0.2);
+  .room-code-box .code {
+    font-family: 'DM Mono', monospace;
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
     color: var(--accent);
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-size: 0.75rem;
+  }
+  .room-code-box .hint {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  #room-code-input {
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
     font-weight: 700;
   }
-
-  /* WAITING */
-  .waiting-pulse {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-    padding: 20px 0;
-  }
-  .dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: var(--muted);
-    animation: pulse 1.4s ease infinite;
-  }
-  .dot:nth-child(2) { animation-delay: 0.2s; }
-  .dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes pulse {
-    0%, 60%, 100% { opacity: 0.3; transform: scale(1); }
-    30% { opacity: 1; transform: scale(1.3); }
-  }
-
-  .divider {
-    width: 100%;
-    height: 1px;
-    background: rgba(255,255,255,0.08);
-    margin: 4px 0;
-  }
-
-  .role-toggle {
-    display: flex;
-    gap: 8px;
-    width: 100%;
-  }
-  .role-btn {
-    flex: 1;
-    padding: 12px;
-    border-radius: 12px;
-    border: 2px solid rgba(255,255,255,0.1);
-    background: transparent;
-    color: var(--muted);
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .role-btn.active {
-    border-color: var(--accent);
-    background: rgba(230,57,70,0.1);
-    color: var(--paper);
-  }
-
-  .info-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.82rem;
-    color: var(--muted);
-    width: 100%;
-    padding: 0 2px;
-  }
-
-  .countdown-big {
-    font-family: 'Syne', sans-serif;
-    font-size: 5rem;
-    font-weight: 800;
-    color: var(--accent);
-    text-align: center;
-    animation: popIn 0.3s ease;
-  }
-  @keyframes popIn {
-    from { transform: scale(1.4); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
-
-  /* Results */
-  .podium {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    height: 120px;
-    margin: 10px 0;
-  }
-  .podium-block {
-    flex: 1;
-    border-radius: 10px 10px 0 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding-top: 10px;
+  .join-error {
+    color: #ff6b6b;
     font-size: 0.8rem;
-    font-weight: 700;
-    gap: 4px;
+    text-align: center;
+    display: none;
   }
-  .podium-block .emoji { font-size: 1.4rem; }
-  .p1 { background: rgba(244,168,50,0.25); height: 100%; border: 1px solid rgba(244,168,50,0.4); }
-  .p2 { background: rgba(255,255,255,0.08); height: 75%; border: 1px solid rgba(255,255,255,0.15); }
-  .p3 { background: rgba(255,255,255,0.05); height: 55%; border: 1px solid rgba(255,255,255,0.1); }
-
+  .join-error.show { display: block; }
+  .answered-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.83rem;
+    color: var(--muted);
+  }
 </style>
 </head>
 <body>
 
+<a class="skip-link" href="#main-content">Hopp til innhold</a>
+
 <header>
-  <div class="logo">Stave<span>krig</span></div>
-  <div class="badge">Nynorsk · 8. trinn</div>
+  <a class="logo" href="index.html">Stave<span>krig</span></a>
+  <div class="header-right">
+    <div class="round-info" id="header-info">Nynorsk · 8. trinn</div>
+    <button class="lang-btn" onclick="toggleLang()">
+      <span id="lang-flag">🇳🇴</span>
+      <span id="lang-txt">Norsk</span>
+    </button>
+  </div>
 </header>
 
+<main id="main-content">
 <!-- SCREEN: ROLE SELECT -->
 <div class="screen active" id="screen-role">
-  <h1>Vil du <em>lære</em> eller <em>lede</em>?</h1>
-  <p class="sub">Læreren starter spillet. Elevene kobler seg på med navn.</p>
+  <div style="text-align:center;padding-top:16px;">
+    <h1 id="t-title">Vil du <em>lære</em> eller <em>lede</em>?</h1>
+    <p class="sub" id="t-subtitle">Læreren starter spillet. Elevene kobler seg på med romkode.</p>
+  </div>
   <div class="role-toggle">
     <button class="role-btn active" onclick="selectRole('student')" id="role-student">🎮 Elev</button>
     <button class="role-btn" onclick="selectRole('teacher')" id="role-teacher">🏫 Lærer</button>
   </div>
   <div class="card" style="gap:14px;display:flex;flex-direction:column;">
-    <input type="text" id="name-input" placeholder="Skriv navnet ditt..." maxlength="20" />
-    <button class="btn-primary" onclick="joinGame()">Bli med →</button>
+    <input type="text" id="name-input" maxlength="20" />
+    <div id="room-code-wrap">
+      <input type="text" id="room-code-input" maxlength="5" />
+    </div>
+    <div class="join-error" id="join-error"></div>
+    <button class="btn-primary" onclick="joinGame()" id="t-join-btn">Bli med →</button>
   </div>
-  <p class="sub" style="font-size:0.78rem;">Del denne siden med elevene dine — alle bruker samme nettleser-fane</p>
+  <p class="sub" style="font-size:0.78rem;" id="t-share-hint">Elevene kobler seg på med romkoden</p>
 </div>
 
 <!-- SCREEN: LOBBY -->
 <div class="screen" id="screen-lobby">
-  <h1>Venter på<br><em>spillere...</em></h1>
-  <p class="sub" id="lobby-status">0 elever klare</p>
+  <h1 id="t-lobby-title">Rommet er<br><em>klart!</em></h1>
+  <div class="room-code-box">
+    <div class="label" id="t-room-code-label">ROMKODE</div>
+    <div class="code" id="room-code-display"></div>
+    <div class="hint" id="t-room-code-share">Del denne koden med elevene</div>
+  </div>
+  <p class="sub" id="lobby-status">0 spillere klar</p>
   <div class="card" style="gap: 12px; display: flex; flex-direction: column;">
     <div class="player-list" id="player-list"></div>
-    <div class="waiting-pulse">
+    <div class="dots">
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
   </div>
-  <div id="teacher-controls" style="display:none; width:100%; gap:10px; flex-direction:column; display:none;">
-    <button class="btn-green" onclick="startCountdown()">▶ Start spillet</button>
+  <div id="teacher-controls" style="display:none; width:100%; gap:10px; flex-direction:column;">
+    <button class="btn-green" onclick="startCountdown()" id="t-start-btn">▶ Start spillet</button>
     <div class="info-row">
-      <span>10 ord · 15 sek per ord</span>
+      <span id="t-game-info">10 ord · 15 sek per ord</span>
       <span id="player-count">0 spillere</span>
     </div>
   </div>
@@ -481,70 +136,195 @@
 
 <!-- SCREEN: COUNTDOWN -->
 <div class="screen" id="screen-countdown">
-  <p class="sub">Spillet starter om...</p>
+  <p class="sub" id="t-get-ready">Spillet starter om...</p>
   <div class="countdown-big" id="countdown-num">3</div>
-  <p class="sub">Gjør deg klar! 🎯</p>
+  <p class="sub" id="t-ready-hint">Gjør deg klar! 🎯</p>
 </div>
 
 <!-- SCREEN: GAME -->
 <div class="screen" id="screen-game">
-  <div class="game-header">
-    <div class="round-badge">Ord <span id="round-num">1</span> av 10</div>
+  <div style="width:100%;display:flex;justify-content:space-between;align-items:center;">
+    <div class="round-tag" id="t-round-tag">Ord <span id="round-num">1</span> av 10</div>
+    <div id="my-score-wrap" style="font-family:'DM Mono',monospace;font-size:0.83rem;color:var(--gold)">⚡ <span id="my-score-display">0</span> <span id="t-pts-label">poeng</span></div>
+    <div id="answered-wrap" class="answered-tag" style="display:none;">✓ <span id="answered-num">0</span>/<span id="total-players-num">0</span></div>
+  </div>
+
+  <div class="word-stage">
     <div class="timer-wrap">
-      <div class="timer-circle">
-        <svg viewBox="0 0 48 48">
-          <circle class="track" cx="24" cy="24" r="20"/>
-          <circle class="progress" id="timer-ring" cx="24" cy="24" r="20"/>
-        </svg>
-        <div class="timer-text" id="timer-text">15</div>
-      </div>
+      <svg viewBox="0 0 44 44">
+        <circle class="ring-track" cx="22" cy="22" r="18"/>
+        <circle class="ring-prog" id="ring-prog" cx="22" cy="22" r="18"/>
+      </svg>
+      <div class="ring-num" id="ring-num">15</div>
     </div>
+    <div class="word-eyebrow" id="t-word-label">Oversett til nynorsk</div>
+    <div class="word-display" id="current-word"></div>
   </div>
 
-  <div class="word-card">
-    <div class="word-label">Oversett til nynorsk</div>
-    <div class="bokmaal-word" id="current-word">huset</div>
+  <div class="answer-wrap" id="answer-wrap">
+    <input class="answer-input" type="text" id="answer-input" autocomplete="off" autocorrect="off" spellcheck="false" />
+    <button class="send-btn" onclick="submitAnswer()" id="t-send-btn">Send</button>
   </div>
 
-  <div class="answer-wrap">
-    <input class="answer-input" type="text" id="answer-input" placeholder="Nynorsk..." autocomplete="off" autocorrect="off" spellcheck="false" />
-    <button class="send-btn" onclick="submitAnswer()">Send</button>
-  </div>
+  <div class="feedback-banner" id="feedback-banner" role="alert" aria-live="assertive"></div>
 
-  <div class="feedback-banner" id="feedback-banner">Riktig! +100 poeng 🎉</div>
-
-  <div class="info-row">
-    <span>Du: <strong id="my-score-display">0 poeng</strong></span>
+  <div class="info-row" id="student-info-row">
+    <span><span id="t-you-label">Du</span>: <strong id="my-score-info">0 poeng</strong></span>
     <span id="streak-display"></span>
   </div>
+
+  <div id="teacher-live-board" style="display:none;width:100%;flex-direction:column;gap:6px;"></div>
 </div>
 
 <!-- SCREEN: BETWEEN ROUNDS -->
 <div class="screen" id="screen-between">
-  <h1>Svar: <em id="correct-answer-show">hus</em></h1>
+  <h1><span id="t-answer-label">Svar</span>: <em id="correct-answer-show"></em></h1>
+  <div class="feedback-banner show" id="between-personal" role="alert" aria-live="assertive" style="display:none;"></div>
   <p class="sub" id="between-msg">Neste ord kommer snart...</p>
   <div style="width:100%;display:flex;flex-direction:column;gap:8px;" id="mini-scoreboard"></div>
 </div>
 
 <!-- SCREEN: RESULTS -->
 <div class="screen" id="screen-results">
-  <h1>Spillet<br>er <em>over!</em></h1>
+  <h1 id="t-results-title">Spillet<br>er <em>over!</em></h1>
   <div class="podium" id="podium"></div>
   <div style="width:100%;display:flex;flex-direction:column;gap:8px;" id="final-scoreboard"></div>
-  <button class="btn-primary" onclick="resetGame()">Spill igjen 🔄</button>
-  <button class="btn-secondary" onclick="showScreen('screen-role')">Endre innstillinger</button>
+  <button class="btn-primary" onclick="resetGame()" id="t-play-again">Spill igjen 🔄</button>
+  <button class="btn-secondary" onclick="backToStart()" id="t-change-settings">Nytt rom</button>
+  <a class="home-link" href="index.html" id="t-back-link">← Tilbake til Clashroom</a>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="shared.js"></script>
 <script>
+// ─── TRANSLATIONS ─────────────────────────────────────────────
+var LANG = {
+  no: {
+    title:        'Vil du <em>lære</em> eller <em>lede</em>?',
+    subtitle:     'Læreren starter spillet. Elevene kobler seg på med romkode.',
+    role_student: '🎮 Elev',
+    role_teacher: '🏫 Lærer',
+    name_ph:      'Skriv navnet ditt...',
+    room_code_ph: 'Romkode...',
+    join_btn:     'Bli med →',
+    create_btn:   'Opprett rom →',
+    share_hint:   'Elevene kobler seg på med romkoden',
+    room_code_label: 'ROMKODE',
+    room_code_share: 'Del denne koden med elevene',
+    room_not_found:  'Fant ikke rommet. Sjekk koden og prøv igjen.',
+    lobby_teacher: 'Rommet er<br><em>klart!</em>',
+    lobby_student: 'Koblet til<br><em>rommet!</em>',
+    start_btn:    '▶ Start spillet',
+    game_info:    '10 ord · 15 sek per ord',
+    get_ready:    'Spillet starter om...',
+    ready_hint:   'Gjør deg klar! 🎯',
+    word_label:   'Oversett til nynorsk',
+    pts_label:    'poeng',
+    send_btn:     'Send',
+    sent_msg:     'Sendt! ⏳',
+    timeout_msg:  'Tiden er ute! ⏱',
+    you_label:    'Du',
+    answer_label: 'Svar',
+    correct_fb:   function(pts) { return 'Riktig! +' + pts + ' poeng 🎉'; },
+    wrong_fb:     'Feil svar',
+    results_title:'Spillet<br>er <em>over!</em>',
+    play_again:   'Spill igjen 🔄',
+    change:       'Nytt rom',
+    back:         '← Tilbake til Clashroom',
+    remaining:    function(n) { return n + ' ord igjen...'; },
+    last_word:    'Siste ord! Resultater kommer...',
+    players_ready:function(n) { return n + ' spiller' + (n !== 1 ? 'e' : '') + ' klar'; },
+    players_count:function(n) { return n + ' spillere'; },
+    streak_badge: function(n) { return '🔥 ' + n + ' på rad'; },
+  },
+  en: {
+    title:        'Want to <em>learn</em> or <em>lead</em>?',
+    subtitle:     'The teacher starts the game. Students join with a room code.',
+    role_student: '🎮 Student',
+    role_teacher: '🏫 Teacher',
+    name_ph:      'Your name...',
+    room_code_ph: 'Room code...',
+    join_btn:     'Join →',
+    create_btn:   'Create room →',
+    share_hint:   'Students join using the room code',
+    room_code_label: 'ROOM CODE',
+    room_code_share: 'Share this code with your students',
+    room_not_found:  'Room not found. Check the code and try again.',
+    lobby_teacher: 'Room is<br><em>ready!</em>',
+    lobby_student: 'Connected to<br><em>the room!</em>',
+    start_btn:    '▶ Start game',
+    game_info:    '10 words · 15 sec each',
+    get_ready:    'Game starts in...',
+    ready_hint:   'Get ready! 🎯',
+    word_label:   'Translate to Nynorsk',
+    pts_label:    'pts',
+    send_btn:     'Send',
+    sent_msg:     'Sent! ⏳',
+    timeout_msg:  'Time\'s up! ⏱',
+    you_label:    'You',
+    answer_label: 'Answer',
+    correct_fb:   function(pts) { return 'Correct! +' + pts + ' pts 🎉'; },
+    wrong_fb:     'Wrong answer',
+    results_title:'Game<br><em>over!</em>',
+    play_again:   'Play again 🔄',
+    change:       'New room',
+    back:         '← Back to Clashroom',
+    remaining:    function(n) { return n + ' words left...'; },
+    last_word:    'Last word! Results coming...',
+    players_ready:function(n) { return n + ' player' + (n !== 1 ? 's' : '') + ' ready'; },
+    players_count:function(n) { return n + ' players'; },
+    streak_badge: function(n) { return '🔥 ' + n + ' in a row'; },
+  }
+};
+
+var L = function() { return LANG[getLang()]; };
+
+function onLangChange() { applyLang(); }
+
+function applyLang() {
+  var set = function(id, val) { var el = document.getElementById(id); if (el) el.innerHTML = val; };
+  var txt = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+  var ph = function(id, val) { var el = document.getElementById(id); if (el) el.placeholder = val; };
+
+  set('t-title', L().title);
+  txt('t-subtitle', L().subtitle);
+  txt('role-student', L().role_student);
+  txt('role-teacher', L().role_teacher);
+  ph('name-input', L().name_ph);
+  ph('room-code-input', L().room_code_ph);
+  txt('t-share-hint', L().share_hint);
+  txt('t-room-code-label', L().room_code_label);
+  txt('t-room-code-share', L().room_code_share);
+  txt('t-start-btn', L().start_btn);
+  txt('t-game-info', L().game_info);
+  txt('t-get-ready', L().get_ready);
+  txt('t-ready-hint', L().ready_hint);
+  txt('t-word-label', L().word_label);
+  txt('t-pts-label', L().pts_label);
+  txt('t-send-btn', L().send_btn);
+  txt('t-you-label', L().you_label);
+  txt('t-answer-label', L().answer_label);
+  set('t-results-title', L().results_title);
+  txt('t-play-again', L().play_again);
+  txt('t-change-settings', L().change);
+  txt('t-back-link', L().back);
+  ph('answer-input', 'Nynorsk...');
+  set('t-lobby-title', state.isTeacher ? L().lobby_teacher : L().lobby_student);
+  txt('t-join-btn', state.role === 'teacher' ? L().create_btn : L().join_btn);
+  renderPlayerList();
+}
+
 // ─── WORD BANK ───────────────────────────────────────────────
-const wordBank = [
+var wordBank = [
   { bm: "huset", ny: ["huset"] },
   { bm: "bilen", ny: ["bilen"] },
   { bm: "ikke", ny: ["ikkje"] },
-  { bm: "jeg", ny: ["eg", "eg"] },
+  { bm: "jeg", ny: ["eg"] },
   { bm: "hva", ny: ["kva"] },
   { bm: "noe", ny: ["noko"] },
-  { bm: "noen", ny: ["nokon", "nokon"] },
+  { bm: "noen", ny: ["nokon"] },
   { bm: "hvor", ny: ["kvar"] },
   { bm: "hvorfor", ny: ["kvifor"] },
   { bm: "hun", ny: ["ho", "henne"] },
@@ -571,310 +351,516 @@ const wordBank = [
 ];
 
 // ─── STATE ───────────────────────────────────────────────────
-let state = {
+var state = {
   role: 'student',
   myName: '',
-  players: [],
-  scores: {},
-  streaks: {},
-  currentRound: 0,
+  myKey: '',
+  isTeacher: false,
+  roomCode: '',
   totalRounds: 10,
+  timerDuration: 15,
   gameWords: [],
   answered: false,
   timerInterval: null,
+  countdownInterval: null,
   timeLeft: 15,
-  isTeacher: false,
 };
 
-const COLORS = ['#e63946','#2176ae','#f4a832','#2a9d5c','#9b5de5','#f77f00','#4cc9f0','#e9c46a'];
-
-// ─── HELPERS ─────────────────────────────────────────────────
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-function getColor(name) {
-  let hash = 0;
-  for (let c of name) hash = c.charCodeAt(0) + ((hash << 5) - hash);
-  return COLORS[Math.abs(hash) % COLORS.length];
-}
-
-function getInitial(name) { return name.charAt(0).toUpperCase(); }
-
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+var fbPlayers = {};
+var fbRound = 0;
+var fbStatus = '';
+var roomListener = null;
 
 // ─── ROLE SELECT ─────────────────────────────────────────────
 function selectRole(role) {
   state.role = role;
   document.getElementById('role-student').classList.toggle('active', role === 'student');
   document.getElementById('role-teacher').classList.toggle('active', role === 'teacher');
-  document.getElementById('name-input').placeholder = role === 'teacher' ? 'Ditt navn (lærer)...' : 'Skriv navnet ditt...';
+  document.getElementById('room-code-wrap').style.display = role === 'student' ? 'block' : 'none';
+  document.getElementById('t-join-btn').textContent = role === 'teacher' ? L().create_btn : L().join_btn;
+  document.getElementById('join-error').className = 'join-error';
 }
 
 function joinGame() {
-  const name = document.getElementById('name-input').value.trim();
+  var name = document.getElementById('name-input').value.trim();
   if (!name) { document.getElementById('name-input').focus(); return; }
 
   state.myName = name;
+  state.myKey = sanitizeKey(name);
   state.isTeacher = state.role === 'teacher';
 
-  if (!state.players.includes(name)) {
-    state.players.push(name);
-    state.scores[name] = 0;
-    state.streaks[name] = 0;
+  if (state.isTeacher) {
+    createRoom();
+  } else {
+    joinExistingRoom();
+  }
+}
+
+// ─── FIREBASE ROOM ──────────────────────────────────────────
+function createRoom() {
+  state.roomCode = generateRoomCode();
+  roomRef(state.roomCode).set({
+    gameType: 'stavekrig',
+    status: 'lobby',
+    round: 0,
+    totalRounds: state.totalRounds,
+    timerDuration: state.timerDuration,
+    prompt: '',
+    correctAnswer: '',
+    startedAt: 0,
+  }).then(function() {
+    document.getElementById('room-code-display').textContent = state.roomCode;
+    document.getElementById('header-info').textContent = 'Rom: ' + state.roomCode;
+    document.getElementById('teacher-controls').style.display = 'flex';
+    applyLang();
+    setupListener();
+    showScreen('screen-lobby');
+  });
+}
+
+function joinExistingRoom() {
+  var code = document.getElementById('room-code-input').value.trim().toUpperCase();
+  if (!code || code.length < 4) {
+    document.getElementById('room-code-input').focus();
+    return;
+  }
+  state.roomCode = code;
+
+  roomRef(code).once('value').then(function(snap) {
+    if (!snap.exists() || snap.val().gameType !== 'stavekrig') {
+      var err = document.getElementById('join-error');
+      err.textContent = L().room_not_found;
+      err.className = 'join-error show';
+      return;
+    }
+    roomRef(code).child('players/' + state.myKey).set({
+      name: state.myName, score: 0, streak: 0, change: 0
+    }).then(function() {
+      document.getElementById('room-code-display').textContent = state.roomCode;
+      document.getElementById('header-info').textContent = 'Rom: ' + state.roomCode;
+      applyLang();
+      setupListener();
+      showScreen('screen-lobby');
+    });
+  });
+}
+
+function setupListener() {
+  roomListener = roomRef(state.roomCode).on('value', function(snap) {
+    var room = snap.val();
+    if (!room) return;
+    onRoomData(room);
+  });
+}
+
+function onRoomData(room) {
+  fbPlayers = room.players || {};
+
+  renderPlayerList();
+
+  if (room.status !== fbStatus) {
+    fbStatus = room.status;
+    handleStatus(room);
   }
 
-  renderLobby();
-  showScreen('screen-lobby');
+  if (state.isTeacher && fbStatus === 'playing') {
+    var answered = Object.keys(room.answers || {}).length;
+    var total = Object.keys(fbPlayers).length;
+    document.getElementById('answered-num').textContent = answered;
+    document.getElementById('total-players-num').textContent = total;
+    renderTeacherLiveBoard();
+  }
+}
 
-  if (state.isTeacher) {
-    document.getElementById('teacher-controls').style.display = 'flex';
+function handleStatus(room) {
+  clearInterval(state.timerInterval);
+  clearInterval(state.countdownInterval);
+
+  switch (fbStatus) {
+    case 'lobby':
+      showScreen('screen-lobby');
+      break;
+    case 'countdown':
+      showScreen('screen-countdown');
+      runCountdown();
+      break;
+    case 'playing':
+      startRoundUI(room);
+      break;
+    case 'between':
+      showBetweenScreen(room);
+      break;
+    case 'results':
+      showResultsScreen();
+      break;
   }
 }
 
 // ─── LOBBY ───────────────────────────────────────────────────
-function renderLobby() {
-  const list = document.getElementById('player-list');
+function renderPlayerList() {
+  var list = document.getElementById('player-list');
+  if (!list) return;
+  var keys = Object.keys(fbPlayers);
   list.innerHTML = '';
-  state.players.forEach((p, i) => {
-    const el = document.createElement('div');
+  keys.forEach(function(key) {
+    var p = fbPlayers[key];
+    var el = document.createElement('div');
     el.className = 'player-item';
-    el.innerHTML = `
-      <div class="player-avatar" style="background:${getColor(p)}">${getInitial(p)}</div>
-      <div class="player-name-text">${p}</div>
-      <div class="player-ready">✓ klar</div>
-    `;
+    el.innerHTML = avHtml(p.name, 32) + '<div class="p-name">' + esc(p.name) + '</div><div class="p-pts">⚡ ' + (p.score || 0) + '</div>';
     list.appendChild(el);
   });
-  document.getElementById('lobby-status').textContent = `${state.players.length} spiller${state.players.length !== 1 ? 'e' : ''} klar`;
-  document.getElementById('player-count').textContent = `${state.players.length} spillere`;
+  var statusEl = document.getElementById('lobby-status');
+  if (statusEl) statusEl.textContent = L().players_ready(keys.length);
+  var countEl = document.getElementById('player-count');
+  if (countEl) countEl.textContent = L().players_count(keys.length);
 }
 
 // ─── COUNTDOWN ───────────────────────────────────────────────
 function startCountdown() {
+  if (Object.keys(fbPlayers).length === 0) return;
   state.gameWords = shuffle(wordBank).slice(0, state.totalRounds);
-  state.currentRound = 0;
-  Object.keys(state.scores).forEach(k => { state.scores[k] = 0; state.streaks[k] = 0; });
+  roomRef(state.roomCode).update({ status: 'countdown' });
+}
 
-  showScreen('screen-countdown');
-  let n = 3;
+function runCountdown() {
+  var n = 3;
   document.getElementById('countdown-num').textContent = n;
-
-  const iv = setInterval(() => {
+  sfxCountdown();
+  state.countdownInterval = setInterval(function() {
     n--;
     if (n <= 0) {
-      clearInterval(iv);
-      startRound();
+      clearInterval(state.countdownInterval);
+      if (state.isTeacher) {
+        fbRound = 0;
+        teacherStartRound(0);
+      }
     } else {
       document.getElementById('countdown-num').textContent = n;
+      sfxCountdown();
     }
   }, 1000);
 }
 
-// ─── GAME ROUND ──────────────────────────────────────────────
-function startRound() {
-  if (state.currentRound >= state.totalRounds) {
-    showResults();
-    return;
+// ─── GAME ────────────────────────────────────────────────────
+function teacherStartRound(roundNum) {
+  var word = state.gameWords[roundNum];
+  var updates = {
+    status: 'playing',
+    round: roundNum,
+    prompt: word.bm,
+    correctAnswer: '',
+    startedAt: SERVER_TS,
+    answers: null,
+  };
+  var keys = Object.keys(fbPlayers);
+  keys.forEach(function(k) {
+    updates['players/' + k + '/change'] = 0;
+  });
+  roomRef(state.roomCode).update(updates);
+}
+
+function startRoundUI(room) {
+  state.answered = false;
+  state.timeLeft = room.timerDuration || state.timerDuration;
+  fbRound = room.round || 0;
+
+  document.getElementById('round-num').textContent = fbRound + 1;
+  document.getElementById('current-word').textContent = room.prompt || '';
+  document.getElementById('header-info').textContent = (fbRound + 1) + '/' + (room.totalRounds || state.totalRounds);
+
+  if (state.isTeacher) {
+    document.getElementById('answer-wrap').style.display = 'none';
+    document.getElementById('student-info-row').style.display = 'none';
+    document.getElementById('my-score-wrap').style.display = 'none';
+    document.getElementById('answered-wrap').style.display = 'block';
+    document.getElementById('teacher-live-board').style.display = 'flex';
+    document.getElementById('answered-num').textContent = '0';
+    document.getElementById('total-players-num').textContent = Object.keys(fbPlayers).length;
+    renderTeacherLiveBoard();
+  } else {
+    document.getElementById('answer-wrap').style.display = 'flex';
+    document.getElementById('student-info-row').style.display = 'flex';
+    document.getElementById('my-score-wrap').style.display = 'block';
+    document.getElementById('answered-wrap').style.display = 'none';
+    document.getElementById('teacher-live-board').style.display = 'none';
+    document.getElementById('answer-input').value = '';
+    document.getElementById('answer-input').disabled = false;
+    document.getElementById('feedback-banner').className = 'feedback-banner';
+    var me = fbPlayers[state.myKey];
+    if (me) {
+      document.getElementById('my-score-display').textContent = me.score || 0;
+      document.getElementById('my-score-info').textContent = (me.score || 0) + ' ' + L().pts_label;
+      updateStreakDisplay(me.streak || 0);
+    }
   }
 
-  const word = state.gameWords[state.currentRound];
-  state.answered = false;
-  state.timeLeft = 15;
-
-  document.getElementById('round-num').textContent = state.currentRound + 1;
-  document.getElementById('current-word').textContent = word.bm;
-  document.getElementById('answer-input').value = '';
-  document.getElementById('answer-input').disabled = false;
-  document.getElementById('feedback-banner').className = 'feedback-banner';
-  document.getElementById('my-score-display').textContent = (state.scores[state.myName] || 0) + ' poeng';
-  updateStreakDisplay();
-
   showScreen('screen-game');
-  document.getElementById('answer-input').focus();
+  if (!state.isTeacher) document.getElementById('answer-input').focus();
 
-  updateTimerRing(15, 15);
+  var ringEl = document.getElementById('ring-prog');
+  var dur = room.timerDuration || state.timerDuration;
+  updateRing(dur, dur, ringEl);
+  ringEl.style.stroke = 'var(--gold)';
+  document.getElementById('ring-num').textContent = dur;
+
   clearInterval(state.timerInterval);
-  state.timerInterval = setInterval(() => {
+  state.timerInterval = setInterval(function() {
     state.timeLeft--;
-    document.getElementById('timer-text').textContent = state.timeLeft;
-    updateTimerRing(state.timeLeft, 15);
-
-    if (state.timeLeft <= 5) {
-      document.getElementById('timer-ring').style.stroke = '#e63946';
-    } else if (state.timeLeft <= 10) {
-      document.getElementById('timer-ring').style.stroke = '#f4a832';
-    }
+    document.getElementById('ring-num').textContent = state.timeLeft;
+    updateRing(state.timeLeft, dur, ringEl);
+    if (state.timeLeft <= 5) { ringEl.style.stroke = 'var(--red)'; sfxTick(); }
+    else if (state.timeLeft <= 10) ringEl.style.stroke = 'var(--gold)';
 
     if (state.timeLeft <= 0) {
       clearInterval(state.timerInterval);
-      if (!state.answered) timeOut();
+      if (state.isTeacher) {
+        processRound();
+      } else if (!state.answered) {
+        state.answered = true;
+        document.getElementById('answer-input').disabled = true;
+        showFeedback('timeout');
+      }
     }
   }, 1000);
 }
 
-function updateTimerRing(current, max) {
-  const circumference = 125.6;
-  const offset = circumference - (current / max) * circumference;
-  document.getElementById('timer-ring').style.strokeDashoffset = offset;
-}
-
-function updateStreakDisplay() {
-  const streak = state.streaks[state.myName] || 0;
-  const el = document.getElementById('streak-display');
+function updateStreakDisplay(streak) {
+  var el = document.getElementById('streak-display');
   if (streak >= 2) {
-    el.innerHTML = `<span class="streak-badge">🔥 ${streak} på rad</span>`;
+    el.innerHTML = '<span class="streak-badge">' + L().streak_badge(streak) + '</span>';
   } else {
     el.textContent = '';
   }
 }
 
+function renderTeacherLiveBoard() {
+  var sorted = getSortedPlayers();
+  var container = document.getElementById('teacher-live-board');
+  container.innerHTML = '';
+  sorted.slice(0, 8).forEach(function(p, i) {
+    var el = document.createElement('div');
+    el.className = 'board-row' + (i === 0 ? ' leader' : '');
+    el.innerHTML = '<div class="b-rank ' + (i === 0 ? 'gold' : '') + '">' + (i === 0 ? '👑' : i + 1) + '</div>' +
+      avHtml(p.name, 24) +
+      '<div class="b-name">' + esc(p.name) + '</div>' +
+      '<div class="b-pts">' + (p.score || 0) + '</div>';
+    container.appendChild(el);
+  });
+}
+
 function submitAnswer() {
-  if (state.answered) return;
-  const input = document.getElementById('answer-input').value.trim().toLowerCase();
+  if (state.answered || state.isTeacher) return;
+  var input = document.getElementById('answer-input').value.trim();
   if (!input) return;
 
-  clearInterval(state.timerInterval);
   state.answered = true;
   document.getElementById('answer-input').disabled = true;
+  showFeedback('sent');
 
-  const word = state.gameWords[state.currentRound];
-  const correct = word.ny.map(a => a.toLowerCase());
-  const isCorrect = correct.includes(input);
+  roomRef(state.roomCode).child('answers/' + state.myKey).set({
+    answer: input,
+    ts: SERVER_TS,
+  });
+}
 
-  const timeBonus = Math.round((state.timeLeft / 15) * 50);
-  const basePoints = isCorrect ? 100 : 0;
-  const total = basePoints + (isCorrect ? timeBonus : 0);
-
-  if (!state.scores[state.myName]) state.scores[state.myName] = 0;
-  state.scores[state.myName] += total;
-
-  if (isCorrect) {
-    state.streaks[state.myName] = (state.streaks[state.myName] || 0) + 1;
-    const streakBonus = state.streaks[state.myName] >= 3 ? ' 🔥 Streak!' : '';
-    showFeedback(true, `Riktig! +${total} poeng${streakBonus}`);
-  } else {
-    state.streaks[state.myName] = 0;
-    showFeedback(false, `Feil. Riktig svar: ${word.ny[0]}`);
+function showFeedback(type) {
+  var el = document.getElementById('feedback-banner');
+  if (type === 'sent') {
+    el.textContent = L().sent_msg;
+    el.className = 'feedback-banner show sent';
+  } else if (type === 'timeout') {
+    el.textContent = L().timeout_msg;
+    el.className = 'feedback-banner show wrong';
   }
-
-  document.getElementById('my-score-display').textContent = state.scores[state.myName] + ' poeng';
-  updateStreakDisplay();
-
-  setTimeout(() => showBetween(word.ny[0]), 1200);
 }
 
-function timeOut() {
-  state.answered = true;
-  document.getElementById('answer-input').disabled = true;
-  const word = state.gameWords[state.currentRound];
-  state.streaks[state.myName] = 0;
-  showFeedback(false, `Tiden er ute! Svar: ${word.ny[0]}`);
-  setTimeout(() => showBetween(word.ny[0]), 1200);
+function processRound() {
+  var ref = roomRef(state.roomCode);
+  var word = state.gameWords[fbRound];
+
+  ref.once('value').then(function(snap) {
+    var room = snap.val();
+    if (!room) return;
+    var answers = room.answers || {};
+    var players = room.players || {};
+    var startedAt = room.startedAt || 0;
+    var dur = room.timerDuration || state.timerDuration;
+    var updates = {};
+
+    Object.keys(players).forEach(function(key) {
+      var player = players[key];
+      var sub = answers[key];
+      var points = 0;
+      var newStreak = player.streak || 0;
+
+      if (sub && sub.answer) {
+        var correct = checkAnswer(sub.answer, word.ny);
+        if (correct) {
+          var elapsed = startedAt > 0 && sub.ts > 0 ? (sub.ts - startedAt) / 1000 : dur;
+          var timeBonus = Math.max(0, Math.round((dur - elapsed) / dur * 50));
+          points = 100 + timeBonus;
+          newStreak++;
+        } else {
+          newStreak = 0;
+        }
+      } else {
+        newStreak = 0;
+      }
+
+      updates['players/' + key + '/score'] = (player.score || 0) + points;
+      updates['players/' + key + '/streak'] = newStreak;
+      updates['players/' + key + '/change'] = points;
+    });
+
+    updates['correctAnswer'] = word.ny[0];
+    updates['status'] = 'between';
+    updates['answers'] = null;
+
+    ref.update(updates);
+
+    setTimeout(function() { advanceRound(); }, 2500);
+  });
 }
 
-function showFeedback(correct, msg) {
-  const el = document.getElementById('feedback-banner');
-  el.textContent = msg;
-  el.className = 'feedback-banner show ' + (correct ? 'correct' : 'wrong');
+function advanceRound() {
+  var nextRound = fbRound + 1;
+  if (nextRound >= state.totalRounds) {
+    roomRef(state.roomCode).update({ status: 'results', round: nextRound });
+  } else {
+    fbRound = nextRound;
+    teacherStartRound(nextRound);
+  }
 }
 
 // ─── BETWEEN ROUNDS ──────────────────────────────────────────
-function showBetween(correctAnswer) {
-  document.getElementById('correct-answer-show').textContent = correctAnswer;
+function showBetweenScreen(room) {
+  document.getElementById('correct-answer-show').textContent = room.correctAnswer || '';
 
-  const sorted = [...state.players].sort((a, b) => (state.scores[b] || 0) - (state.scores[a] || 0));
-  const mini = document.getElementById('mini-scoreboard');
+  var personalEl = document.getElementById('between-personal');
+  if (!state.isTeacher && fbPlayers[state.myKey]) {
+    var myChange = fbPlayers[state.myKey].change || 0;
+    personalEl.style.display = 'block';
+    if (myChange > 0) {
+      personalEl.textContent = L().correct_fb(myChange);
+      personalEl.className = 'feedback-banner show correct scale-pop';
+      sfxCorrect();
+      if ((fbPlayers[state.myKey].streak || 0) >= 3) {
+        spawnConfetti(document.getElementById('screen-between'), 25);
+      }
+    } else {
+      personalEl.textContent = L().wrong_fb;
+      personalEl.className = 'feedback-banner show wrong shake';
+      sfxWrong();
+    }
+  } else {
+    personalEl.style.display = 'none';
+  }
+
+  var sorted = getSortedPlayers();
+  var mini = document.getElementById('mini-scoreboard');
   mini.innerHTML = '';
-  sorted.slice(0, 5).forEach((p, i) => {
-    const el = document.createElement('div');
-    el.className = 'score-row' + (i === 0 ? ' top' : '');
-    el.innerHTML = `
-      <div class="rank ${i === 0 ? 'gold' : ''}">${i === 0 ? '👑' : i + 1}</div>
-      <div class="player-avatar" style="background:${getColor(p)};width:28px;height:28px;font-size:0.75rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">${getInitial(p)}</div>
-      <div class="score-name">${p}</div>
-      <div class="score-pts">${state.scores[p] || 0}</div>
-    `;
+  sorted.slice(0, 6).forEach(function(p, i) {
+    var change = p.change || 0;
+    var el = document.createElement('div');
+    el.className = 'board-row' + (i === 0 ? ' leader' : '');
+    el.innerHTML =
+      '<div class="b-rank ' + (i === 0 ? 'gold' : '') + '">' + (i === 0 ? '👑' : i + 1) + '</div>' +
+      avHtml(p.name, 24) +
+      '<div class="b-name">' + esc(p.name) + '</div>' +
+      '<div class="b-pts">' + (p.score || 0) + '</div>' +
+      '<div class="b-chg ' + (change > 0 ? 'up' : '') + '">' + (change > 0 ? '+' + change : '') + '</div>';
     mini.appendChild(el);
   });
 
-  const remaining = state.totalRounds - state.currentRound - 1;
-  document.getElementById('between-msg').textContent = remaining > 0
-    ? `${remaining} ord igjen...`
-    : 'Siste ord! Resultater kommer...';
+  var remaining = (room.totalRounds || state.totalRounds) - (room.round || 0) - 1;
+  document.getElementById('between-msg').textContent = remaining > 0 ? L().remaining(remaining) : L().last_word;
 
   showScreen('screen-between');
-  state.currentRound++;
-
-  setTimeout(() => {
-    if (state.currentRound >= state.totalRounds) {
-      showResults();
-    } else {
-      startRound();
-    }
-  }, 2500);
 }
 
 // ─── RESULTS ─────────────────────────────────────────────────
-function showResults() {
-  const sorted = [...state.players].sort((a, b) => (state.scores[b] || 0) - (state.scores[a] || 0));
+function showResultsScreen() {
+  var sorted = getSortedPlayers();
 
-  // Podium
-  const podium = document.getElementById('podium');
+  var podium = document.getElementById('podium');
   podium.innerHTML = '';
-  const order = [1, 0, 2]; // 2nd, 1st, 3rd
-  const emojis = ['🥇', '🥈', '🥉'];
-  order.forEach(idx => {
-    const p = sorted[idx];
+  [[1,'pod2'],[0,'pod1'],[2,'pod3']].forEach(function(pair) {
+    var idx = pair[0], cls = pair[1];
+    var p = sorted[idx];
     if (!p) return;
-    const block = document.createElement('div');
-    block.className = `podium-block p${idx === 0 ? 1 : idx === 1 ? 2 : 3}`;
-    block.innerHTML = `<div class="emoji">${emojis[idx]}</div><div>${p.split(' ')[0]}</div><div style="font-size:0.7rem;color:var(--muted)">${state.scores[p] || 0}p</div>`;
-    podium.appendChild(block);
+    var d = document.createElement('div');
+    d.className = 'pod ' + cls;
+    d.innerHTML = '<div class="pod-emoji">' + ['🥇','🥈','🥉'][idx] + '</div><div>' + esc(p.name.split(' ')[0]) + '</div><div style="color:var(--gold);font-family:\'DM Mono\',monospace;font-size:0.75rem">' + (p.score || 0) + '</div>';
+    podium.appendChild(d);
   });
 
-  // Full scoreboard
-  const final = document.getElementById('final-scoreboard');
+  var final = document.getElementById('final-scoreboard');
   final.innerHTML = '';
-  sorted.forEach((p, i) => {
-    const el = document.createElement('div');
-    el.className = 'score-row' + (i === 0 ? ' top' : '');
-    el.innerHTML = `
-      <div class="rank ${i === 0 ? 'gold' : ''}">${i + 1}</div>
-      <div class="player-avatar" style="background:${getColor(p)};width:32px;height:32px;font-size:0.85rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">${getInitial(p)}</div>
-      <div class="score-name">${p}</div>
-      <div class="score-pts">${state.scores[p] || 0} p</div>
-    `;
+  sorted.forEach(function(p, i) {
+    var el = document.createElement('div');
+    el.className = 'board-row' + (i === 0 ? ' leader' : '');
+    el.innerHTML =
+      '<div class="b-rank ' + (i === 0 ? 'gold' : '') + '">' + (i + 1) + '</div>' +
+      avHtml(p.name, 28) +
+      '<div class="b-name">' + esc(p.name) + '</div>' +
+      '<div class="b-pts">⚡ ' + (p.score || 0) + '</div>';
     final.appendChild(el);
   });
 
+  document.getElementById('header-info').textContent = getLang() === 'no' ? 'Resultater' : 'Results';
   showScreen('screen-results');
 }
 
-// ─── RESET ───────────────────────────────────────────────────
+function getSortedPlayers() {
+  return Object.keys(fbPlayers).map(function(key) {
+    return { key: key, name: fbPlayers[key].name, score: fbPlayers[key].score || 0, streak: fbPlayers[key].streak || 0, change: fbPlayers[key].change || 0 };
+  }).sort(function(a, b) { return b.score - a.score; });
+}
+
 function resetGame() {
-  Object.keys(state.scores).forEach(k => { state.scores[k] = 0; state.streaks[k] = 0; });
-  state.currentRound = 0;
-  renderLobby();
-  showScreen('screen-lobby');
+  if (state.isTeacher) {
+    var updates = { status: 'lobby', round: 0, prompt: '', correctAnswer: '', answers: null };
+    Object.keys(fbPlayers).forEach(function(k) {
+      updates['players/' + k + '/score'] = 0;
+      updates['players/' + k + '/streak'] = 0;
+      updates['players/' + k + '/change'] = 0;
+    });
+    state.gameWords = [];
+    roomRef(state.roomCode).update(updates);
+  }
+}
+
+function backToStart() {
+  clearInterval(state.timerInterval);
+  clearInterval(state.countdownInterval);
+  if (roomListener) {
+    roomRef(state.roomCode).off('value', roomListener);
+    roomListener = null;
+  }
+  if (!state.isTeacher && state.roomCode && state.myKey) {
+    roomRef(state.roomCode).child('players/' + state.myKey).remove();
+  }
+  fbPlayers = {};
+  fbRound = 0;
+  fbStatus = '';
+  state.roomCode = '';
+  state.gameWords = [];
+  document.getElementById('header-info').textContent = 'Nynorsk · 8. trinn';
+  showScreen('screen-role');
 }
 
 // ─── KEYBOARD ────────────────────────────────────────────────
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') {
-    const active = document.querySelector('.screen.active');
+    var active = document.querySelector('.screen.active');
     if (active && active.id === 'screen-game') submitAnswer();
     if (active && active.id === 'screen-role') joinGame();
   }
 });
+
+// ─── INIT ────────────────────────────────────────────────────
+applyLang();
 </script>
+</main>
 </body>
 </html>

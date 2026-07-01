@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(update-config)",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git config user.name 'Matselats' && git config user.email 'mats.jakobs1@gmail.com' && echo 'git config set OK'\")",
+      "PowerShell(wsl -e bash -c \"jq -e '.hooks.PostToolUse[] | select\\(.matcher == \\\\\"Write|Edit\\\\\"\\) | .hooks[] | select\\(.type == \\\\\"command\\\\\"\\) | .command' /home/mats/clashroom/.claude/settings.local.json\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git log --oneline -8\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git status --short\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git add grammarduell.html && git commit -m 'Rebuild grammarduell: 10sec timer, steal mechanic, language toggle, 32-question bank' && git push\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git add mathblitz.html && git commit -m 'Add mathblitz: multiplayer mental maths, grade selector, language toggle' && git push\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git add klassekart.html && git commit -m 'Add klassekart: seating chart generator, constraints, print support, localStorage' && git push\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git add timer.html && git commit -m 'Add timer: fullscreen countdown, 3 modes, Web Audio beep, keyboard shortcuts' && git push\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git add index.html && git commit -m 'Update index: add mathblitz, klassekart, timer; add teacher tools section' && git push\")",
+      "PowerShell(npm install *)",
+      "PowerShell(npm approve-scripts *)",
+      "PowerShell(claude *)",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git log --oneline -8 && echo '---' && git status --short\")",
+      "PowerShell(wsl -e bash -c \"sed -n '169,172p' /mnt/c/Users/05jakma1/Downloads/clashroom-design.html | head -c 2000\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git status && echo '---' && git log --oneline -5\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git diff --stat\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git status --short && echo '---' && git log --oneline -3\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git add ordjakten.html && git commit -m 'Add ordjakten: Norwegian synonym battle, 30 words, steal mechanic, 12s timer'\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git push\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git add flaggquiz.html && git commit -m 'Add flaggquiz: geography flag quiz, 40 countries, steal mechanic, 10s timer'\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git add tidslinjen.html && git commit -m 'Add tidslinjen: history timeline game, 35 events, Norwegian/world categories, 12s timer'\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git add index.html && git commit -m 'Update index: add flaggquiz and tidslinjen to game list'\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git log --oneline -5 && echo '---' && git remote -v && echo '---' && git status\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git push origin main 2>&1\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && GIT_TERMINAL_PROMPT=0 git push origin main\")",
+      "PowerShell(wsl -e bash -c \"cat ~/.ssh/id_ed25519.pub\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git remote set-url origin git@github.com:Matselats/clashroom.git && ssh -o StrictHostKeyChecking=accept-new -T git@github.com 2>&1; git push origin main\")",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git add -A && git diff --cached --stat\")",
+      "PowerShell(wsl -e bash -c 'cd /home/mats/clashroom && git reset HEAD .claude/settings.local.json && git commit -m \"Fix bugs: XSS sanitization, font consistency \\(Bricolage+Inter\\), back links, dead assignment\"')",
+      "PowerShell(wsl -e bash -c \"cd /home/mats/clashroom && git push origin main\")"
+    ]
+  }
+}
