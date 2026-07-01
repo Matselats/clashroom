@@ -3,10 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2B1338">
+<link rel="icon" href="brand-assets/clashroom-icon.svg" type="image/svg+xml">
 <title>Klassekart – Clashroom</title>
 <script src="shared.js"></script>
+<link rel="stylesheet" href="brand.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
 
   :root {
     --ink:    #0f0f1a;
@@ -44,7 +47,7 @@
     z-index: 100;
   }
 
-  .logo { font-family:'Bebas Neue',sans-serif; font-weight:800; font-size:1.15rem; letter-spacing:-0.03em; text-decoration:none; color:var(--paper); }
+  .logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.15rem; letter-spacing:-0.03em; text-decoration:none; color:var(--paper); }
   .logo span { color:var(--purple); }
 
   .header-right { display:flex; align-items:center; gap:10px; }
@@ -53,7 +56,7 @@
     display:flex; align-items:center; gap:5px;
     background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
     color:var(--paper); padding:5px 11px; border-radius:20px;
-    font-size:0.77rem; font-family:'Inter',sans-serif; font-weight:600;
+    font-size:0.77rem; font-family:'Schibsted Grotesk',sans-serif; font-weight:600;
     cursor:pointer; transition:background 0.15s; white-space:nowrap;
   }
   .lang-btn:hover { background:rgba(255,255,255,0.13); }
@@ -73,7 +76,7 @@
     overflow-y: auto;
   }
 
-  .sidebar h2 { font-family:'Bebas Neue',sans-serif; font-weight:800; font-size:1.1rem; letter-spacing:-0.03em; }
+  .sidebar h2 { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; letter-spacing:-0.03em; }
 
   label { font-size:0.78rem; font-weight:600; color:var(--muted); display:block; margin-bottom:5px; }
 
@@ -84,7 +87,7 @@
     border:2px solid rgba(255,255,255,0.1);
     border-radius:11px;
     color:var(--paper);
-    font-family:'Inter',sans-serif;
+    font-family:'Schibsted Grotesk',sans-serif;
     font-size:0.85rem;
     padding:10px 12px;
     resize:vertical;
@@ -106,14 +109,14 @@
     flex:1; padding:8px 5px; border-radius:9px;
     border:2px solid rgba(255,255,255,0.1);
     background:transparent; color:var(--muted);
-    font-size:0.78rem; font-family:'Bebas Neue',sans-serif; font-weight:700;
+    font-size:0.78rem; font-family:'Syne',sans-serif; font-weight:700;
     cursor:pointer; transition:all 0.2s; text-align:center;
   }
   .layout-btn.active { border-color:var(--purple); background:var(--pdim); color:var(--paper); }
 
   button.action {
     width:100%; padding:12px; border-radius:11px; border:none;
-    font-family:'Bebas Neue',sans-serif; font-weight:800; font-size:0.9rem;
+    font-family:'Syne',sans-serif; font-weight:800; font-size:0.9rem;
     cursor:pointer; transition:opacity 0.15s, transform 0.1s;
   }
   button.action:hover { opacity:0.88; transform:translateY(-1px); }
@@ -135,13 +138,13 @@
     border:2px solid rgba(255,255,255,0.1);
     background:rgba(255,255,255,0.05);
     color:var(--paper); font-size:0.82rem;
-    font-family:'Inter',sans-serif; outline:none; transition:border-color 0.2s;
+    font-family:'Schibsted Grotesk',sans-serif; outline:none; transition:border-color 0.2s;
   }
   .add-constraint-row input:focus { border-color:var(--purple); }
   .add-constraint-row input::placeholder { color:var(--muted); }
   .add-constraint-row button {
     width:auto; padding:7px 13px; background:var(--purple); color:white;
-    border:none; border-radius:9px; font-family:'Bebas Neue',sans-serif; font-weight:700;
+    border:none; border-radius:9px; font-family:'Syne',sans-serif; font-weight:700;
     font-size:0.82rem; cursor:pointer;
   }
 
@@ -153,12 +156,12 @@
   .canvas-header {
     display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
   }
-  .canvas-title { font-family:'Bebas Neue',sans-serif; font-weight:800; font-size:1.15rem; letter-spacing:-0.03em; }
+  .canvas-title { font-family:'Syne',sans-serif; font-weight:800; font-size:1.15rem; letter-spacing:-0.03em; }
 
   .canvas-actions { display:flex; gap:8px; flex-wrap:wrap; }
   .canvas-actions button {
     width:auto; padding:8px 16px; border-radius:10px; border:none;
-    font-family:'Bebas Neue',sans-serif; font-weight:700; font-size:0.8rem;
+    font-family:'Syne',sans-serif; font-weight:700; font-size:0.8rem;
     cursor:pointer; transition:opacity 0.15s;
   }
   .canvas-actions button:hover { opacity:0.85; }
@@ -170,7 +173,7 @@
     gap:14px; text-align:center; padding:40px 20px;
   }
   .empty-state .icon { font-size:3.5rem; }
-  .empty-state h3 { font-family:'Bebas Neue',sans-serif; font-weight:800; font-size:1.3rem; }
+  .empty-state h3 { font-family:'Syne',sans-serif; font-weight:800; font-size:1.3rem; }
   .empty-state p { color:var(--muted); font-size:0.88rem; max-width:280px; line-height:1.55; }
 
   .board-wrap { overflow-x:auto; }
@@ -214,7 +217,7 @@
     width:100%; max-width:260px;
     background:rgba(245,166,35,0.1); border:2px solid rgba(245,166,35,0.35);
     border-radius:10px; padding:8px 18px;
-    text-align:center; font-family:'Bebas Neue',sans-serif; font-weight:800; font-size:0.82rem;
+    text-align:center; font-family:'Syne',sans-serif; font-weight:800; font-size:0.82rem;
     color:var(--gold); margin:0 auto 6px;
     letter-spacing:0.04em;
   }
@@ -267,10 +270,14 @@
 <a class="skip-link" href="#main-content">Hopp til innhold</a>
 
 <header>
-  <a class="logo" href="index.html">Klasse<span>kart</span> 🪑</a>
+  <a class="header-brand" href="index.html">
+    <svg viewBox="0 0 120 130" width="24" height="26" aria-hidden="true"><path d="M60 36 L46 42 L26 6 L14 54 L26 84 L60 116 L94 84 L106 54 L94 6 L74 42 Z" fill="#FF9E33" stroke="#FF9E33" stroke-width="4" stroke-linejoin="round"/><path d="M31 18 L23 48 L43 41 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/><path d="M89 18 L97 48 L77 41 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/><path d="M60 46 L42 58 L34 80 L60 110 L86 80 L78 58 Z" fill="#FFF6EC" stroke="#FFF6EC" stroke-width="3" stroke-linejoin="round"/><ellipse cx="48" cy="68" rx="5" ry="5" fill="#2B1338"/><ellipse cx="72" cy="68" rx="5" ry="5" fill="#2B1338"/><path d="M53 78 H67 L60 90 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/></svg>
+    <span class="header-brand-name">Clashroom</span>
+  </a>
   <div class="header-right">
-    <button class="lang-btn" onclick="toggleLang()">
-      <span id="lang-flag">🇳🇴</span>
+    <span class="chip subj-chip-tool" data-no="Verktøy" data-en="Tool">Verktøy</span>
+    <button class="lang-btn" onclick="toggleLang()" aria-label="Bytt språk">
+      <span id="lang-flag">NO</span>
       <span id="lang-txt">Norsk</span>
     </button>
   </div>
@@ -331,7 +338,7 @@
     <div class="constraint-warn" id="constraint-warn"></div>
     <div class="board-wrap" id="board-wrap">
       <div class="empty-state" id="empty-state">
-        <div class="icon">🪑</div>
+        <div class="icon"></div>
         <h3 id="t-empty-title">Ingen elever enda</h3>
         <p id="t-empty-desc">Lim inn elevnavn til venstre og trykk "Generer kart" for å se sitteplassene.</p>
       </div>
@@ -614,7 +621,7 @@ function renderGrid(arrangement, cols) {
   const teacherDiv = document.createElement('div');
   teacherDiv.className = 'teacher-row';
   teacherDiv.id = 't-teacher-row';
-  teacherDiv.textContent = '👩‍🏫 ' + L().teacher_label;
+  teacherDiv.textContent = L().teacher_label;
   wrap.appendChild(teacherDiv);
 
   const grid = document.createElement('div');
@@ -668,7 +675,7 @@ function clearAll() {
   document.getElementById('count-display').textContent = '0';
   document.getElementById('board-wrap').innerHTML = `
     <div class="empty-state" id="empty-state">
-      <div class="icon">🪑</div>
+      <div class="icon"></div>
       <h3 id="t-empty-title"></h3>
       <p id="t-empty-desc"></p>
     </div>`;

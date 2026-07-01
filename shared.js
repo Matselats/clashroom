@@ -191,7 +191,7 @@ function setLang(lang) {
   document.documentElement.lang = lang;
   var flagEl = document.getElementById('lang-flag');
   var txtEl = document.getElementById('lang-txt');
-  if (flagEl) flagEl.textContent = lang === 'no' ? '\u{1F1F3}\u{1F1F4}' : '\u{1F1EC}\u{1F1E7}';
+  if (flagEl) flagEl.textContent = lang === 'no' ? 'NO' : 'EN';
   if (txtEl) txtEl.textContent = lang === 'no' ? 'Norsk' : 'English';
   if (typeof onLangChange === 'function') onLangChange();
 }

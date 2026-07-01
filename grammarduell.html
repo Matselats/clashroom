@@ -4,12 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Grammar Duel – Clashroom</title>
-<link rel="stylesheet" href="shared.css">
+<meta name="theme-color" content="#2B1338">
+<link rel="icon" href="brand-assets/clashroom-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="brand.css">
 <style>
   :root {
-    --accent: #e63946;
-    --accent-dim: rgba(230,57,70,0.14);
-    --accent-border: rgba(230,57,70,0.35);
+    --accent: var(--subj-english);
+    --accent-dim: var(--subj-english-dim);
+    --accent-border: rgba(74,126,194,0.30);
   }
 </style>
 </head>
@@ -18,11 +20,15 @@
 <a class="skip-link" href="#main-content">Hopp til innhold</a>
 
 <header>
-  <a class="logo" href="index.html">Grammar<span>Duel</span> 🧠</a>
+  <a class="header-brand" href="index.html">
+    <svg viewBox="0 0 120 130" width="24" height="26" aria-hidden="true"><path d="M60 36 L46 42 L26 6 L14 54 L26 84 L60 116 L94 84 L106 54 L94 6 L74 42 Z" fill="#FF9E33" stroke="#FF9E33" stroke-width="4" stroke-linejoin="round"/><path d="M31 18 L23 48 L43 41 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/><path d="M89 18 L97 48 L77 41 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/><path d="M60 46 L42 58 L34 80 L60 110 L86 80 L78 58 Z" fill="#FFF6EC" stroke="#FFF6EC" stroke-width="3" stroke-linejoin="round"/><ellipse cx="48" cy="68" rx="5" ry="5" fill="#2B1338"/><ellipse cx="72" cy="68" rx="5" ry="5" fill="#2B1338"/><path d="M53 78 H67 L60 90 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/></svg>
+    <span class="header-brand-name">Clashroom</span>
+  </a>
   <div class="header-right">
+    <span class="chip subj-chip-english">English</span>
     <div class="round-info" id="header-info">Clashroom</div>
-    <button class="lang-btn" onclick="toggleLang()">
-      <span id="lang-flag">🇳🇴</span>
+    <button class="lang-btn" onclick="toggleLang()" aria-label="Bytt språk">
+      <span id="lang-flag">NO</span>
       <span id="lang-txt">Norsk</span>
     </button>
   </div>
@@ -32,7 +38,6 @@
 <!-- ROLE SELECT -->
 <div class="screen active" id="screen-role">
   <div style="text-align:center;padding-top:16px;">
-    <div style="font-size:2.8rem;margin-bottom:14px;">🧠</div>
     <h1>Grammar<em>Duel</em></h1>
     <p class="sub" id="t-subtitle"></p>
   </div>
@@ -75,7 +80,7 @@
 <div class="screen" id="screen-game">
   <div style="width:100%;display:flex;justify-content:space-between;align-items:center;">
     <div class="round-tag">Q <span id="round-num">1</span>/20</div>
-    <div style="font-family:'DM Mono',monospace;font-size:0.83rem;color:var(--gold)">⚡ <span id="my-score-live">0</span> pts</div>
+    <div style="font-family:'DM Mono',monospace;font-size:0.83rem;color:var(--gold)"><span id="my-score-live">0</span> pts</div>
   </div>
 
   <div class="q-stage">
@@ -123,20 +128,20 @@
 const LANG = {
   no: {
     subtitle:        "Velg riktig grammatikk raskere enn resten av klassen.",
-    role_student:    "🎮 Elev",
-    role_teacher:    "🏫 Lærer",
+    role_student:    "Elev",
+    role_teacher:    "Lærer",
     name_ph:         "Navnet ditt...",
     join_btn:        "Bli med i duellen →",
     share_hint:      "Del siden med klassen – alle bruker sin egen enhet",
     lobby_title:     "Venter på<br><em>utfordrere...</em>",
-    start_btn:       "▶ Start duellen",
+    start_btn:       "Start duellen",
     game_info:       "20 spørsmål · 10 sek hvert",
     get_ready:       "Gjør deg klar...",
-    fastest_wins:    "🧠 Raskest riktig svar stjeler poeng!",
+    fastest_wins:    "Raskest riktig svar stjeler poeng!",
     q_eyebrow:       "Velg riktig form",
-    board_lbl:       "🏆 Live poengtavle",
+    board_lbl:       "Live poengtavle",
     results_title:   "Duellen<br><em>er over!</em>",
-    play_again:      "🔄 Ny duel",
+    play_again:      "Ny duel",
     change_settings: "Endre innstillinger",
     ans_label:       "Svar:",
     last_label:      "Siste:",
@@ -146,31 +151,31 @@ const LANG = {
     header_lobby:    n => `${n} i lobbyen`,
     header_q:        (q,t) => `Q ${q}/${t}`,
     flash_correct:   pts => `✓ Riktig! +${pts} pts`,
-    flash_steal:     (pts,n) => `💥 Stjal ${pts} pts fra ${n} spiller${n!==1?'e':''}!`,
+    flash_steal:     (pts,n) => `Stjal ${pts} pts fra ${n} spiller${n!==1?'e':''}!`,
     flash_wrong:     (pts,a) => `✗ Feil! −${pts} pts. Svar: ${a}`,
-    flash_timeout:   a => `⏱ Tiden er ute! Svar: ${a}`,
-    chg_pos:         pts => `⚡ Du fikk +${pts} pts!`,
-    chg_neg:         pts => `💸 Du mistet ${pts} pts`,
-    chg_none:        "⏱ Ingen endring denne runden",
+    flash_timeout:   a => `Tiden er ute! Svar: ${a}`,
+    chg_pos:         pts => `Du fikk +${pts} pts!`,
+    chg_neg:         pts => `Du mistet ${pts} pts`,
+    chg_none:        "Ingen endring denne runden",
     remaining:       n => `${n} spørsmål igjen...`,
     last_q:          "Siste spørsmål! Resultater straks...",
   },
   en: {
     subtitle:        "Pick the right grammar faster than the rest of the class.",
-    role_student:    "🎮 Student",
-    role_teacher:    "🏫 Teacher",
+    role_student:    "Student",
+    role_teacher:    "Teacher",
     name_ph:         "Your name...",
     join_btn:        "Enter the duel →",
     share_hint:      "Share this page with your class — everyone joins on their own device",
     lobby_title:     "Waiting for<br><em>challengers...</em>",
-    start_btn:       "▶ Start the duel",
+    start_btn:       "Start the duel",
     game_info:       "20 questions · 10 sec each",
     get_ready:       "Get ready...",
-    fastest_wins:    "🧠 Fastest correct answer steals points!",
+    fastest_wins:    "Fastest correct answer steals points!",
     q_eyebrow:       "Choose the correct form",
-    board_lbl:       "🏆 Live Scoreboard",
+    board_lbl:       "Live Scoreboard",
     results_title:   "Duel<br><em>Complete!</em>",
-    play_again:      "🔄 New Duel",
+    play_again:      "New Duel",
     change_settings: "Change settings",
     ans_label:       "Answer:",
     last_label:      "Last:",
@@ -180,12 +185,12 @@ const LANG = {
     header_lobby:    n => `${n} in lobby`,
     header_q:        (q,t) => `Q ${q}/${t}`,
     flash_correct:   pts => `✓ Correct! +${pts} pts`,
-    flash_steal:     (pts,n) => `💥 Stole ${pts} pts from ${n} player${n!==1?'s':''}!`,
+    flash_steal:     (pts,n) => `Stole ${pts} pts from ${n} player${n!==1?'s':''}!`,
     flash_wrong:     (pts,a) => `✗ Wrong! −${pts} pts. Answer: ${a}`,
-    flash_timeout:   a => `⏱ Time's up! Answer: ${a}`,
-    chg_pos:         pts => `⚡ You earned +${pts} pts!`,
-    chg_neg:         pts => `💸 You lost ${pts} pts`,
-    chg_none:        "⏱ No change this round",
+    flash_timeout:   a => `Time's up! Answer: ${a}`,
+    chg_pos:         pts => `You earned +${pts} pts!`,
+    chg_neg:         pts => `You lost ${pts} pts`,
+    chg_none:        "No change this round",
     remaining:       n => `${n} questions left...`,
     last_q:          "Last question! Results coming...",
   }
@@ -300,7 +305,7 @@ function renderLobby() {
   G.players.forEach(p => {
     const el = document.createElement('div');
     el.className = 'player-item';
-    el.innerHTML = `${avHtml(p,32)}<div class="p-name">${esc(p)}</div><div class="p-pts">⚡ ${G.scores[p]||0}</div>`;
+    el.innerHTML = `${avHtml(p,32)}<div class="p-name">${esc(p)}</div><div class="p-pts">${G.scores[p]||0}</div>`;
     list.appendChild(el);
   });
   const n = G.players.length;
@@ -444,7 +449,7 @@ function renderBoard() {
     const el = document.createElement('div');
     el.className = 'board-row' + (i===0?' leader':'') + (isMe?' me':'');
     el.innerHTML = `
-      <div class="b-rank${i===0?' gold':''}">${i===0?'👑':i+1}</div>
+      <div class="b-rank${i===0?' gold':''}">${i===0?'1':i+1}</div>
       ${avHtml(p,24)}
       <div class="b-name">${p}${isMe ? L().you_suffix : ''}</div>
       <div class="b-pts">${G.scores[p]||0}</div>
@@ -474,7 +479,7 @@ function between(ans) {
     const el = document.createElement('div');
     el.className = 'board-row' + (i===0?' leader':'');
     el.innerHTML = `
-      <div class="b-rank${i===0?' gold':''}">${i===0?'👑':i+1}</div>
+      <div class="b-rank${i===0?' gold':''}">${i===0?'1':i+1}</div>
       ${avHtml(p,24)}
       <div class="b-name">${esc(p)}</div>
       <div class="b-pts">${G.scores[p]||0} pts</div>
@@ -508,7 +513,7 @@ function showResults() {
       <div class="b-rank${i===0?' gold':''}">${i+1}</div>
       ${avHtml(p,28)}
       <div class="b-name">${esc(p)}</div>
-      <div class="b-pts">⚡ ${G.scores[p]||0}</div>
+      <div class="b-pts">${G.scores[p]||0}</div>
     `;
     fb.appendChild(el);
   });

@@ -3,10 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2B1338">
+<link rel="icon" href="brand-assets/clashroom-icon.svg" type="image/svg+xml">
 <title>Clashroom Detective</title>
 <script src="shared.js"></script>
+<link rel="stylesheet" href="brand.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
 
   :root {
     --ink: #0f0f1a;
@@ -24,7 +27,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Schibsted Grotesk', sans-serif;
     background: var(--ink);
     color: var(--paper);
     min-height: 100vh;
@@ -48,7 +51,7 @@
   }
 
   .logo {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-weight: 800;
     font-size: 1.2rem;
     letter-spacing: -0.03em;
@@ -81,7 +84,7 @@
   }
 
   h1 {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-weight: 800;
     font-size: 2.4rem;
     letter-spacing: -0.05em;
@@ -126,7 +129,7 @@
 
   .case-info { flex: 1; }
   .case-title {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-weight: 700;
     font-size: 1rem;
     margin-bottom: 4px;
@@ -181,7 +184,7 @@
   .back-btn:hover { background: rgba(255,255,255,0.1); }
 
   .case-title-big {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-weight: 800;
     font-size: 1.3rem;
     flex: 1;
@@ -371,7 +374,7 @@
     border: none;
     background: var(--amber);
     color: #0f0f1a;
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-weight: 800;
     font-size: 1.05rem;
     cursor: pointer;
@@ -394,7 +397,7 @@
   .result-emoji { font-size: 3.5rem; display: block; margin-bottom: 16px; }
 
   .result-title {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-weight: 800;
     font-size: 1.8rem;
     letter-spacing: -0.04em;
@@ -418,7 +421,7 @@
 
   .breakdown-item { text-align: center; }
   .breakdown-num {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 1.5rem;
     font-weight: 800;
     color: var(--paper);
@@ -445,7 +448,7 @@
     padding: 14px;
     border-radius: 12px;
     border: none;
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-weight: 700;
     font-size: 0.95rem;
     cursor: pointer;
@@ -474,7 +477,7 @@
     text-align: center;
   }
   .stat-num {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Syne', sans-serif;
     font-size: 1.8rem;
     font-weight: 800;
     color: var(--amber);
@@ -525,7 +528,11 @@
 <a class="skip-link" href="#main-content">Skip to content</a>
 
 <header>
-  <div class="logo">Clash<span>room</span> 🔍</div>
+  <a class="header-brand" href="index.html">
+    <svg viewBox="0 0 120 130" width="24" height="26" aria-hidden="true"><path d="M60 36 L46 42 L26 6 L14 54 L26 84 L60 116 L94 84 L106 54 L94 6 L74 42 Z" fill="#FF9E33" stroke="#FF9E33" stroke-width="4" stroke-linejoin="round"/><path d="M31 18 L23 48 L43 41 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/><path d="M89 18 L97 48 L77 41 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/><path d="M60 46 L42 58 L34 80 L60 110 L86 80 L78 58 Z" fill="#FFF6EC" stroke="#FFF6EC" stroke-width="3" stroke-linejoin="round"/><ellipse cx="48" cy="68" rx="5" ry="5" fill="#2B1338"/><ellipse cx="72" cy="68" rx="5" ry="5" fill="#2B1338"/><path d="M53 78 H67 L60 90 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/></svg>
+    <span class="header-brand-name">Clashroom</span>
+  </a>
+  <span class="chip subj-chip-english">English</span>
   <div class="case-counter" id="header-progress" aria-live="polite">0 / 5 solved</div>
 </header>
 
@@ -533,7 +540,7 @@
 <!-- INTRO SCREEN -->
 <div class="screen active" id="screen-intro">
   <div class="intro-hero">
-    <span class="case-file-icon">🗂️</span>
+    <span class="case-file-icon"></span>
     <h1>Clashroom<br><em>Detective</em></h1>
     <p class="sub">Five mysteries. One detective. Read carefully — the clues are hidden in the text.</p>
   </div>
@@ -559,7 +566,7 @@
   </div>
 
   <div class="clue-board">
-    <div class="clue-board-title">🔍 Your clues</div>
+    <div class="clue-board-title">Your clues</div>
     <div class="clue-tags" id="clue-tags">
       <span class="clue-empty">No clues collected yet...</span>
     </div>
@@ -578,7 +585,7 @@
 <!-- RESULT SCREEN -->
 <div class="screen" id="screen-result">
   <div class="result-card fade-up">
-    <span class="result-emoji" id="result-emoji">🎉</span>
+    <span class="result-emoji" id="result-emoji"></span>
     <div class="result-title" id="result-title">Case Solved!</div>
     <div class="result-score" id="result-score">850 pts</div>
     <div class="result-breakdown">
@@ -606,7 +613,7 @@
 <!-- FINAL SCREEN -->
 <div class="screen" id="screen-final">
   <div class="final-screen">
-    <span class="trophy">🏆</span>
+    <span class="trophy"></span>
     <h1>All Cases<br><em>Solved!</em></h1>
     <p class="sub">You've cracked every mystery in the file. Outstanding detective work.</p>
     <div class="stats-grid">
@@ -627,7 +634,7 @@
         <div class="stat-label">Final Rank</div>
       </div>
     </div>
-    <button class="btn btn-primary" style="width:100%" onclick="resetAll()">🔄 Play Again</button>
+    <button class="btn btn-primary" style="width:100%" onclick="resetAll()">Play Again</button>
   </div>
 </div>
 
@@ -635,7 +642,7 @@
 const CASES = [
   {
     id: 0,
-    emoji: '🏫',
+    emoji: '',
     title: 'The Missing Lunch',
     difficulty: 1,
     timeLimit: 120,
@@ -927,7 +934,7 @@ function updateClueBoard() {
   foundClues.forEach(clue => {
     const tag = document.createElement('span');
     tag.className = 'clue-tag';
-    tag.textContent = '🔍 ' + clue;
+    tag.textContent = clue;
     container.appendChild(tag);
   });
 }
@@ -984,7 +991,7 @@ function updateSolveBtn() {
   const btn = document.getElementById('solve-btn');
   if (allAnswered) {
     btn.disabled = false;
-    btn.textContent = '🔍 Close the case!';
+    btn.textContent = 'Close the case!';
   }
 }
 
@@ -1010,10 +1017,10 @@ function solveCase() {
 
   let rank, rankClass, emoji, title;
   const pct = correct / total;
-  if (pct === 1) { rank = 'Super Sleuth 🌟'; rankClass = 'rank-super'; emoji = '🏆'; title = 'Perfect!'; }
-  else if (pct >= 0.75) { rank = 'Senior Detective'; rankClass = 'rank-senior'; emoji = '🎯'; title = 'Case Solved!'; }
-  else if (pct >= 0.5) { rank = 'Detective'; rankClass = 'rank-detective'; emoji = '🔍'; title = 'Case Closed'; }
-  else { rank = 'Rookie'; rankClass = 'rank-rookie'; emoji = '📋'; title = 'Partial Solution'; }
+  if (pct === 1) { rank = 'Super Sleuth'; rankClass = 'rank-super'; emoji = ''; title = 'Perfect!'; }
+  else if (pct >= 0.75) { rank = 'Senior Detective'; rankClass = 'rank-senior'; emoji = ''; title = 'Case Solved!'; }
+  else if (pct >= 0.5) { rank = 'Detective'; rankClass = 'rank-detective'; emoji = ''; title = 'Case Closed'; }
+  else { rank = 'Rookie'; rankClass = 'rank-rookie'; emoji = ''; title = 'Partial Solution'; }
 
   document.getElementById('result-emoji').textContent = emoji;
   document.getElementById('result-title').textContent = title;
@@ -1031,7 +1038,7 @@ function solveCase() {
     nextBtn.textContent = 'Next Case →';
     nextBtn.style.display = 'block';
   } else {
-    nextBtn.textContent = '🏆 See Final Results';
+    nextBtn.textContent = 'See Final Results';
     nextBtn.style.display = 'block';
   }
 
@@ -1094,7 +1101,7 @@ function autoSolve() {
         if (oi === q.correct) btn.classList.add('correct');
       });
       const feedback = document.getElementById(`feedback-${qi}`);
-      feedback.textContent = '⏱ Time\'s up! ' + q.explanation;
+      feedback.textContent = 'Time\'s up! ' + q.explanation;
       feedback.className = 'q-feedback show wrong';
     }
   });

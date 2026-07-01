@@ -3,54 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stavekrig – Nynorsk</title>
-<link rel="stylesheet" href="shared.css">
+<title>Stavekrig – Clashroom</title>
+<meta name="theme-color" content="#2B1338">
+<link rel="icon" href="brand-assets/clashroom-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="brand.css">
 <style>
   :root {
-    --accent: #e63946;
-    --accent-dim: rgba(230,57,70,0.14);
-    --accent-border: rgba(230,57,70,0.35);
-  }
-  .word-display { font-size: 2.4rem; }
-  .feedback-banner {
-    width: 100%;
-    padding: 14px 20px;
-    border-radius: 12px;
-    text-align: center;
-    font-weight: 700;
-    font-size: 1rem;
-    display: none;
-  }
-  .feedback-banner.correct { background: rgba(42,157,92,0.2); border: 1px solid var(--green); color: #5de097; }
-  .feedback-banner.wrong { background: rgba(230,57,70,0.2); border: 1px solid var(--accent); color: #ff8a93; }
-  .feedback-banner.sent { background: rgba(33,118,174,0.2); border: 1px solid #2176ae; color: #64b5f6; }
-  .feedback-banner.show { display: block; }
-  .room-code-box {
-    width: 100%;
-    background: var(--card);
-    border: 2px dashed var(--accent-border);
-    border-radius: 16px;
-    padding: 20px;
-    text-align: center;
-  }
-  .room-code-box .label {
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-  .room-code-box .code {
-    font-family: 'DM Mono', monospace;
-    font-size: 2.8rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    color: var(--accent);
-  }
-  .room-code-box .hint {
-    font-size: 0.7rem;
-    color: var(--muted);
-    margin-top: 6px;
+    --accent: var(--subj-norsk);
+    --accent-dim: var(--subj-norsk-dim);
+    --accent-border: rgba(61,140,92,0.30);
   }
   #room-code-input {
     text-transform: uppercase;
@@ -59,18 +20,6 @@
     font-family: 'DM Mono', monospace;
     font-weight: 700;
   }
-  .join-error {
-    color: #ff6b6b;
-    font-size: 0.8rem;
-    text-align: center;
-    display: none;
-  }
-  .join-error.show { display: block; }
-  .answered-tag {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.83rem;
-    color: var(--muted);
-  }
 </style>
 </head>
 <body>
@@ -78,11 +27,15 @@
 <a class="skip-link" href="#main-content">Hopp til innhold</a>
 
 <header>
-  <a class="logo" href="index.html">Stave<span>krig</span></a>
+  <a class="header-brand" href="index.html">
+    <svg viewBox="0 0 120 130" width="24" height="26" aria-hidden="true"><path d="M60 36 L46 42 L26 6 L14 54 L26 84 L60 116 L94 84 L106 54 L94 6 L74 42 Z" fill="#FF9E33" stroke="#FF9E33" stroke-width="4" stroke-linejoin="round"/><path d="M31 18 L23 48 L43 41 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/><path d="M89 18 L97 48 L77 41 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/><path d="M60 46 L42 58 L34 80 L60 110 L86 80 L78 58 Z" fill="#FFF6EC" stroke="#FFF6EC" stroke-width="3" stroke-linejoin="round"/><ellipse cx="48" cy="68" rx="5" ry="5" fill="#2B1338"/><ellipse cx="72" cy="68" rx="5" ry="5" fill="#2B1338"/><path d="M53 78 H67 L60 90 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/></svg>
+    <span class="header-brand-name">Clashroom</span>
+  </a>
   <div class="header-right">
+    <span class="chip subj-chip-norsk">Norsk</span>
     <div class="round-info" id="header-info">Nynorsk · 8. trinn</div>
-    <button class="lang-btn" onclick="toggleLang()">
-      <span id="lang-flag">🇳🇴</span>
+    <button class="lang-btn" onclick="toggleLang()" aria-label="Bytt språk">
+      <span id="lang-flag">NO</span>
       <span id="lang-txt">Norsk</span>
     </button>
   </div>
@@ -96,8 +49,8 @@
     <p class="sub" id="t-subtitle">Læreren starter spillet. Elevene kobler seg på med romkode.</p>
   </div>
   <div class="role-toggle">
-    <button class="role-btn active" onclick="selectRole('student')" id="role-student">🎮 Elev</button>
-    <button class="role-btn" onclick="selectRole('teacher')" id="role-teacher">🏫 Lærer</button>
+    <button class="role-btn active" onclick="selectRole('student')" id="role-student">Elev</button>
+    <button class="role-btn" onclick="selectRole('teacher')" id="role-teacher">Lærer</button>
   </div>
   <div class="card" style="gap:14px;display:flex;flex-direction:column;">
     <input type="text" id="name-input" maxlength="20" />
@@ -126,7 +79,7 @@
     </div>
   </div>
   <div id="teacher-controls" style="display:none; width:100%; gap:10px; flex-direction:column;">
-    <button class="btn-green" onclick="startCountdown()" id="t-start-btn">▶ Start spillet</button>
+    <button class="btn-green" onclick="startCountdown()" id="t-start-btn">Start spillet</button>
     <div class="info-row">
       <span id="t-game-info">10 ord · 15 sek per ord</span>
       <span id="player-count">0 spillere</span>
@@ -138,14 +91,14 @@
 <div class="screen" id="screen-countdown">
   <p class="sub" id="t-get-ready">Spillet starter om...</p>
   <div class="countdown-big" id="countdown-num">3</div>
-  <p class="sub" id="t-ready-hint">Gjør deg klar! 🎯</p>
+  <p class="sub" id="t-ready-hint">Gjør deg klar!</p>
 </div>
 
 <!-- SCREEN: GAME -->
 <div class="screen" id="screen-game">
   <div style="width:100%;display:flex;justify-content:space-between;align-items:center;">
     <div class="round-tag" id="t-round-tag">Ord <span id="round-num">1</span> av 10</div>
-    <div id="my-score-wrap" style="font-family:'DM Mono',monospace;font-size:0.83rem;color:var(--gold)">⚡ <span id="my-score-display">0</span> <span id="t-pts-label">poeng</span></div>
+    <div id="my-score-wrap" style="font-family:'DM Mono',monospace;font-size:0.83rem;color:var(--gold)"><span id="my-score-display">0</span> <span id="t-pts-label">poeng</span></div>
     <div id="answered-wrap" class="answered-tag" style="display:none;">✓ <span id="answered-num">0</span>/<span id="total-players-num">0</span></div>
   </div>
 
@@ -189,7 +142,7 @@
   <h1 id="t-results-title">Spillet<br>er <em>over!</em></h1>
   <div class="podium" id="podium"></div>
   <div style="width:100%;display:flex;flex-direction:column;gap:8px;" id="final-scoreboard"></div>
-  <button class="btn-primary" onclick="resetGame()" id="t-play-again">Spill igjen 🔄</button>
+  <button class="btn-primary" onclick="resetGame()" id="t-play-again">Spill igjen</button>
   <button class="btn-secondary" onclick="backToStart()" id="t-change-settings">Nytt rom</button>
   <a class="home-link" href="index.html" id="t-back-link">← Tilbake til Clashroom</a>
 </div>
@@ -204,8 +157,8 @@ var LANG = {
   no: {
     title:        'Vil du <em>lære</em> eller <em>lede</em>?',
     subtitle:     'Læreren starter spillet. Elevene kobler seg på med romkode.',
-    role_student: '🎮 Elev',
-    role_teacher: '🏫 Lærer',
+    role_student: 'Elev',
+    role_teacher: 'Lærer',
     name_ph:      'Skriv navnet ditt...',
     room_code_ph: 'Romkode...',
     join_btn:     'Bli med →',
@@ -216,34 +169,34 @@ var LANG = {
     room_not_found:  'Fant ikke rommet. Sjekk koden og prøv igjen.',
     lobby_teacher: 'Rommet er<br><em>klart!</em>',
     lobby_student: 'Koblet til<br><em>rommet!</em>',
-    start_btn:    '▶ Start spillet',
+    start_btn:    'Start spillet',
     game_info:    '10 ord · 15 sek per ord',
     get_ready:    'Spillet starter om...',
-    ready_hint:   'Gjør deg klar! 🎯',
+    ready_hint:   'Gjør deg klar!',
     word_label:   'Oversett til nynorsk',
     pts_label:    'poeng',
     send_btn:     'Send',
-    sent_msg:     'Sendt! ⏳',
-    timeout_msg:  'Tiden er ute! ⏱',
+    sent_msg:     'Sendt!',
+    timeout_msg:  'Tiden er ute!',
     you_label:    'Du',
     answer_label: 'Svar',
-    correct_fb:   function(pts) { return 'Riktig! +' + pts + ' poeng 🎉'; },
+    correct_fb:   function(pts) { return 'Riktig! +' + pts + ' poeng'; },
     wrong_fb:     'Feil svar',
     results_title:'Spillet<br>er <em>over!</em>',
-    play_again:   'Spill igjen 🔄',
+    play_again:   'Spill igjen',
     change:       'Nytt rom',
     back:         '← Tilbake til Clashroom',
     remaining:    function(n) { return n + ' ord igjen...'; },
     last_word:    'Siste ord! Resultater kommer...',
     players_ready:function(n) { return n + ' spiller' + (n !== 1 ? 'e' : '') + ' klar'; },
     players_count:function(n) { return n + ' spillere'; },
-    streak_badge: function(n) { return '🔥 ' + n + ' på rad'; },
+    streak_badge: function(n) { return n + ' på rad'; },
   },
   en: {
     title:        'Want to <em>learn</em> or <em>lead</em>?',
     subtitle:     'The teacher starts the game. Students join with a room code.',
-    role_student: '🎮 Student',
-    role_teacher: '🏫 Teacher',
+    role_student: 'Student',
+    role_teacher: 'Teacher',
     name_ph:      'Your name...',
     room_code_ph: 'Room code...',
     join_btn:     'Join →',
@@ -254,28 +207,28 @@ var LANG = {
     room_not_found:  'Room not found. Check the code and try again.',
     lobby_teacher: 'Room is<br><em>ready!</em>',
     lobby_student: 'Connected to<br><em>the room!</em>',
-    start_btn:    '▶ Start game',
+    start_btn:    'Start game',
     game_info:    '10 words · 15 sec each',
     get_ready:    'Game starts in...',
-    ready_hint:   'Get ready! 🎯',
+    ready_hint:   'Get ready!',
     word_label:   'Translate to Nynorsk',
     pts_label:    'pts',
     send_btn:     'Send',
-    sent_msg:     'Sent! ⏳',
-    timeout_msg:  'Time\'s up! ⏱',
+    sent_msg:     'Sent!',
+    timeout_msg:  'Time\'s up!',
     you_label:    'You',
     answer_label: 'Answer',
-    correct_fb:   function(pts) { return 'Correct! +' + pts + ' pts 🎉'; },
+    correct_fb:   function(pts) { return 'Correct! +' + pts + ' pts'; },
     wrong_fb:     'Wrong answer',
     results_title:'Game<br><em>over!</em>',
-    play_again:   'Play again 🔄',
+    play_again:   'Play again',
     change:       'New room',
     back:         '← Back to Clashroom',
     remaining:    function(n) { return n + ' words left...'; },
     last_word:    'Last word! Results coming...',
     players_ready:function(n) { return n + ' player' + (n !== 1 ? 's' : '') + ' ready'; },
     players_count:function(n) { return n + ' players'; },
-    streak_badge: function(n) { return '🔥 ' + n + ' in a row'; },
+    streak_badge: function(n) { return n + ' in a row'; },
   }
 };
 
@@ -640,7 +593,7 @@ function renderTeacherLiveBoard() {
   sorted.slice(0, 8).forEach(function(p, i) {
     var el = document.createElement('div');
     el.className = 'board-row' + (i === 0 ? ' leader' : '');
-    el.innerHTML = '<div class="b-rank ' + (i === 0 ? 'gold' : '') + '">' + (i === 0 ? '👑' : i + 1) + '</div>' +
+    el.innerHTML = '<div class="b-rank ' + (i === 0 ? 'gold' : '') + '">' + (i + 1) + '</div>' +
       avHtml(p.name, 24) +
       '<div class="b-name">' + esc(p.name) + '</div>' +
       '<div class="b-pts">' + (p.score || 0) + '</div>';
@@ -764,7 +717,7 @@ function showBetweenScreen(room) {
     var el = document.createElement('div');
     el.className = 'board-row' + (i === 0 ? ' leader' : '');
     el.innerHTML =
-      '<div class="b-rank ' + (i === 0 ? 'gold' : '') + '">' + (i === 0 ? '👑' : i + 1) + '</div>' +
+      '<div class="b-rank ' + (i === 0 ? 'gold' : '') + '">' + (i + 1) + '</div>' +
       avHtml(p.name, 24) +
       '<div class="b-name">' + esc(p.name) + '</div>' +
       '<div class="b-pts">' + (p.score || 0) + '</div>' +

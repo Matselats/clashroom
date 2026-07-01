@@ -3,10 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2B1338">
+<link rel="icon" href="brand-assets/clashroom-icon.svg" type="image/svg+xml">
 <title>Timer – Clashroom</title>
 <script src="shared.js"></script>
+<link rel="stylesheet" href="brand.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
 
   :root {
     --ink:    #0f0f1a;
@@ -24,7 +27,7 @@
   * { box-sizing:border-box; margin:0; padding:0; }
 
   body {
-    font-family:'Inter',sans-serif;
+    font-family:'Schibsted Grotesk',sans-serif;
     background:var(--ink);
     color:var(--paper);
     min-height:100vh;
@@ -45,7 +48,7 @@
     backdrop-filter:blur(8px);
   }
 
-  .logo { font-family:'Bebas Neue',sans-serif; font-weight:800; font-size:1.1rem; letter-spacing:-0.03em; text-decoration:none; color:var(--paper); }
+  .logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.1rem; letter-spacing:-0.03em; text-decoration:none; color:var(--paper); }
   .logo span { color:var(--accent); transition:color 0.4s; }
 
   .header-right { display:flex; align-items:center; gap:8px; }
@@ -54,7 +57,7 @@
     display:flex; align-items:center; gap:4px;
     background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
     color:var(--paper); padding:5px 10px; border-radius:20px;
-    font-size:0.75rem; font-family:'Inter',sans-serif; font-weight:600;
+    font-size:0.75rem; font-family:'Schibsted Grotesk',sans-serif; font-weight:600;
     cursor:pointer; transition:background 0.15s; white-space:nowrap;
   }
   .lang-btn:hover { background:rgba(255,255,255,0.13); }
@@ -77,14 +80,14 @@
     padding:9px 18px; border-radius:24px;
     border:2px solid rgba(255,255,255,0.1);
     background:rgba(255,255,255,0.05);
-    color:var(--muted);
-    font-family:'Bebas Neue',sans-serif; font-weight:700; font-size:0.85rem;
+    color:rgba(255,255,255,0.5);
+    font-family:'Syne',sans-serif; font-weight:700; font-size:0.85rem;
     cursor:pointer; transition:all 0.2s;
   }
-  .mode-tab:hover { border-color:rgba(255,255,255,0.25); color:var(--paper); }
-  .mode-tab.active-work  { border-color:var(--work-accent);  background:rgba(33,118,174,0.15);  color:var(--paper); }
-  .mode-tab.active-group { border-color:var(--group-accent); background:rgba(42,157,92,0.15);   color:var(--paper); }
-  .mode-tab.active-test  { border-color:var(--test-accent);  background:rgba(230,57,70,0.15);   color:var(--paper); }
+  .mode-tab:hover { border-color:rgba(255,255,255,0.25); color:var(--cream); }
+  .mode-tab.active-work  { border-color:var(--work-accent);  background:rgba(33,118,174,0.15);  color:var(--cream); }
+  .mode-tab.active-group { border-color:var(--group-accent); background:rgba(42,157,92,0.15);   color:var(--cream); }
+  .mode-tab.active-test  { border-color:var(--test-accent);  background:rgba(230,57,70,0.15);   color:var(--cream); }
 
   /* ── BIG DISPLAY ── */
   .timer-display {
@@ -96,7 +99,7 @@
   }
 
   .mode-label {
-    font-family:'Bebas Neue',sans-serif; font-weight:800; font-size:0.85rem;
+    font-family:'Syne',sans-serif; font-weight:800; font-size:0.85rem;
     letter-spacing:0.18em; text-transform:uppercase;
     opacity:0.5; transition:color 0.4s;
   }
@@ -139,7 +142,7 @@
   .controls { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
   .ctrl-btn {
     padding:12px 24px; border-radius:13px; border:none;
-    font-family:'Bebas Neue',sans-serif; font-weight:800; font-size:0.92rem;
+    font-family:'Syne',sans-serif; font-weight:800; font-size:0.92rem;
     cursor:pointer; transition:opacity 0.15s, transform 0.1s;
   }
   .ctrl-btn:hover { opacity:0.88; transform:translateY(-1px); }
@@ -156,7 +159,7 @@
     padding:8px 16px; border-radius:10px;
     border:2px solid rgba(255,255,255,0.1);
     background:transparent; color:var(--muted);
-    font-family:'Bebas Neue',sans-serif; font-weight:700; font-size:0.83rem;
+    font-family:'Syne',sans-serif; font-weight:700; font-size:0.83rem;
     cursor:pointer; transition:all 0.2s;
   }
   .preset-btn:hover { border-color:rgba(255,255,255,0.3); color:var(--paper); }
@@ -181,7 +184,7 @@
   .custom-set {
     padding:8px 16px; border-radius:10px; border:none;
     background:rgba(255,255,255,0.1); color:var(--paper);
-    font-family:'Bebas Neue',sans-serif; font-weight:700; font-size:0.83rem;
+    font-family:'Syne',sans-serif; font-weight:700; font-size:0.83rem;
     cursor:pointer; transition:opacity 0.15s;
   }
   .custom-set:hover { opacity:0.85; }
@@ -195,11 +198,11 @@
   }
   .done-banner.show { display:flex; }
   .done-icon { font-size:5rem; animation:donePop 0.5s ease; }
-  .done-text { font-family:'Bebas Neue',sans-serif; font-weight:800; font-size:2.5rem; text-align:center; }
+  .done-text { font-family:'Syne',sans-serif; font-weight:800; font-size:2.5rem; text-align:center; }
   .done-sub  { color:var(--muted); font-size:1rem; }
   .done-dismiss {
     padding:13px 32px; border-radius:14px; border:none;
-    font-family:'Bebas Neue',sans-serif; font-weight:800; font-size:1rem;
+    font-family:'Syne',sans-serif; font-weight:800; font-size:1rem;
     background:var(--work-accent); color:white; cursor:pointer;
     transition:opacity 0.15s;
   }
@@ -224,10 +227,14 @@
 <a class="skip-link" href="#main-content">Hopp til innhold</a>
 
 <header>
-  <a class="logo" href="index.html">Clash<span>room</span> ⏱</a>
+  <a class="header-brand" href="index.html">
+    <svg viewBox="0 0 120 130" width="24" height="26" aria-hidden="true"><path d="M60 36 L46 42 L26 6 L14 54 L26 84 L60 116 L94 84 L106 54 L94 6 L74 42 Z" fill="#FF9E33" stroke="#FF9E33" stroke-width="4" stroke-linejoin="round"/><path d="M31 18 L23 48 L43 41 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/><path d="M89 18 L97 48 L77 41 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/><path d="M60 46 L42 58 L34 80 L60 110 L86 80 L78 58 Z" fill="#FFF6EC" stroke="#FFF6EC" stroke-width="3" stroke-linejoin="round"/><ellipse cx="48" cy="68" rx="5" ry="5" fill="#2B1338"/><ellipse cx="72" cy="68" rx="5" ry="5" fill="#2B1338"/><path d="M53 78 H67 L60 90 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/></svg>
+    <span class="header-brand-name">Clashroom</span>
+  </a>
   <div class="header-right">
-    <button class="lang-btn" onclick="toggleLang()">
-      <span id="lang-flag">🇳🇴</span>
+    <span class="chip subj-chip-tool" data-no="Verktøy" data-en="Tool">Verktøy</span>
+    <button class="lang-btn" onclick="toggleLang()" aria-label="Bytt språk">
+      <span id="lang-flag">NO</span>
       <span id="lang-txt">Norsk</span>
     </button>
   </div>
@@ -278,22 +285,22 @@
 // ─── TRANSLATIONS ─────────────────────────────────────────────
 const LANG = {
   no: {
-    tab_work:    "⏱ Arbeidsøkt",
-    tab_group:   "👥 Gruppearbeid",
-    tab_test:    "📝 Prøve",
+    tab_work:    "Arbeidsøkt",
+    tab_group:   "Gruppearbeid",
+    tab_test:    "Prøve",
     label_work:  "ARBEIDSØKT",
     label_group: "GRUPPEARBEID",
     label_test:  "PRØVETID",
-    start:       "▶ Start",
-    pause:       "⏸ Pause",
-    resume:      "▶ Fortsett",
-    reset:       "↺ Nullstill",
+    start:       "Start",
+    pause:       "Pause",
+    resume:      "Fortsett",
+    reset:       "Nullstill",
     custom_lbl:  "Egendefinert:",
     min_lbl:     "min",
-    custom_set:  "Sett →",
-    done_icon_work:  "⏰",
-    done_icon_group: "👋",
-    done_icon_test:  "✏️",
+    custom_set:  "Sett",
+    done_icon_work:  "",
+    done_icon_group: "",
+    done_icon_test:  "",
     done_text_work:  "Arbeidsøkten er ferdig!",
     done_text_group: "Tid er ute!",
     done_text_test:  "Prøvetiden er over!",
@@ -304,22 +311,22 @@ const LANG = {
     presets:         [5, 10, 15, 20, 30],
   },
   en: {
-    tab_work:    "⏱ Work session",
-    tab_group:   "👥 Group work",
-    tab_test:    "📝 Test",
+    tab_work:    "Work session",
+    tab_group:   "Group work",
+    tab_test:    "Test",
     label_work:  "WORK SESSION",
     label_group: "GROUP WORK",
     label_test:  "TEST TIME",
-    start:       "▶ Start",
-    pause:       "⏸ Pause",
-    resume:      "▶ Resume",
-    reset:       "↺ Reset",
+    start:       "Start",
+    pause:       "Pause",
+    resume:      "Resume",
+    reset:       "Reset",
     custom_lbl:  "Custom:",
     min_lbl:     "min",
-    custom_set:  "Set →",
-    done_icon_work:  "⏰",
-    done_icon_group: "👋",
-    done_icon_test:  "✏️",
+    custom_set:  "Set",
+    done_icon_work:  "",
+    done_icon_group: "",
+    done_icon_test:  "",
     done_text_work:  "Work session complete!",
     done_text_group: "Time's up!",
     done_text_test:  "Test time is over!",
@@ -371,7 +378,8 @@ function setMode(m) {
   document.querySelector('.big-time').className = `big-time ${m}-color`;
   document.querySelector('.progress-bar').style.background = `var(--${m}-accent)`;
   document.getElementById('btn-start').className = `ctrl-btn btn-start ${m==='work'?'':m}`;
-  document.querySelector('.logo span').style.color = `var(--${m}-accent)`;
+  const brandName = document.querySelector('.header-brand-name');
+  if (brandName) brandName.style.color = `var(--${m}-accent)`;
   updateModeLabel();
   renderPresets();
 }
