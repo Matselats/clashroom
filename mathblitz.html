@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Blitz – Clashroom</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  :root {
+    --accent: #e63946;
+    --accent-dim: rgba(230,57,70,0.14);
+    --accent-border: rgba(230,57,70,0.35);
+  }
+
+  /* Grade selector */
+  .grade-select { display: flex; gap: 8px; width: 100%; }
+  .grade-btn {
+    flex: 1; padding: 10px 8px;
+    border-radius: 10px;
+    border: 2px solid rgba(255,255,255,0.1);
+    background: transparent; color: var(--muted);
+    font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+    font-family: 'Bebas Neue', sans-serif; font-weight: 700;
+  }
+  .grade-btn.active { border-color: var(--accent); background: var(--accent-dim); color: var(--paper); }
+
+  /* Math problem display */
+  .math-problem {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.2rem; font-weight: 800;
+    letter-spacing: -0.04em; color: var(--paper); line-height: 1;
+  }
+
+  /* Game-specific overrides */
+  .q-stage { padding: 32px 24px 28px; }
+  .answer-input { padding: 16px 60px 16px 20px; font-size: 1.6rem; font-weight: 800; text-align: center; }
+  .send-btn { padding: 8px 14px; font-size: 0.82rem; }
+  .q-eyebrow { margin-bottom: 12px; }
+
+  @media (max-width: 400px) {
+    .math-problem { font-size: 2.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main-content">Hopp til innhold</a>
+
+<header>
+  <a class="logo" href="index.html">Math<span>Blitz</span> 🔢</a>
+  <div class="header-right">
+    <div class="round-info" id="header-info">Clashroom</div>
+    <button class="lang-btn" onclick="toggleLang()">
+      <span id="lang-flag">🇳🇴</span>
+      <span id="lang-txt">Norsk</span>
+    </button>
+  </div>
+</header>
+
+<main id="main-content">
+<!-- ROLE SELECT -->
+<div class="screen active" id="screen-role">
+  <div style="text-align:center;padding-top:16px;">
+    <div style="font-size:2.8rem;margin-bottom:14px;">🔢</div>
+    <h1>Math<em>Blitz</em></h1>
+    <p class="sub" id="t-subtitle"></p>
+  </div>
+  <div class="role-toggle">
+    <button class="role-btn active" onclick="selectRole('student')" id="role-student"></button>
+    <button class="role-btn" onclick="selectRole('teacher')" id="role-teacher"></button>
+  </div>
+  <div class="card" style="display:flex;flex-direction:column;gap:11px;">
+    <input type="text" id="name-input" maxlength="20" />
+    <div id="grade-section" style="display:none;flex-direction:column;gap:8px;">
+      <div class="sub" id="t-grade-label" style="text-align:left;font-size:0.8rem;"></div>
+      <div class="grade-select">
+        <button class="grade-btn active" onclick="selectGrade(8)" id="grade-8">8. trinn</button>
+        <button class="grade-btn" onclick="selectGrade(9)" id="grade-9">9. trinn</button>
+        <button class="grade-btn" onclick="selectGrade(10)" id="grade-10">10. trinn</button>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="joinGame()" id="t-join-btn"></button>
+  </div>
+  <p class="sub" style="font-size:0.73rem;" id="t-share-hint"></p>
+</div>
+
+<!-- LOBBY -->
+<div class="screen" id="screen-lobby">
+  <h1 id="t-lobby-title"></h1>
+  <p class="sub" id="lobby-count"></p>
+  <div class="card" style="display:flex;flex-direction:column;gap:9px;">
+    <div class="player-list" id="player-list"></div>
+    <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+  <div id="teacher-controls" style="display:none;width:100%;flex-direction:column;gap:9px;">
+    <button class="btn-green" onclick="startCountdown()" id="t-start-btn"></button>
+    <div class="info-row">
+      <span id="t-game-info"></span>
+      <span id="player-count-label"></span>
+    </div>
+  </div>
+</div>
+
+<!-- COUNTDOWN -->
+<div class="screen" id="screen-countdown">
+  <p class="sub" id="t-get-ready"></p>
+  <div class="countdown-big" id="countdown-num">3</div>
+  <p class="sub" id="t-fastest-wins"></p>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="screen-game">
+  <div style="width:100%;display:flex;justify-content:space-between;align-items:center;">
+    <div class="round-tag">Q <span id="round-num">1</span>/20</div>
+    <div style="font-family:'DM Mono',monospace;font-size:0.83rem;color:var(--gold)">⚡ <span id="my-score-live">0</span> pts</div>
+  </div>
+
+  <div class="q-stage">
+    <div class="timer-wrap">
+      <svg viewBox="0 0 44 44">
+        <circle class="ring-track" cx="22" cy="22" r="18"/>
+        <circle class="ring-prog" id="ring-prog" cx="22" cy="22" r="18"/>
+      </svg>
+      <div class="ring-num" id="ring-num">10</div>
+    </div>
+    <div class="q-eyebrow" id="t-q-eyebrow"></div>
+    <div class="math-problem" id="math-problem">4 × 7 = ?</div>
+  </div>
+
+  <div class="answer-wrap">
+    <input class="answer-input" type="number" id="answer-input"
+      inputmode="numeric" pattern="[0-9\-]*"
+      autocomplete="off" autocorrect="off" spellcheck="false" />
+    <button class="send-btn" onclick="submitAnswer()">→</button>
+  </div>
+
+  <div class="flash" id="game-flash" role="alert" aria-live="assertive"></div>
+
+  <div class="live-board">
+    <div class="board-lbl" id="t-board-lbl"></div>
+    <div id="live-scoreboard"></div>
+  </div>
+</div>
+
+<!-- BETWEEN -->
+<div class="screen" id="screen-between">
+  <h1 id="between-title"></h1>
+  <div class="flash show neutral" id="between-flash"></div>
+  <div style="width:100%;display:flex;flex-direction:column;gap:5px;" id="between-board"></div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="screen-results">
+  <h1 id="t-results-title"></h1>
+  <div class="podium" id="podium"></div>
+  <div style="width:100%;display:flex;flex-direction:column;gap:5px;margin-top:6px;" id="final-board"></div>
+  <button class="btn-primary" onclick="resetGame()" id="t-play-again"></button>
+  <button class="btn-secondary" onclick="showScreen('screen-role')" id="t-change-settings"></button>
+  <a href="index.html" style="margin-top:8px;color:var(--muted);font-size:.82rem;text-decoration:none;">← Tilbake til Clashroom</a>
+</div>
+
+<script src="shared.js"></script>
+<script>
+// ─── TRANSLATIONS ─────────────────────────────────────────────
+const LANG = {
+  no: {
+    subtitle:        "Mental matte i full fart. Slå klassekameratene til riktig svar.",
+    role_student:    "🎮 Elev",
+    role_teacher:    "🏫 Lærer",
+    name_ph:         "Navnet ditt...",
+    grade_label:     "Velg vanskelighetsgrad:",
+    join_btn:        "Bli med →",
+    share_hint:      "Del siden med klassen – alle bruker sin egen enhet",
+    lobby_title:     "Venter på<br><em>spillere...</em>",
+    start_btn:       "▶ Start spillet",
+    game_info:       "20 oppgaver · 10 sek hver",
+    get_ready:       "Gjør deg klar...",
+    fastest_wins:    "🔢 Raskest riktig svar vinner!",
+    q_eyebrow:       "Hva er svaret?",
+    board_lbl:       "🏆 Live poengtavle",
+    results_title:   "Spillet<br><em>er over!</em>",
+    play_again:      "🔄 Spill igjen",
+    change_settings: "Endre innstillinger",
+    ans_label:       "Svar:",
+    last_label:      "Siste:",
+    you_suffix:      " (deg)",
+    players_ready:   n => `${n} spiller${n!==1?'e':''} klar`,
+    players_count:   n => `${n} spillere`,
+    header_lobby:    n => `${n} i lobbyen`,
+    header_q:        (q,t) => `Q ${q}/${t}`,
+    flash_correct:   pts => `✓ Riktig! +${pts} pts`,
+    flash_wrong:     (pts,a) => `✗ Feil! −${pts} pts. Svar: ${a}`,
+    flash_timeout:   a => `⏱ Tiden er ute! Svar: ${a}`,
+    chg_pos:         pts => `⚡ Du fikk +${pts} pts!`,
+    chg_neg:         pts => `💸 Du mistet ${pts} pts`,
+    chg_none:        "⏱ Ingen endring denne runden",
+  },
+  en: {
+    subtitle:        "Mental maths at full speed. Beat your classmates to the answer.",
+    role_student:    "🎮 Student",
+    role_teacher:    "🏫 Teacher",
+    name_ph:         "Your name...",
+    grade_label:     "Choose difficulty:",
+    join_btn:        "Join →",
+    share_hint:      "Share this page with your class — everyone joins on their own device",
+    lobby_title:     "Waiting for<br><em>players...</em>",
+    start_btn:       "▶ Start the game",
+    game_info:       "20 questions · 10 sec each",
+    get_ready:       "Get ready...",
+    fastest_wins:    "🔢 Fastest correct answer wins!",
+    q_eyebrow:       "What's the answer?",
+    board_lbl:       "🏆 Live Scoreboard",
+    results_title:   "Game<br><em>Over!</em>",
+    play_again:      "🔄 Play again",
+    change_settings: "Change settings",
+    ans_label:       "Answer:",
+    last_label:      "Last:",
+    you_suffix:      " (you)",
+    players_ready:   n => `${n} player${n!==1?'s':''} ready`,
+    players_count:   n => `${n} players`,
+    header_lobby:    n => `${n} in lobby`,
+    header_q:        (q,t) => `Q ${q}/${t}`,
+    flash_correct:   pts => `✓ Correct! +${pts} pts`,
+    flash_wrong:     (pts,a) => `✗ Wrong! −${pts} pts. Answer: ${a}`,
+    flash_timeout:   a => `⏱ Time's up! Answer: ${a}`,
+    chg_pos:         pts => `⚡ You earned +${pts} pts!`,
+    chg_neg:         pts => `💸 You lost ${pts} pts`,
+    chg_none:        "⏱ No change this round",
+  }
+};
+
+const L = () => LANG[getLang()];
+
+function onLangChange() { applyLang(); }
+
+function applyLang() {
+  document.documentElement.lang = getLang();
+  document.getElementById('lang-flag').textContent = getLang() === 'no' ? '🇳🇴' : '🇬🇧';
+  document.getElementById('lang-txt').textContent  = getLang() === 'no' ? 'Norsk' : 'English';
+  const s = (id, v) => { const e = document.getElementById(id); if (e) e.innerHTML = v; };
+  const t = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  const p = (id, v) => { const e = document.getElementById(id); if (e) e.placeholder = v; };
+  s('t-subtitle',        L().subtitle);
+  t('role-student',      L().role_student);
+  t('role-teacher',      L().role_teacher);
+  p('name-input',        L().name_ph);
+  t('t-grade-label',     L().grade_label);
+  t('t-join-btn',        L().join_btn);
+  t('t-share-hint',      L().share_hint);
+  s('t-lobby-title',     L().lobby_title);
+  t('t-start-btn',       L().start_btn);
+  t('t-game-info',       L().game_info);
+  t('t-get-ready',       L().get_ready);
+  t('t-fastest-wins',    L().fastest_wins);
+  t('t-q-eyebrow',       L().q_eyebrow);
+  t('t-board-lbl',       L().board_lbl);
+  s('t-results-title',   L().results_title);
+  t('t-play-again',      L().play_again);
+  t('t-change-settings', L().change_settings);
+  if (G.players.length > 0) renderLobby();
+}
+
+// ─── QUESTION GENERATORS ─────────────────────────────────────
+function makeQuestions(grade) {
+  const qs = [];
+  const add = (a, op, b) => {
+    let ans;
+    if (op === '+') ans = a + b;
+    else if (op === '-') ans = a - b;
+    else if (op === '×') ans = a * b;
+    else if (op === '÷') ans = a / b;
+    qs.push({ problem: `${a} ${op} ${b} = ?`, answer: ans });
+  };
+
+  if (grade === 8) {
+    // addition/subtraction up to 100, small multiplication
+    for (let i = 0; i < 7; i++) {
+      const a = rand(10, 99), b = rand(1, Math.min(a, 50));
+      add(a, '+', b); add(a, '-', b);
+    }
+    for (let i = 0; i < 6; i++) add(rand(2,9), '×', rand(2,9));
+  } else if (grade === 9) {
+    // larger multiplication, division, negatives
+    for (let i = 0; i < 6; i++) add(rand(10,30), '×', rand(2,12));
+    for (let i = 0; i < 6; i++) {
+      const b = rand(2,12), a = b * rand(2,15);
+      add(a, '÷', b);
+    }
+    for (let i = 0; i < 8; i++) {
+      const a = rand(10,200), b = rand(10,200);
+      add(a, '+', b); add(Math.max(a,b), '-', Math.min(a,b));
+    }
+  } else {
+    // grade 10: bigger numbers, mixed ops
+    for (let i = 0; i < 6; i++) add(rand(20,99), '×', rand(2,15));
+    for (let i = 0; i < 6; i++) {
+      const b = rand(2,20), a = b * rand(3,25);
+      add(a, '÷', b);
+    }
+    for (let i = 0; i < 8; i++) {
+      const a = rand(50,500), b = rand(50,500);
+      add(a, '+', b); add(Math.max(a,b), '-', Math.min(a,b));
+    }
+  }
+  return shuffle(qs).slice(0, 20);
+}
+
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+// ─── CONSTANTS ────────────────────────────────────────────────
+const TIME_MAX = 10;
+const ROUNDS   = 20;
+const PENALTY  = 20;
+
+// ─── STATE ────────────────────────────────────────────────────
+const G = {
+  role:'student', myName:'', isTeacher:false,
+  grade:8,
+  players:[], scores:{}, lastChange:{},
+  questions:[], round:0,
+  answered:false, timeLeft:TIME_MAX, timer:null,
+};
+
+// ─── ROLE / GRADE ────────────────────────────────────────────
+function selectRole(role) {
+  G.role = role;
+  document.getElementById('role-student').classList.toggle('active', role==='student');
+  document.getElementById('role-teacher').classList.toggle('active', role==='teacher');
+  const gs = document.getElementById('grade-section');
+  gs.style.display = role==='teacher' ? 'flex' : 'none';
+}
+
+function selectGrade(g) {
+  G.grade = g;
+  [8,9,10].forEach(n => document.getElementById(`grade-${n}`).classList.toggle('active', n===g));
+}
+
+function joinGame() {
+  const name = document.getElementById('name-input').value.trim();
+  if (!name) { document.getElementById('name-input').focus(); return; }
+  G.myName = name;
+  G.isTeacher = G.role === 'teacher';
+  if (!G.players.includes(name)) {
+    G.players.push(name);
+    G.scores[name] = 0;
+    G.lastChange[name] = 0;
+  }
+  renderLobby();
+  showScreen('screen-lobby');
+  if (G.isTeacher) document.getElementById('teacher-controls').style.display = 'flex';
+}
+
+function renderLobby() {
+  const list = document.getElementById('player-list');
+  list.innerHTML = '';
+  G.players.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'player-item';
+    el.innerHTML = `${avHtml(p,32)}<div class="p-name">${esc(p)}</div><div class="p-pts">⚡ ${G.scores[p]||0}</div>`;
+    list.appendChild(el);
+  });
+  const n = G.players.length;
+  document.getElementById('lobby-count').textContent = L().players_ready(n);
+  document.getElementById('player-count-label').textContent = L().players_count(n);
+  document.getElementById('header-info').textContent = L().header_lobby(n);
+}
+
+function startCountdown() {
+  G.questions = makeQuestions(G.grade);
+  G.round = 0;
+  G.players.forEach(p => { G.scores[p]=0; G.lastChange[p]=0; });
+  showScreen('screen-countdown');
+  let n = 3;
+  document.getElementById('countdown-num').textContent = n;
+  sfxCountdown();
+  const iv = setInterval(() => {
+    n--;
+    if (n<=0) { clearInterval(iv); startRound(); }
+    else { document.getElementById('countdown-num').textContent = n; sfxCountdown(); }
+  }, 1000);
+}
+
+function startRound() {
+  if (G.round >= ROUNDS) { showResults(); return; }
+  const q = G.questions[G.round];
+  G.answered = false;
+  G.timeLeft = TIME_MAX;
+
+  document.getElementById('round-num').textContent = G.round+1;
+  document.getElementById('math-problem').textContent = q.problem;
+  document.getElementById('answer-input').value = '';
+  document.getElementById('answer-input').disabled = false;
+  document.getElementById('game-flash').className = 'flash';
+  document.getElementById('my-score-live').textContent = G.scores[G.myName]||0;
+  document.getElementById('header-info').textContent = L().header_q(G.round+1, ROUNDS);
+  document.getElementById('ring-num').textContent = TIME_MAX;
+
+  renderBoard();
+  showScreen('screen-game');
+  document.getElementById('answer-input').focus();
+  updateRing(TIME_MAX, TIME_MAX, document.getElementById('ring-prog'));
+  document.getElementById('ring-prog').style.stroke = 'var(--gold)';
+  clearInterval(G.timer);
+  G.timer = setInterval(() => {
+    G.timeLeft--;
+    document.getElementById('ring-num').textContent = G.timeLeft;
+    updateRing(G.timeLeft, TIME_MAX, document.getElementById('ring-prog'));
+    if (G.timeLeft<=3) { document.getElementById('ring-prog').style.stroke='var(--red)'; sfxTick(); }
+    else if (G.timeLeft<=6) document.getElementById('ring-prog').style.stroke='var(--gold)';
+    if (G.timeLeft<=0) { clearInterval(G.timer); if(!G.answered) timeout(q); }
+  }, 1000);
+}
+
+function submitAnswer() {
+  if (G.answered) return;
+  const raw = document.getElementById('answer-input').value.trim();
+  if (raw === '') return;
+  const val = parseFloat(raw);
+  if (isNaN(val)) return;
+
+  clearInterval(G.timer);
+  G.answered = true;
+  document.getElementById('answer-input').disabled = true;
+
+  const q = G.questions[G.round];
+  const ok = Math.abs(val - q.answer) < 0.001;
+  const timeBonus = Math.round((G.timeLeft / TIME_MAX) * 60);
+  const flash = document.getElementById('game-flash');
+
+  if (ok) {
+    const gained = 100 + timeBonus;
+    G.scores[G.myName] = (G.scores[G.myName]||0) + gained;
+    G.lastChange[G.myName] = gained;
+    G.players.forEach(p => { if (p!==G.myName) G.lastChange[p]=0; });
+    flash.textContent = L().flash_correct(gained);
+    flash.className = 'flash show win scale-pop';
+    sfxCorrect();
+  } else {
+    G.scores[G.myName] = Math.max(0,(G.scores[G.myName]||0)-PENALTY);
+    G.lastChange[G.myName] = -PENALTY;
+    G.players.forEach(p => { if (p!==G.myName) G.lastChange[p]=0; });
+    flash.textContent = L().flash_wrong(PENALTY, q.answer);
+    flash.className = 'flash show lose shake';
+    sfxWrong();
+  }
+
+  document.getElementById('my-score-live').textContent = G.scores[G.myName]||0;
+  renderBoard();
+  setTimeout(() => between(q.answer), 1500);
+}
+
+function timeout(q) {
+  G.answered = true;
+  document.getElementById('answer-input').disabled = true;
+  G.players.forEach(p => { G.lastChange[p]=0; });
+  const flash = document.getElementById('game-flash');
+  flash.textContent = L().flash_timeout(q.answer);
+  flash.className = 'flash show neutral';
+  renderBoard();
+  setTimeout(() => between(q.answer), 1500);
+}
+
+function renderBoard() {
+  const sorted = [...G.players].sort((a,b)=>(G.scores[b]||0)-(G.scores[a]||0));
+  const c = document.getElementById('live-scoreboard');
+  c.innerHTML = '';
+  sorted.slice(0,6).forEach((p,i) => {
+    const chg = G.lastChange[p]||0;
+    const isMe = p===G.myName;
+    const el = document.createElement('div');
+    el.className = 'board-row'+(i===0?' leader':'')+(isMe?' me':'');
+    el.innerHTML = `
+      <div class="b-rank${i===0?' gold':''}">${i===0?'👑':i+1}</div>
+      ${avHtml(p,24)}
+      <div class="b-name">${p}${isMe?L().you_suffix:''}</div>
+      <div class="b-pts">${G.scores[p]||0}</div>
+      <div class="b-chg ${chg>0?'up':chg<0?'down':''}">${chg>0?'+'+chg:chg<0?chg:''}</div>
+    `;
+    c.appendChild(el);
+  });
+}
+
+function between(ans) {
+  const remaining = ROUNDS - G.round - 1;
+  document.getElementById('between-title').innerHTML =
+    remaining > 0 ? `${L().ans_label} <em>${ans}</em>` : `${L().last_label} <em>${ans}</em>`;
+
+  const chg = G.lastChange[G.myName]||0;
+  const bf = document.getElementById('between-flash');
+  if (chg>0)      { bf.textContent=L().chg_pos(chg);           bf.className='flash show win';     }
+  else if (chg<0) { bf.textContent=L().chg_neg(Math.abs(chg)); bf.className='flash show lose';    }
+  else            { bf.textContent=L().chg_none;                bf.className='flash show neutral'; }
+
+  const sorted=[...G.players].sort((a,b)=>(G.scores[b]||0)-(G.scores[a]||0));
+  const board=document.getElementById('between-board');
+  board.innerHTML='';
+  sorted.slice(0,6).forEach((p,i)=>{
+    const el=document.createElement('div');
+    el.className='board-row'+(i===0?' leader':'');
+    el.innerHTML=`<div class="b-rank${i===0?' gold':''}">${i===0?'👑':i+1}</div>${avHtml(p,24)}<div class="b-name">${esc(p)}</div><div class="b-pts">${G.scores[p]||0} pts</div>`;
+    board.appendChild(el);
+  });
+
+  showScreen('screen-between');
+  G.round++;
+  setTimeout(()=>{ if(G.round>=ROUNDS) showResults(); else startRound(); }, 2500);
+}
+
+function showResults() {
+  const sorted=[...G.players].sort((a,b)=>(G.scores[b]||0)-(G.scores[a]||0));
+  const podium=document.getElementById('podium');
+  podium.innerHTML='';
+  [[1,'pod2'],[0,'pod1'],[2,'pod3']].forEach(([idx,cls])=>{
+    const p=sorted[idx]; if(!p) return;
+    const d=document.createElement('div');
+    d.className=`pod ${cls}`;
+    d.innerHTML=`<div class="pod-emoji">${['🥇','🥈','🥉'][idx]}</div><div>${p.split(' ')[0]}</div><div style="color:var(--gold);font-family:'DM Mono',monospace;font-size:0.75rem">${G.scores[p]||0}</div>`;
+    podium.appendChild(d);
+  });
+  const fb=document.getElementById('final-board');
+  fb.innerHTML='';
+  sorted.forEach((p,i)=>{
+    const el=document.createElement('div');
+    el.className='board-row'+(i===0?' leader':'');
+    el.innerHTML=`<div class="b-rank${i===0?' gold':''}">${i+1}</div>${avHtml(p,28)}<div class="b-name">${esc(p)}</div><div class="b-pts">⚡ ${G.scores[p]||0}</div>`;
+    fb.appendChild(el);
+  });
+  showScreen('screen-results');
+}
+
+function resetGame() {
+  G.players.forEach(p=>{ G.scores[p]=0; G.lastChange[p]=0; });
+  G.round=0;
+  renderLobby();
+  showScreen('screen-lobby');
+}
+
+document.addEventListener('keydown', e => {
+  const active = document.querySelector('.screen.active');
+  if (!active) return;
+  if (active.id==='screen-role' && e.key==='Enter') { joinGame(); return; }
+  if (active.id==='screen-game' && e.key==='Enter') { submitAnswer(); }
+});
+
+applyLang();
+</script>
+</main>
+</body>
+</html>

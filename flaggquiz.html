@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Flaggquiz – Clashroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="shared.js"></script>
+<style>
+:root{
+  --bg:#0f0f1a;--card:#1a1a2e;--paper:#f0ede6;
+  --accent:#e63946;--accent-h:#cf2f3d;
+  --green:#22c55e;--red:#ef4444;
+  --muted:rgba(240,237,230,.45);--border:rgba(240,237,230,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--paper);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+
+.lang-btn{position:fixed;top:16px;right:16px;background:var(--card);border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:4px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;z-index:50}
+.lang-btn:hover{color:var(--paper)}
+
+.screen{display:none;width:100%;max-width:520px;flex-direction:column;align-items:center}
+.screen.active{display:flex}
+
+h1{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:2rem;text-align:center;margin-bottom:6px;letter-spacing:0.04em;text-transform:uppercase}
+.sub{color:var(--muted);font-size:.85rem;text-align:center;margin-bottom:28px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:24px;width:100%}
+.card+.card{margin-top:12px}
+.card-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;font-weight:600}
+textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:4px;padding:12px;color:var(--paper);font-family:'Inter',sans-serif;font-size:.85rem;resize:vertical;min-height:80px}
+textarea::placeholder{color:var(--muted)}
+textarea:focus{outline:none;border-color:var(--accent)}
+
+.start-btn{margin-top:20px;background:var(--accent);color:#fff;border:none;padding:14px 32px;border-radius:4px;font-family:'Inter',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;transition:background .15s;width:100%}
+.start-btn:hover{background:var(--accent-h)}
+.start-btn:disabled{opacity:.4;cursor:default}
+
+/* GAME */
+.top-bar{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:20px}
+.round-label{font-size:.75rem;color:var(--muted);font-weight:600}
+.timer-ring{position:relative;width:48px;height:48px}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring circle{fill:none;stroke-width:3}
+.timer-bg{stroke:var(--border)}
+.timer-fg{stroke:var(--accent);stroke-dasharray:113;stroke-dashoffset:0;transition:stroke-dashoffset .3s linear}
+.timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.95rem}
+
+.flag-display{font-size:6rem;text-align:center;margin:16px 0 24px;line-height:1.1}
+.flag-hint{text-align:center;font-size:.82rem;color:var(--muted);margin-bottom:20px;font-style:italic}
+
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-bottom:16px}
+.opt{background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:4px;padding:14px 16px;color:var(--paper);font-family:'Inter',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .15s;text-align:center}
+.opt:hover:not(.locked){border-color:var(--accent);background:rgba(230,57,70,.08)}
+.opt.correct{background:rgba(34,197,94,.15);border-color:var(--green);color:var(--green)}
+.opt.wrong{background:rgba(239,68,68,.1);border-color:var(--red);color:var(--red)}
+.opt.locked{cursor:default;opacity:.6}
+.opt.show-correct{border-color:var(--green);opacity:1}
+
+.scores{width:100%;margin-top:8px}
+.score-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:.82rem}
+.score-row:last-child{border:none}
+.score-name{font-weight:600}
+.score-pts{font-weight:700;color:var(--accent)}
+.steal-tag{font-size:.65rem;background:var(--accent);color:#fff;padding:2px 7px;border-radius:6px;margin-left:6px;font-weight:700}
+
+/* RESULT */
+.podium{display:flex;justify-content:center;align-items:flex-end;gap:12px;margin:24px 0 32px;width:100%}
+.pod{display:flex;flex-direction:column;align-items:center;gap:6px}
+.pod-bar{width:64px;border-radius:4px 10px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:12px;font-weight:800;font-size:1.1rem}
+.pod-name{font-size:.78rem;font-weight:600;max-width:80px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pod-pts{font-size:.72rem;color:var(--muted)}
+.pod:nth-child(1) .pod-bar{height:120px;background:var(--accent)}
+.pod:nth-child(2) .pod-bar{height:88px;background:rgba(230,57,70,.5)}
+.pod:nth-child(3) .pod-bar{height:64px;background:rgba(230,57,70,.25)}
+
+.play-again{margin-top:8px;background:var(--accent);color:#fff;border:none;padding:14px 32px;border-radius:4px;font-family:'Inter',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;width:100%}
+.play-again:hover{background:var(--accent-h)}
+.home-link{margin-top:12px;color:var(--muted);font-size:.82rem;text-decoration:none}
+.home-link:hover{color:var(--paper)}
+
+button:focus-visible,.opt:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(max-width:480px){
+  .flag-display{font-size:4.5rem}
+  .opts{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main-content" style="position:absolute;top:-40px;left:0;background:#e63946;color:#fff;padding:8px 16px;z-index:200;font-size:.85rem;text-decoration:none;border-radius:0 0 4px 0;transition:top .2s" onfocus="this.style.top='0'" onblur="this.style.top='-40px'">Hopp til innhold</a>
+
+<button class="lang-btn" onclick="toggleLang()" id="langBtn" aria-label="Bytt språk">EN</button>
+
+<main id="main-content">
+<!-- SETUP -->
+<div class="screen active" id="setup">
+  <h1 data-no="Flaggquiz" data-en="Flag Quiz">Flaggquiz</h1>
+  <p class="sub" data-no="Gjenkjenn flagget. Raskest riktig svar stjeler poeng." data-en="Identify the flag. Fastest correct answer steals points.">Gjenkjenn flagget. Raskest riktig svar stjeler poeng.</p>
+
+  <div class="card">
+    <div class="card-label" data-no="Spillere (én per linje)" data-en="Players (one per line)">Spillere (én per linje)</div>
+    <textarea id="names" placeholder="Ola&#10;Kari&#10;Henrik"></textarea>
+  </div>
+
+  <button class="start-btn" onclick="startGame()" data-no="Start spill" data-en="Start game">Start spill</button>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="game">
+  <div class="top-bar">
+    <span class="round-label" id="roundLabel">1 / 20</span>
+    <div class="timer-ring">
+      <svg width="48" height="48" viewBox="0 0 40 40"><circle class="timer-bg" cx="20" cy="20" r="18"/><circle class="timer-fg" id="timerFg" cx="20" cy="20" r="18"/></svg>
+      <div class="timer-num" id="timerNum">10</div>
+    </div>
+  </div>
+
+  <div class="flag-display" id="flagDisplay"></div>
+  <div class="flag-hint" id="flagHint"></div>
+
+  <div class="opts" id="opts"></div>
+
+  <div class="scores" id="scores"></div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="result">
+  <h1 data-no="Resultater" data-en="Results">Resultater</h1>
+  <div class="podium" id="podium"></div>
+  <button class="play-again" onclick="reset()" data-no="Spill igjen" data-en="Play again">Spill igjen</button>
+  <a class="home-link" href="index.html" data-no="← Tilbake til Clashroom" data-en="← Back to Clashroom">← Tilbake til Clashroom</a>
+</div>
+
+<script>
+var TOTAL=20, TIME=10, STEAL_EACH=25;
+
+var COUNTRIES=[
+  {f:'\u{1F1F3}\u{1F1F4}',no:'Norge',en:'Norway',h:'Skandinavia'},
+  {f:'\u{1F1F8}\u{1F1EA}',no:'Sverige',en:'Sweden',h:'Skandinavia'},
+  {f:'\u{1F1E9}\u{1F1F0}',no:'Danmark',en:'Denmark',h:'Skandinavia'},
+  {f:'\u{1F1EB}\u{1F1EE}',no:'Finland',en:'Finland',h:'Norden'},
+  {f:'\u{1F1EE}\u{1F1F8}',no:'Island',en:'Iceland',h:'Norden'},
+  {f:'\u{1F1EC}\u{1F1E7}',no:'Storbritannia',en:'United Kingdom',h:'Europa'},
+  {f:'\u{1F1EB}\u{1F1F7}',no:'Frankrike',en:'France',h:'Europa'},
+  {f:'\u{1F1E9}\u{1F1EA}',no:'Tyskland',en:'Germany',h:'Europa'},
+  {f:'\u{1F1EA}\u{1F1F8}',no:'Spania',en:'Spain',h:'Europa'},
+  {f:'\u{1F1EE}\u{1F1F9}',no:'Italia',en:'Italy',h:'Europa'},
+  {f:'\u{1F1F3}\u{1F1F1}',no:'Nederland',en:'Netherlands',h:'Europa'},
+  {f:'\u{1F1E7}\u{1F1EA}',no:'Belgia',en:'Belgium',h:'Europa'},
+  {f:'\u{1F1E8}\u{1F1ED}',no:'Sveits',en:'Switzerland',h:'Europa'},
+  {f:'\u{1F1E6}\u{1F1F9}',no:'Østerrike',en:'Austria',h:'Europa'},
+  {f:'\u{1F1F5}\u{1F1F1}',no:'Polen',en:'Poland',h:'Europa'},
+  {f:'\u{1F1F5}\u{1F1F9}',no:'Portugal',en:'Portugal',h:'Europa'},
+  {f:'\u{1F1EC}\u{1F1F7}',no:'Hellas',en:'Greece',h:'Europa'},
+  {f:'\u{1F1EE}\u{1F1EA}',no:'Irland',en:'Ireland',h:'Europa'},
+  {f:'\u{1F1F7}\u{1F1FA}',no:'Russland',en:'Russia',h:'Europa/Asia'},
+  {f:'\u{1F1FA}\u{1F1E6}',no:'Ukraina',en:'Ukraine',h:'Europa'},
+  {f:'\u{1F1F9}\u{1F1F7}',no:'Tyrkia',en:'Turkey',h:'Europa/Asia'},
+  {f:'\u{1F1E8}\u{1F1FF}',no:'Tsjekkia',en:'Czech Republic',h:'Europa'},
+  {f:'\u{1F1FA}\u{1F1F8}',no:'USA',en:'USA',h:'Nord-Amerika'},
+  {f:'\u{1F1E8}\u{1F1E6}',no:'Canada',en:'Canada',h:'Nord-Amerika'},
+  {f:'\u{1F1E7}\u{1F1F7}',no:'Brasil',en:'Brazil',h:'Sør-Amerika'},
+  {f:'\u{1F1EF}\u{1F1F5}',no:'Japan',en:'Japan',h:'Asia'},
+  {f:'\u{1F1E8}\u{1F1F3}',no:'Kina',en:'China',h:'Asia'},
+  {f:'\u{1F1EE}\u{1F1F3}',no:'India',en:'India',h:'Asia'},
+  {f:'\u{1F1E6}\u{1F1FA}',no:'Australia',en:'Australia',h:'Oseania'},
+  {f:'\u{1F1F0}\u{1F1F7}',no:'Sør-Korea',en:'South Korea',h:'Asia'},
+  {f:'\u{1F1F2}\u{1F1FD}',no:'Mexico',en:'Mexico',h:'Nord-Amerika'},
+  {f:'\u{1F1EA}\u{1F1EC}',no:'Egypt',en:'Egypt',h:'Afrika'},
+  {f:'\u{1F1FF}\u{1F1E6}',no:'Sør-Afrika',en:'South Africa',h:'Afrika'},
+  {f:'\u{1F1E6}\u{1F1F7}',no:'Argentina',en:'Argentina',h:'Sør-Amerika'},
+  {f:'\u{1F1F3}\u{1F1FF}',no:'New Zealand',en:'New Zealand',h:'Oseania'},
+  {f:'\u{1F1F9}\u{1F1ED}',no:'Thailand',en:'Thailand',h:'Asia'},
+  {f:'\u{1F1ED}\u{1F1FA}',no:'Ungarn',en:'Hungary',h:'Europa'},
+  {f:'\u{1F1ED}\u{1F1F7}',no:'Kroatia',en:'Croatia',h:'Europa'},
+  {f:'\u{1F1F7}\u{1F1F4}',no:'Romania',en:'Romania',h:'Europa'},
+  {f:'\u{1F1E8}\u{1F1F1}',no:'Chile',en:'Chile',h:'Sør-Amerika'},
+];
+
+var players=[],scores=[],round=0,questions=[],timer,timeLeft,answered;
+
+function cname(c){return getLang()==='en'?c.en:c.no}
+
+function makeQuestions(){
+  var pool=shuffle(COUNTRIES.slice());
+  var qs=[];
+  for(var i=0;i<TOTAL;i++){
+    var correct=pool[i%pool.length];
+    var wrongs=shuffle(COUNTRIES.filter(function(c){return c!==correct})).slice(0,3);
+    var opts=shuffle([correct].concat(wrongs));
+    qs.push({country:correct,options:opts,correctIdx:opts.indexOf(correct)});
+  }
+  return qs;
+}
+
+
+function startGame(){
+  var raw=document.getElementById('names').value.trim();
+  if(!raw)return;
+  players=raw.split('\n').map(function(n){return n.trim()}).filter(Boolean);
+  if(!players.length)return;
+  scores=players.map(function(){return 0});
+  round=0;
+  questions=makeQuestions();
+  showScreen('game');
+  showRound();
+}
+
+function showRound(){
+  var q=questions[round];
+  document.getElementById('roundLabel').textContent=(round+1)+' / '+TOTAL;
+  document.getElementById('flagDisplay').textContent=q.country.f;
+  document.getElementById('flagHint').textContent=q.country.h;
+
+  var optsEl=document.getElementById('opts');
+  optsEl.innerHTML='';
+  answered=new Array(players.length).fill(null);
+
+  q.options.forEach(function(c,i){
+    var btn=document.createElement('button');
+    btn.className='opt';
+    btn.textContent=cname(c);
+    btn.onclick=function(){pickAnswer(i)};
+    optsEl.appendChild(btn);
+  });
+
+  renderScores();
+  startTimer();
+}
+
+function startTimer(){
+  timeLeft=TIME;
+  document.getElementById('timerNum').textContent=timeLeft;
+  document.getElementById('timerFg').style.strokeDashoffset='0';
+  clearInterval(timer);
+  timer=setInterval(function(){
+    timeLeft--;
+    document.getElementById('timerNum').textContent=Math.max(0,timeLeft);
+    document.getElementById('timerFg').style.strokeDashoffset=(113*(1-timeLeft/TIME));
+    if(timeLeft<=3&&timeLeft>0)sfxTick();
+    if(timeLeft<=0){clearInterval(timer);endRound()}
+  },1000);
+}
+
+var currentPlayer=0;
+function pickAnswer(optIdx){
+  if(answered[currentPlayer]!==null)return;
+  answered[currentPlayer]=optIdx;
+  currentPlayer=(currentPlayer+1)%players.length;
+  if(answered.every(function(a){return a!==null})){clearInterval(timer);endRound()}
+}
+
+function endRound(){
+  var q=questions[round];
+  var btns=document.getElementById('opts').children;
+  for(var i=0;i<btns.length;i++){
+    btns[i].classList.add('locked');
+    if(i===q.correctIdx)btns[i].classList.add('correct');
+  }
+
+  var firstCorrect=-1;
+  for(var p=0;p<players.length;p++){
+    if(answered[p]===q.correctIdx){
+      if(firstCorrect===-1)firstCorrect=p;
+      scores[p]+=100;
+    }
+  }
+
+  if(firstCorrect!==-1){
+    var stolen=0;
+    for(var p=0;p<players.length;p++){
+      if(p!==firstCorrect&&scores[p]>0){
+        var take=Math.min(STEAL_EACH,scores[p]);
+        scores[p]-=take;
+        stolen+=take;
+      }
+    }
+    scores[firstCorrect]+=stolen;
+    sfxCorrect();
+  }
+
+  renderScores(firstCorrect);
+
+  var anyWrong=false;
+  for(var p=0;p<players.length;p++){
+    if(answered[p]!==null&&answered[p]!==q.correctIdx){
+      btns[answered[p]].classList.add('wrong');
+      anyWrong=true;
+    }
+  }
+  if(anyWrong&&firstCorrect===-1)sfxWrong();
+
+  currentPlayer=0;
+  setTimeout(function(){
+    round++;
+    if(round>=TOTAL)showResult();
+    else showRound();
+  },1800);
+}
+
+function renderScores(stealer){
+  var el=document.getElementById('scores');
+  var sorted=players.map(function(n,i){return{name:n,pts:scores[i],idx:i}}).sort(function(a,b){return b.pts-a.pts});
+  el.innerHTML=sorted.map(function(p){
+    var stealTag=(stealer===p.idx)?'<span class="steal-tag">STEAL</span>':'';
+    return '<div class="score-row"><span class="score-name">'+esc(p.name)+stealTag+'</span><span class="score-pts">'+p.pts+'p</span></div>';
+  }).join('');
+}
+
+function showResult(){
+  showScreen('result');
+  var sorted=players.map(function(n,i){return{name:n,pts:scores[i]}}).sort(function(a,b){return b.pts-a.pts});
+  var pod=document.getElementById('podium');
+  pod.innerHTML='';
+  var top=sorted.slice(0,3);
+  var order=top.length>=2?[top[1],top[0],top.length>2?top[2]:null]:[top[0]];
+  order.forEach(function(p,i){
+    if(!p)return;
+    var div=document.createElement('div');
+    div.className='pod';
+    var rank=top.indexOf(p)+1;
+    div.innerHTML='<div class="pod-name">'+esc(p.name)+'</div><div class="pod-bar">'+rank+'</div><div class="pod-pts">'+p.pts+'p</div>';
+    pod.appendChild(div);
+  });
+}
+
+function reset(){showScreen('setup');round=0;currentPlayer=0}
+
+function onLangChange(){
+  var l=getLang();
+  document.getElementById('langBtn').textContent=l==='no'?'EN':'NO';
+  document.querySelectorAll('[data-'+l+']').forEach(function(el){
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')el.placeholder=el.getAttribute('data-'+l);
+    else el.innerHTML=el.getAttribute('data-'+l);
+  });
+}
+onLangChange();
+</script>
+</main>
+</body>
+</html>
