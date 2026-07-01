@@ -1,0 +1,40 @@
+{
+  "rules": {
+    "rooms": {
+      "$roomCode": {
+        ".read": "auth != null",
+        ".write": "auth != null && !newData.exists() && data.child('hostId').val() === auth.uid",
+        "hostId": {
+          ".write": "auth != null && !data.exists()"
+        },
+        "createdAt": {
+          ".write": "auth != null && root.child('rooms/' + $roomCode + '/hostId').val() === auth.uid"
+        },
+        "status": {
+          ".write": "auth != null && root.child('rooms/' + $roomCode + '/hostId').val() === auth.uid"
+        },
+        "currentQuestionIndex": {
+          ".write": "auth != null && root.child('rooms/' + $roomCode + '/hostId').val() === auth.uid"
+        },
+        "questionStartedAt": {
+          ".write": "auth != null && root.child('rooms/' + $roomCode + '/hostId').val() === auth.uid"
+        },
+        "questions": {
+          ".write": "auth != null && root.child('rooms/' + $roomCode + '/hostId').val() === auth.uid"
+        },
+        "players": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        }
+      }
+    },
+    "leaderboard": {
+      ".read": "auth != null",
+      ".indexOn": ["score"],
+      "$entryId": {
+        ".write": "auth != null && !data.exists()"
+      }
+    }
+  }
+}

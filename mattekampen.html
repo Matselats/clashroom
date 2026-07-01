@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Mattekampen — Clashroom</title>
+<link rel="stylesheet" href="brand.css">
+<style>
+/* ── GAME OVERRIDES ──────────────────────────────────── */
+:root { --accent: var(--subj-matte); --accent-dim: rgba(74,158,150,0.15); }
+body { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; }
+
+.game-header {
+  width: 100%; padding: 12px 20px; display: flex; align-items: center;
+  justify-content: space-between; position: sticky; top: 0; z-index: 10;
+  background: var(--aubergine); border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.back-link { display: flex; align-items: center; gap: 7px; color: var(--muted); text-decoration: none; font-size: 0.85rem; }
+.back-link:hover { color: var(--cream); }
+.game-header-title { font-family: 'Syne',sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--accent); }
+
+.screen { max-width: 480px; padding: 24px 20px; }
+
+/* ── HOME ───────────────────────────────────────────── */
+.home-title { font-family: 'Syne',sans-serif; font-weight: 800; font-size: clamp(1.8rem,5vw,2.4rem); color: var(--accent); text-align: center; letter-spacing: -0.03em; }
+.home-sub { color: var(--muted); font-size: 0.88rem; text-align: center; margin-top: -8px; }
+
+.form-input {
+  width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05); color: var(--cream); font-family: inherit; font-size: 1rem;
+  outline: none; transition: border-color 0.15s;
+}
+.form-input:focus { border-color: var(--accent); }
+.form-input::placeholder { color: var(--muted); }
+.form-input.code-input { font-family: 'DM Mono',monospace; font-size: 1.3rem; letter-spacing: 0.15em; text-transform: uppercase; text-align: center; }
+
+.btn-action {
+  width: 100%; padding: 14px; border-radius: 10px; border: none; cursor: pointer;
+  font-family: 'Syne',sans-serif; font-weight: 700; font-size: 1rem;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn-action:active { transform: scale(0.97); }
+.btn-primary { background: var(--accent); color: var(--aubergine-deep); }
+.btn-secondary { background: rgba(255,255,255,0.08); color: var(--cream); border: 1px solid rgba(255,255,255,0.12); }
+.btn-action:disabled { opacity: 0.4; cursor: default; }
+
+.divider { display: flex; align-items: center; gap: 14px; width: 100%; color: var(--muted); font-size: 0.8rem; }
+.divider::before,.divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+
+.link-subtle { color: var(--muted); font-size: 0.82rem; text-decoration: none; text-align: center; }
+.link-subtle:hover { color: var(--cream); }
+
+.error-msg { color: var(--red); font-size: 0.82rem; min-height: 1.2em; text-align: center; }
+
+/* ── LOBBY ──────────────────────────────────────────── */
+.room-code-label { font-size: 0.82rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.room-code {
+  font-family: 'DM Mono',monospace; font-size: clamp(2.2rem,8vw,3.2rem); font-weight: 700;
+  letter-spacing: 0.2em; color: var(--accent); text-align: center;
+  padding: 12px 24px; border-radius: 12px; background: var(--accent-dim);
+}
+.player-count { font-size: 0.85rem; color: var(--muted); }
+.player-list { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.player-row {
+  display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+  border-radius: 8px; background: rgba(255,255,255,0.04);
+}
+.player-name { font-weight: 500; font-size: 0.92rem; }
+.host-badge { font-size: 0.7rem; color: var(--accent); font-family: 'DM Mono',monospace; margin-left: auto; }
+.lobby-wait { color: var(--muted); font-size: 0.85rem; text-align: center; }
+
+/* ── COUNTDOWN ──────────────────────────────────────── */
+.countdown-num {
+  font-family: 'Syne',sans-serif; font-weight: 800; font-size: clamp(5rem,20vw,8rem);
+  color: var(--accent); animation: countPop 0.6s ease;
+}
+@keyframes countPop { 0% { transform: scale(1.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+/* ── GAME ───────────────────────────────────────────── */
+.q-header { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+.q-number { font-family: 'DM Mono',monospace; font-size: 0.82rem; color: var(--muted); }
+.q-score { font-family: 'DM Mono',monospace; font-size: 0.85rem; color: var(--gold); }
+.q-topic { font-size: 0.72rem; color: var(--accent); background: var(--accent-dim); padding: 3px 10px; border-radius: 20px; }
+
+.timer-ring-wrap { position: relative; width: 72px; height: 72px; flex-shrink: 0; }
+.timer-ring { width: 100%; height: 100%; }
+.timer-bg { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 6; }
+.timer-fg { fill: none; stroke: var(--accent); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.3s linear, stroke 0.3s; }
+.timer-fg.urgent { stroke: var(--red); }
+.timer-text { fill: var(--cream); font-family: 'DM Mono',monospace; font-size: 22px; font-weight: 700; }
+
+.q-prompt {
+  font-size: clamp(1.05rem,3.5vw,1.3rem); font-weight: 600; text-align: center;
+  line-height: 1.4; min-height: 2.8em;
+}
+
+.choices { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.choice-btn {
+  padding: 14px 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05); color: var(--cream); font-family: 'DM Mono',monospace;
+  font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: all 0.15s; text-align: center;
+  min-height: 52px; display: flex; align-items: center; justify-content: center;
+}
+.choice-btn:hover:not(.locked) { background: rgba(255,255,255,0.1); border-color: var(--accent); }
+.choice-btn.selected { background: var(--accent); border-color: var(--accent); color: var(--aubergine-deep); }
+.choice-btn.correct { background: var(--green); border-color: var(--green); color: #fff; }
+.choice-btn.wrong { background: var(--red); border-color: var(--red); color: #fff; }
+.choice-btn.reveal { border-color: var(--green); background: rgba(42,157,92,0.15); }
+.choice-btn.locked { cursor: default; opacity: 0.7; }
+
+.feedback {
+  text-align: center; padding: 10px 16px; border-radius: 10px; font-weight: 700; font-size: 0.95rem;
+  animation: feedSlide 0.3s ease;
+}
+.feedback.good { background: rgba(42,157,92,0.15); color: var(--green); }
+.feedback.bad { background: rgba(230,57,70,0.15); color: var(--red); }
+.feedback .pts { font-family: 'DM Mono',monospace; font-size: 1.2rem; }
+.feedback .streak-info { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+@keyframes feedSlide { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── BETWEEN / LEADERBOARD ──────────────────────────── */
+.between-title { font-family: 'Syne',sans-serif; font-weight: 700; font-size: 1.1rem; text-align: center; }
+.lb { width: 100%; display: flex; flex-direction: column; gap: 4px; }
+.lb-row {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  border-radius: 8px; background: rgba(255,255,255,0.04); transition: background 0.2s;
+}
+.lb-row.me { background: var(--accent-dim); }
+.lb-row.top { background: rgba(245,166,35,0.1); }
+.lb-rank { font-family: 'DM Mono',monospace; font-weight: 700; font-size: 0.85rem; width: 24px; text-align: center; color: var(--muted); }
+.lb-row.top .lb-rank { color: var(--gold); }
+.lb-name { flex: 1; font-weight: 500; font-size: 0.9rem; }
+.lb-score { font-family: 'DM Mono',monospace; font-weight: 700; font-size: 0.9rem; color: var(--accent); }
+.lb-delta { font-family: 'DM Mono',monospace; font-size: 0.75rem; color: var(--green); margin-left: 4px; }
+
+/* ── RESULTS ────────────────────────────────────────── */
+.results-heading { font-family: 'Syne',sans-serif; font-weight: 800; font-size: 1.4rem; text-align: center; }
+.podium { display: flex; align-items: flex-end; justify-content: center; gap: 8px; width: 100%; margin: 8px 0; }
+.podium-slot { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.podium-bar {
+  width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  padding: 12px 6px 10px; border-radius: 10px 10px 0 0;
+}
+.podium-bar.p1 { height: 120px; background: linear-gradient(180deg,rgba(245,166,35,0.3),rgba(245,166,35,0.08)); border: 1px solid rgba(245,166,35,0.3); border-bottom: none; }
+.podium-bar.p2 { height: 90px; background: linear-gradient(180deg,rgba(192,192,192,0.2),rgba(192,192,192,0.05)); border: 1px solid rgba(192,192,192,0.2); border-bottom: none; }
+.podium-bar.p3 { height: 70px; background: linear-gradient(180deg,rgba(205,127,50,0.2),rgba(205,127,50,0.05)); border: 1px solid rgba(205,127,50,0.15); border-bottom: none; }
+.podium-rank { font-family: 'Syne',sans-serif; font-weight: 800; font-size: 1.5rem; }
+.podium-bar.p1 .podium-rank { color: var(--gold); }
+.podium-bar.p2 .podium-rank { color: #c0c0c0; }
+.podium-bar.p3 .podium-rank { color: #cd7f32; }
+.podium-name { font-size: 0.78rem; font-weight: 600; text-align: center; max-width: 85px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.podium-score { font-family: 'DM Mono',monospace; font-size: 0.72rem; color: var(--muted); }
+.saved-msg { color: var(--green); font-size: 0.82rem; text-align: center; }
+
+.btn-row { display: flex; gap: 10px; width: 100%; }
+.btn-row .btn-action { flex: 1; }
+
+/* ── ALL-TIME ───────────────────────────────────────── */
+.at-heading { font-family: 'Syne',sans-serif; font-weight: 700; font-size: 1.15rem; text-align: center; }
+.at-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; }
+.at-row:nth-child(odd) { background: rgba(255,255,255,0.03); }
+.at-rank { font-family: 'DM Mono',monospace; width: 28px; text-align: center; color: var(--muted); font-size: 0.82rem; }
+.at-name { flex: 1; font-size: 0.88rem; }
+.at-score { font-family: 'DM Mono',monospace; font-weight: 700; color: var(--accent); font-size: 0.88rem; }
+.at-date { font-family: 'DM Mono',monospace; font-size: 0.72rem; color: var(--muted); }
+
+/* ── RESPONSIVE ─────────────────────────────────────── */
+@media (max-width: 400px) {
+  .choices { grid-template-columns: 1fr; }
+  .podium-bar { width: 72px; }
+  .room-code { font-size: 2rem; }
+}
+/* Smartboard/projector: scale up what the class reads from a distance */
+@media (min-width: 900px) {
+  .screen { max-width: 640px; }
+  .q-prompt { font-size: 1.7rem; }
+  .choice-btn { font-size: 1.3rem; min-height: 68px; }
+  .room-code { font-size: 4rem; }
+  .countdown-num { font-size: 9rem; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main-content">Hopp til innhold</a>
+
+<header class="game-header">
+  <a href="index.html" class="back-link">
+    <svg viewBox="0 0 120 130" width="18" height="20" aria-hidden="true">
+      <path d="M60 36 L46 42 L26 6 L14 54 L26 84 L60 116 L94 84 L106 54 L94 6 L74 42 Z" fill="#FF9E33" stroke="#FF9E33" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M31 18 L23 48 L43 41 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M89 18 L97 48 L77 41 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M60 46 L42 58 L34 80 L60 110 L86 80 L78 58 Z" fill="#FFF6EC" stroke="#FFF6EC" stroke-width="3" stroke-linejoin="round"/>
+      <ellipse cx="48" cy="68" rx="5" ry="5" fill="#2B1338"/>
+      <ellipse cx="72" cy="68" rx="5" ry="5" fill="#2B1338"/>
+      <path d="M53 78 H67 L60 90 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/>
+    </svg>
+    <span>Clashroom</span>
+  </a>
+  <span class="game-header-title">Mattekampen</span>
+</header>
+
+<main id="main-content">
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <h1 class="home-title">Mattekampen</h1>
+  <p class="home-sub">Sanntids matteduell for ungdomsskolen</p>
+
+  <input id="inp-name" class="form-input" type="text" placeholder="Ditt navn" maxlength="20" autocomplete="off">
+  <button id="btn-create" class="btn-action btn-primary">Opprett rom</button>
+
+  <div class="divider">eller</div>
+
+  <input id="inp-code" class="form-input code-input" type="text" placeholder="KODE" maxlength="4" autocomplete="off">
+  <button id="btn-join" class="btn-action btn-secondary">Bli med</button>
+
+  <p id="home-error" class="error-msg"></p>
+  <a href="#" id="link-alltime" class="link-subtle">Topplista →</a>
+</div>
+
+<!-- LOBBY -->
+<div class="screen" id="screen-lobby">
+  <p class="room-code-label">Romkode</p>
+  <div id="lobby-code" class="room-code"></div>
+  <p class="lobby-wait">Del koden med klassen</p>
+  <p id="lobby-count" class="player-count"></p>
+  <div id="lobby-players" class="player-list"></div>
+  <button id="btn-start" class="btn-action btn-primary" disabled>Start kampen</button>
+  <p id="lobby-hint" class="lobby-wait" style="display:none">Trenger minst to spillere for å starte</p>
+  <p id="lobby-wait" class="lobby-wait" style="display:none">Venter på at verten starter ...</p>
+</div>
+
+<!-- COUNTDOWN -->
+<div class="screen" id="screen-countdown">
+  <div id="cd-num" class="countdown-num">3</div>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="screen-game">
+  <div class="q-header">
+    <span id="q-number" class="q-number"></span>
+    <span id="q-score" class="q-score"></span>
+    <div class="timer-ring-wrap">
+      <svg class="timer-ring" viewBox="0 0 100 100">
+        <circle class="timer-bg" cx="50" cy="50" r="44"/>
+        <circle id="timer-fg" class="timer-fg" cx="50" cy="50" r="44"
+                stroke-dasharray="276.46" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+        <text id="timer-text" class="timer-text" x="50" y="58" text-anchor="middle">15</text>
+      </svg>
+    </div>
+  </div>
+  <span id="q-topic" class="q-topic"></span>
+  <p id="q-prompt" class="q-prompt"></p>
+  <div id="q-choices" class="choices"></div>
+  <div id="q-feedback" class="feedback" style="display:none"></div>
+</div>
+
+<!-- BETWEEN -->
+<div class="screen" id="screen-between">
+  <p id="bw-title" class="between-title"></p>
+  <div id="bw-lb" class="lb"></div>
+  <button id="btn-next" class="btn-action btn-primary" style="display:none">Neste spørsmål</button>
+  <button id="btn-finish" class="btn-action btn-primary" style="display:none">Se resultater</button>
+  <p id="bw-wait" class="lobby-wait" style="display:none">Venter på neste spørsmål ...</p>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="screen-results">
+  <h2 class="results-heading">Kamp ferdig!</h2>
+  <div id="res-podium" class="podium"></div>
+  <div id="res-lb" class="lb"></div>
+  <button id="btn-save-lb" class="btn-action btn-secondary">Lagre til topplista</button>
+  <p id="res-saved" class="saved-msg" style="display:none"></p>
+  <div class="btn-row">
+    <button id="btn-again" class="btn-action btn-secondary">Spill igjen</button>
+    <a href="index.html" id="btn-res-home" class="btn-action btn-secondary" style="text-align:center;text-decoration:none;">Tilbake</a>
+  </div>
+</div>
+
+<!-- ALL-TIME LEADERBOARD -->
+<div class="screen" id="screen-alltime">
+  <h2 class="at-heading">Topplista</h2>
+  <div id="at-list" class="lb"></div>
+  <button id="btn-at-back" class="btn-action btn-secondary">← Tilbake</button>
+</div>
+
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="shared.js"></script>
+<script>
+(function(){
+'use strict';
+
+/* ── Firebase ─────────────────────────────────────── */
+if(!firebase.apps.length) firebase.initializeApp({
+  apiKey:"AIzaSyB7bSNTnulcVoo9afiWrGKcJHw7VHtOV_Q",
+  authDomain:"clashroom-1d0a4.firebaseapp.com",
+  databaseURL:"https://clashroom-1d0a4-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"clashroom-1d0a4",
+  storageBucket:"clashroom-1d0a4.firebasestorage.app",
+  messagingSenderId:"880259090891",
+  appId:"1:880259090891:web:4255f1318cec4ef00d0e4e"
+});
+var db=firebase.database(), fbAuth=firebase.auth(), SERVER_TS=firebase.database.ServerValue.TIMESTAMP;
+var serverOff=0;
+db.ref('.info/serverTimeOffset').on('value',function(s){serverOff=s.val()||0;});
+function serverNow(){return Date.now()+serverOff;}
+
+/* ── Math Questions (from mathQuestions.js) ────────── */
+function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function fmtNum(n){return String(Math.round(n*100)/100);}
+
+function makeChoices(correct,spread){
+  spread=spread||Math.max(2,Math.round(Math.abs(correct)*0.15)||3);
+  var s=new Set([correct]),g=0;
+  while(s.size<4&&g<50){g++;var d=randInt(-spread,spread)||(Math.random()<0.5?-1:1);s.add(correct+d);}
+  var e=spread*2;while(s.size<4){s.add(correct+e);e++;}
+  return shuffle([...s]).map(function(v){return{label:fmtNum(v),value:v};});
+}
+
+function genProsent(diff){
+  if(diff==='easy'){
+    var p=[10,20,25,50][randInt(0,3)],base=randInt(2,40)*10,ans=(p/100)*base;
+    return{topic:'prosent',difficulty:diff,prompt:'Hva er '+p+'% av '+base+'?',answer:ans,choices:makeChoices(ans)};
+  }
+  if(diff==='medium'){
+    var p2=randInt(5,95),base2=randInt(20,400),ans2=Math.round((p2/100)*base2*100)/100;
+    return{topic:'prosent',difficulty:diff,prompt:'Hva er '+p2+'% av '+base2+'?',answer:ans2,choices:makeChoices(ans2)};
+  }
+  var st=randInt(50,400),ch=randInt(-60,80)||10,en=st+Math.round((ch/100)*st);
+  var pct=Math.round(((en-st)/st)*1000)/10;
+  return{topic:'prosent',difficulty:diff,prompt:'Prisen gikk fra '+st+' kr til '+en+' kr. Hvor mange prosent endring?',answer:pct,choices:makeChoices(pct,8)};
+}
+
+function genLigning(diff){
+  var a,x,b;
+  if(diff==='easy'){a=randInt(1,5);x=randInt(-10,10);b=randInt(-10,10);}
+  else if(diff==='medium'){a=randInt(2,9);x=randInt(-15,15);b=randInt(-20,20);}
+  else{a=randInt(-9,9)||2;x=randInt(-20,20);b=randInt(-30,30);}
+  var c=a*x+b;
+  var bT=b===0?'':b>0?' + '+b:' - '+Math.abs(b);
+  var aT=a===1?'x':a===-1?'-x':a+'x';
+  return{topic:'ligninger',difficulty:diff,prompt:'Løs for x: '+aT+bT+' = '+c,answer:x,choices:makeChoices(x,4)};
+}
+
+function genNeg(diff){
+  var r=diff==='easy'?12:diff==='medium'?25:50;
+  var a=randInt(-r,r),b=randInt(-r,r)||1;
+  var ops=diff==='hard'?['+','-','×']:['+','-'],op=ops[randInt(0,ops.length-1)];
+  var fmt=function(n){return n<0?'('+n+')':''+n;};
+  var ans,pr;
+  if(op==='+'){ans=a+b;pr=a+' + '+fmt(b)+' = ?';}
+  else if(op==='-'){ans=a-b;pr=a+' - '+fmt(b)+' = ?';}
+  else{var sa=randInt(-12,12)||2,sb=randInt(-12,12)||3;ans=sa*sb;pr=fmt(sa)+' × '+fmt(sb)+' = ?';}
+  return{topic:'negative tall',difficulty:diff,prompt:pr,answer:ans,choices:makeChoices(ans,Math.max(3,Math.round(r/4)))};
+}
+
+function genPotens(diff){
+  if(diff==='easy'){
+    var base=randInt(2,10),ans=base*base;
+    return{topic:'potenser',difficulty:diff,prompt:base+'² = ?',answer:ans,choices:makeChoices(ans,Math.max(4,Math.round(ans*0.2)))};
+  }
+  if(diff==='medium'){
+    var roots=[4,9,16,25,36,49,64,81,100,121,144],under=roots[randInt(0,roots.length-1)],ans2=Math.sqrt(under);
+    return{topic:'potenser',difficulty:diff,prompt:'√'+under+' = ?',answer:ans2,choices:makeChoices(ans2,3)};
+  }
+  var base2=randInt(2,6),ans3=base2*base2*base2;
+  return{topic:'potenser',difficulty:diff,prompt:base2+'³ = ?',answer:ans3,choices:makeChoices(ans3,Math.max(6,Math.round(ans3*0.25)))};
+}
+
+function genBrok(diff){
+  var pairs=[[1,2,0.5],[1,4,0.25],[3,4,0.75],[1,5,0.2],[2,5,0.4],[3,5,0.6],[4,5,0.8],[1,10,0.1],[3,10,0.3],[7,10,0.7],[1,8,0.125],[3,8,0.375],[1,20,0.05],[1,3,0.333],[2,3,0.667]];
+  var p=pairs[randInt(0,pairs.length-1)],num=p[0],den=p[1],dec=p[2];
+  if(diff!=='easy'&&Math.random()<0.4){
+    var ans=Math.round(dec*1000)/10;
+    return{topic:'brøk/desimal',difficulty:diff,prompt:'Hva er '+num+'/'+den+' som prosent?',answer:ans,choices:makeChoices(ans,8)};
+  }
+  var ans2=Math.round(dec*1000)/1000;
+  return{topic:'brøk/desimal',difficulty:diff,prompt:'Hva er '+num+'/'+den+' som desimaltall?',answer:ans2,choices:makeChoices(ans2,0.2)};
+}
+
+var GENS=[genProsent,genLigning,genNeg,genPotens,genBrok];
+
+function generateQuestion(diff){
+  diff=diff||['easy','medium','hard'][randInt(0,2)];
+  var q=GENS[randInt(0,GENS.length-1)](diff);
+  return Object.assign({id:Date.now()+'-'+randInt(0,999999)},q);
+}
+
+function generateQuestionSet(n){
+  n=n||10;var qs=[];
+  for(var i=0;i<n;i++){
+    var p=i/Math.max(1,n-1),d=p<0.4?'easy':p<0.75?'medium':'hard';
+    qs.push(generateQuestion(d));
+  }
+  return qs;
+}
+
+/* ── Scoring (from scoring.js) ────────────────────── */
+var TIME_LIMIT=15000,BASE_PTS=1000,MIN_PTS=200,STREAK_PER=50,STREAK_CAP=5;
+
+function calcPoints(correct,timeMs,streak){
+  if(!correct) return{points:0,speed:0,streakBonus:0};
+  var t=Math.min(Math.max(timeMs,0),TIME_LIMIT);
+  var frac=1-t/TIME_LIMIT;
+  var speed=Math.round(MIN_PTS+(BASE_PTS-MIN_PTS)*frac);
+  var sb=Math.min(streak||0,STREAK_CAP)*STREAK_PER;
+  return{points:speed+sb,speed:speed,streakBonus:sb};
+}
+
+/* ── Room Code ────────────────────────────────────── */
+var CODE_CHARS='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+// Words the charset can actually spell (no I/O/0/1) that shouldn't end up on a smartboard
+var BAD_CODES=['FAEN','KUKK','FUCK','DAMN','CUNT','SLUT','ANAL','RAPE','ARSE','SEXY','TISS','MUSA'];
+function genCode(){
+  var c;
+  do{c='';for(var i=0;i<4;i++)c+=CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];}
+  while(BAD_CODES.indexOf(c)>=0);
+  return c;
+}
+
+/* ── State ────────────────────────────────────────── */
+var S={
+  uid:null,name:'',room:null,isHost:false,
+  questions:[],curQ:-1,qStart:0,answered:false,
+  score:0,streak:0,players:{},
+  phase:'home',timer:null,roomRef:null,
+  savedToLb:false
+};
+
+/* ── DOM refs ─────────────────────────────────────── */
+var $=function(id){return document.getElementById(id);};
+
+/* ── Auth ─────────────────────────────────────────── */
+function ensureAuth(cb){
+  if(fbAuth.currentUser){S.uid=fbAuth.currentUser.uid;cb();return;}
+  fbAuth.signInAnonymously().then(function(c){S.uid=c.user.uid;cb();})
+    .catch(function(){$('home-error').textContent='Kan ikke koble til Firebase. Prøv igjen.';});
+}
+
+/* ── Helpers ──────────────────────────────────────── */
+function err(msg){$('home-error').textContent=msg;}
+
+function renderPlayers(){
+  var el=$('lobby-players'), keys=Object.keys(S.players).filter(function(k){return k!=='_hostId';}), html='';
+  keys.forEach(function(uid){
+    var p=S.players[uid];
+    html+='<div class="player-row">'+avHtml(p.name,28)+'<span class="player-name">'+esc(p.name)+'</span>';
+    if(uid===S.players._hostId) html+='<span class="host-badge">VERT</span>';
+    html+='</div>';
+  });
+  el.innerHTML=html;
+  $('lobby-count').textContent=keys.length+' spiller'+(keys.length!==1?'e':'');
+  if(S.isHost){
+    $('btn-start').disabled=keys.length<2;
+    $('lobby-hint').style.display=keys.length<2?'':'none';
+  }
+}
+
+function updScore(){
+  $('q-score').textContent=S.streak>1?S.score+' · x'+S.streak:String(S.score);
+}
+
+function sortedPlayers(){
+  var arr=[];
+  Object.keys(S.players).forEach(function(uid){
+    if(uid==='_hostId') return;
+    arr.push(Object.assign({uid:uid},S.players[uid]));
+  });
+  arr.sort(function(a,b){return(b.score||0)-(a.score||0);});
+  return arr;
+}
+
+function renderLb(container,players,deltaQ){
+  var html='';
+  players.forEach(function(p,i){
+    var isMe=p.uid===S.uid;
+    var cls='lb-row'+(isMe?' me':'')+(i===0?' top':'');
+    var delta='';
+    if(typeof deltaQ==='number'&&p.answers&&p.answers[deltaQ]){
+      var d=p.answers[deltaQ].points||0;
+      if(d>0) delta='<span class="lb-delta">+'+d+'</span>';
+    }
+    html+='<div class="'+cls+'">'
+      +'<span class="lb-rank">'+(i+1)+'</span>'
+      +avHtml(p.name,26)
+      +'<span class="lb-name">'+esc(p.name)+'</span>'
+      +'<span class="lb-score">'+(p.score||0)+'</span>'
+      +delta+'</div>';
+  });
+  container.innerHTML=html;
+}
+
+/* ── Create Room ──────────────────────────────────── */
+function doCreate(){
+  var name=$('inp-name').value.trim();
+  if(!name){$('inp-name').focus();err('Skriv inn navnet ditt');return;}
+  S.name=name; err('');
+  ensureAuth(function(){
+    var code=genCode();
+    var ref=db.ref('rooms/'+code);
+    ref.once('value',function(snap){
+      if(snap.exists()){doCreate();return;} // collision, retry
+      S.room=code; S.isHost=true; S.roomRef=ref;
+      ref.child('hostId').set(S.uid).then(function(){
+        return ref.update({status:'lobby',currentQuestionIndex:-1,createdAt:SERVER_TS});
+      }).then(function(){
+        return ref.child('players/'+S.uid).set({name:S.name,score:0,streak:0});
+      }).then(function(){
+        $('lobby-code').textContent=code;
+        if(S.isHost){$('btn-start').style.display='';$('lobby-wait').style.display='none';}
+        else{$('btn-start').style.display='none';$('lobby-wait').style.display='';}
+        attachListeners();
+        showScreen('screen-lobby');
+      });
+    });
+  });
+}
+
+/* ── Join Room ────────────────────────────────────── */
+function doJoin(){
+  var name=$('inp-name').value.trim();
+  var code=$('inp-code').value.trim().toUpperCase();
+  if(!name){$('inp-name').focus();err('Skriv inn navnet ditt');return;}
+  if(code.length<4){$('inp-code').focus();err('Skriv inn romkoden (4 tegn)');return;}
+  S.name=name; err('');
+  ensureAuth(function(){
+    var ref=db.ref('rooms/'+code);
+    ref.once('value',function(snap){
+      if(!snap.exists()){err('Rommet finnes ikke');return;}
+      var room=snap.val();
+      if(room.status!=='lobby'){err('Kampen har allerede startet');return;}
+      S.room=code; S.isHost=false; S.roomRef=ref;
+      ref.child('players/'+S.uid).set({name:S.name,score:0,streak:0}).then(function(){
+        $('lobby-code').textContent=code;
+        $('btn-start').style.display='none';
+        $('lobby-wait').style.display='';
+        attachListeners();
+        showScreen('screen-lobby');
+      });
+    });
+  });
+}
+
+/* ── Start Game (host) ────────────────────────────── */
+function doStart(){
+  if(!S.isHost) return;
+  var qs=generateQuestionSet(10);
+  var ser=qs.map(function(q){return{id:q.id,topic:q.topic,difficulty:q.difficulty,prompt:q.prompt,answer:q.answer,choices:q.choices};});
+  S.roomRef.update({questions:ser,status:'countdown'});
+}
+
+/* ── Countdown ────────────────────────────────────── */
+function runCountdown(cb){
+  showScreen('screen-countdown');
+  var n=3;
+  $('cd-num').textContent=n;
+  sfxCountdown();
+  var iv=setInterval(function(){
+    n--;
+    if(n<=0){clearInterval(iv);cb();return;}
+    $('cd-num').textContent=n;
+    $('cd-num').style.animation='none';
+    void $('cd-num').offsetWidth; // reflow
+    $('cd-num').style.animation='countPop 0.6s ease';
+    sfxCountdown();
+  },1000);
+}
+
+/* ── Show Question ────────────────────────────────── */
+function showQ(idx){
+  S.curQ=idx; S.answered=false;
+  var q=S.questions[idx]; if(!q) return;
+  showScreen('screen-game');
+  $('q-number').textContent='Spørsmål '+(idx+1)+'/'+S.questions.length;
+  updScore();
+  $('q-topic').textContent=q.topic;
+  $('q-prompt').textContent=q.prompt;
+  $('q-feedback').style.display='none';
+
+  var choicesEl=$('q-choices'); choicesEl.innerHTML='';
+  q.choices.forEach(function(c,ci){
+    var btn=document.createElement('button');
+    btn.className='choice-btn';
+    btn.textContent=c.label;
+    btn.onclick=function(){submitAnswer(ci);};
+    choicesEl.appendChild(btn);
+  });
+
+  startTimer();
+}
+
+/* ── Timer ────────────────────────────────────────── */
+var CIRC=2*Math.PI*44; // 276.46
+
+function startTimer(){
+  stopTimer();
+  var fg=$('timer-fg'), txt=$('timer-text');
+  fg.classList.remove('urgent');
+
+  function tick(){
+    var elapsed=serverNow()-S.qStart;
+    var left=Math.max(0,(TIME_LIMIT-elapsed)/1000);
+    var sec=Math.ceil(left);
+    txt.textContent=sec;
+    fg.style.strokeDashoffset=CIRC*(1-left/(TIME_LIMIT/1000));
+    if(left<=5) fg.classList.add('urgent');
+    if(left<=3&&left>0&&sec!==parseInt(txt.dataset.last||'0')){sfxTick();txt.dataset.last=sec;}
+    if(left<=0){stopTimer();if(!S.answered)handleTimeout();}
+  }
+  tick();
+  S.timer=setInterval(tick,200);
+}
+
+function stopTimer(){if(S.timer){clearInterval(S.timer);S.timer=null;}}
+
+/* ── Submit Answer ────────────────────────────────── */
+function submitAnswer(ci){
+  if(S.answered) return;
+  S.answered=true; stopTimer();
+
+  var q=S.questions[S.curQ];
+  var chosen=q.choices[ci];
+  var correct=chosen.value===q.answer;
+  var elapsed=serverNow()-S.qStart;
+  var res=calcPoints(correct,elapsed,S.streak);
+
+  if(correct){S.streak++;S.score+=res.points;sfxCorrect();}
+  else{S.streak=0;sfxWrong();}
+  updScore();
+
+  // Mark buttons
+  var btns=$('q-choices').querySelectorAll('.choice-btn');
+  btns.forEach(function(b,i){
+    b.classList.add('locked');
+    b.onclick=null;
+    if(i===ci) b.classList.add(correct?'correct':'wrong');
+    if(q.choices[i].value===q.answer&&i!==ci) b.classList.add('reveal');
+  });
+
+  // Feedback
+  var fb=$('q-feedback');
+  if(correct){
+    var streakTxt=S.streak>1?' (streak x'+S.streak+')':'';
+    fb.className='feedback good';
+    fb.innerHTML='<div class="pts">+'+res.points+'</div>'+(res.streakBonus?'<div class="streak-info">'+res.speed+' + '+res.streakBonus+' streak-bonus'+streakTxt+'</div>':'');
+  } else {
+    fb.className='feedback bad';
+    fb.innerHTML='Feil! Riktig svar: '+fmtNum(q.answer);
+  }
+  fb.style.display='';
+
+  // Write to Firebase
+  var pRef=S.roomRef.child('players/'+S.uid);
+  pRef.child('answers/'+S.curQ).set({choice:ci,timeUsedMs:Math.round(elapsed),correct:correct,points:res.points});
+  pRef.update({score:S.score,streak:S.streak});
+
+  // After 2s, show between screen
+  setTimeout(function(){goToBetween();},2000);
+}
+
+function handleTimeout(){
+  S.answered=true; S.streak=0;
+  updScore();
+  var q=S.questions[S.curQ];
+  var btns=$('q-choices').querySelectorAll('.choice-btn');
+  btns.forEach(function(b,i){
+    b.classList.add('locked');b.onclick=null;
+    if(q.choices[i].value===q.answer) b.classList.add('reveal');
+  });
+  var fb=$('q-feedback');
+  fb.className='feedback bad';
+  fb.innerHTML='Tiden er ute! Riktig svar: '+fmtNum(q.answer);
+  fb.style.display='';
+  sfxWrong();
+
+  var pRef=S.roomRef.child('players/'+S.uid);
+  pRef.child('answers/'+S.curQ).set({choice:-1,timeUsedMs:TIME_LIMIT,correct:false,points:0});
+  pRef.update({streak:0});
+
+  setTimeout(function(){goToBetween();},2000);
+}
+
+/* ── Between Rounds ───────────────────────────────── */
+function goToBetween(){
+  if(S.phase==='finished') return;
+  showScreen('screen-between');
+  var isLast=S.curQ>=S.questions.length-1;
+  $('bw-title').textContent='Etter spørsmål '+(S.curQ+1)+'/'+S.questions.length;
+  renderLb($('bw-lb'),sortedPlayers(),S.curQ);
+
+  if(S.isHost){
+    if(isLast){
+      $('btn-next').style.display='none';
+      $('btn-finish').style.display='';
+    } else {
+      $('btn-next').style.display='';
+      $('btn-finish').style.display='none';
+    }
+    $('bw-wait').style.display='none';
+  } else {
+    $('btn-next').style.display='none';
+    $('btn-finish').style.display='none';
+    $('bw-wait').style.display='';
+  }
+}
+
+function doNext(){
+  if(!S.isHost) return;
+  S.roomRef.update({currentQuestionIndex:S.curQ+1,questionStartedAt:SERVER_TS});
+}
+
+function doFinish(){
+  if(!S.isHost) return;
+  S.roomRef.update({status:'finished'});
+}
+
+/* ── Results ──────────────────────────────────────── */
+function showResults(){
+  S.phase='finished'; stopTimer();
+  showScreen('screen-results');
+  var players=sortedPlayers();
+
+  // Podium (top 3)
+  var pod=$('res-podium');
+  if(players.length>=3){
+    var order=[players[1],players[0],players[2]]; // 2nd, 1st, 3rd
+    var classes=['p2','p1','p3'];
+    var ranks=['2','1','3'];
+    pod.innerHTML=order.map(function(p,i){
+      return '<div class="podium-slot">'
+        +'<div class="podium-name">'+esc(p.name)+'</div>'
+        +'<div class="podium-bar '+classes[i]+'">'
+        +'<div class="podium-rank">'+ranks[i]+'</div>'
+        +'<div class="podium-score">'+(p.score||0)+'</div>'
+        +'</div></div>';
+    }).join('');
+  } else if(players.length>0) {
+    pod.innerHTML='<div class="podium-slot"><div class="podium-name">'+esc(players[0].name)+'</div>'
+      +'<div class="podium-bar p1"><div class="podium-rank">1</div><div class="podium-score">'+(players[0].score||0)+'</div></div></div>';
+  }
+
+  renderLb($('res-lb'),players);
+
+  S.savedToLb=false;
+  $('btn-save-lb').style.display='';
+  $('res-saved').style.display='none';
+
+  spawnConfetti(document.body,30);
+}
+
+/* ── Save to All-Time Leaderboard ─────────────────── */
+function doSaveToLb(){
+  if(S.savedToLb) return;
+  S.savedToLb=true;
+  var d=new Date();
+  var dateStr=d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear();
+  db.ref('leaderboard').push({name:S.name,score:S.score,date:dateStr,roomCode:S.room}).then(function(){
+    $('btn-save-lb').style.display='none';
+    $('res-saved').textContent='Lagret!';
+    $('res-saved').style.display='';
+  });
+}
+
+/* ── All-Time Leaderboard ─────────────────────────── */
+function loadAllTime(){
+  showScreen('screen-alltime');
+  $('at-list').innerHTML='<p style="color:var(--muted);text-align:center">Laster ...</p>';
+  db.ref('leaderboard').orderByChild('score').limitToLast(50).once('value',function(snap){
+    var entries=[];
+    snap.forEach(function(ch){entries.push(ch.val());});
+    entries.reverse(); // highest first
+    if(!entries.length){$('at-list').innerHTML='<p style="color:var(--muted);text-align:center">Ingen resultater ennå</p>';return;}
+    var html='';
+    entries.forEach(function(e,i){
+      html+='<div class="at-row">'
+        +'<span class="at-rank">'+(i+1)+'</span>'
+        +avHtml(e.name,24)
+        +'<span class="at-name">'+esc(e.name)+'</span>'
+        +'<span class="at-score">'+(e.score||0)+'</span>'
+        +'<span class="at-date">'+(e.date||'')+'</span>'
+        +'</div>';
+    });
+    $('at-list').innerHTML=html;
+  });
+}
+
+/* ── Play Again ───────────────────────────────────── */
+function doPlayAgain(){
+  if(S.isHost){
+    S.roomRef.update({status:'lobby',currentQuestionIndex:-1});
+  }
+  S.score=0; S.streak=0; S.curQ=-1; S.answered=false; S.savedToLb=false; S.phase='lobby';
+  S.roomRef.child('players/'+S.uid).update({score:0,streak:0,answers:null});
+  $('lobby-code').textContent=S.room;
+  if(S.isHost){$('btn-start').style.display='';$('lobby-wait').style.display='none';}
+  else{$('btn-start').style.display='none';$('lobby-wait').style.display='';}
+  showScreen('screen-lobby');
+}
+
+/* ── Firebase Listeners ───────────────────────────── */
+function attachListeners(){
+  var ref=S.roomRef;
+
+  // Players
+  ref.child('players').on('value',function(snap){
+    var data=snap.val()||{};
+    // Preserve hostId reference
+    ref.child('hostId').once('value',function(hSnap){
+      data._hostId=hSnap.val();
+      S.players=data;
+      renderPlayers();
+      // Update between-screen leaderboard if visible
+      if($('screen-between').classList.contains('active')){
+        renderLb($('bw-lb'),sortedPlayers(),S.curQ);
+      }
+    });
+  });
+
+  // Status
+  ref.child('status').on('value',function(snap){
+    var status=snap.val();
+    if(status==='countdown'&&S.phase!=='countdown'&&S.phase!=='playing'){
+      S.phase='countdown';
+      ref.child('questions').once('value',function(qSnap){
+        S.questions=qSnap.val()||[];
+        runCountdown(function(){
+          // Host triggers the first question
+          if(S.isHost){
+            ref.update({status:'playing',currentQuestionIndex:0,questionStartedAt:SERVER_TS});
+          } else {
+            S.phase='playing';
+            // Non-host waits for currentQuestionIndex to change
+          }
+        });
+      });
+    }
+    if(status==='playing'&&S.phase==='countdown'){
+      S.phase='playing';
+    }
+    if(status==='finished'&&S.phase!=='finished'){
+      showResults();
+    }
+    if(status==='lobby'&&(S.phase==='finished'||S.phase==='playing')){
+      // Play again triggered by host
+      S.score=0;S.streak=0;S.curQ=-1;S.answered=false;S.savedToLb=false;S.phase='lobby';
+      S.roomRef.child('players/'+S.uid).update({score:0,streak:0,answers:null});
+      if(S.isHost){$('btn-start').style.display='';$('lobby-wait').style.display='none';}
+      else{$('btn-start').style.display='none';$('lobby-wait').style.display='';}
+      showScreen('screen-lobby');
+    }
+  });
+
+  // Question index
+  ref.child('currentQuestionIndex').on('value',function(snap){
+    var idx=snap.val();
+    if(idx===null||idx<0) return;
+    if(S.phase!=='playing'&&S.phase!=='countdown') return;
+    S.phase='playing';
+    ref.child('questionStartedAt').once('value',function(tsSnap){
+      S.qStart=tsSnap.val()||serverNow();
+      if(idx!==S.curQ){showQ(idx);}
+    });
+  });
+}
+
+/* ── Event Bindings ───────────────────────────────── */
+$('btn-create').onclick=doCreate;
+$('btn-join').onclick=doJoin;
+$('btn-start').onclick=doStart;
+$('btn-next').onclick=doNext;
+$('btn-finish').onclick=doFinish;
+$('btn-save-lb').onclick=doSaveToLb;
+$('btn-again').onclick=doPlayAgain;
+$('btn-at-back').onclick=function(){showScreen(S.room?'screen-results':'screen-home');};
+// ponytail: best-effort cleanup — host deletes the room on exit; abandoned rooms need a scheduled sweep if they ever matter
+$('btn-res-home').onclick=function(){if(S.isHost&&S.roomRef)S.roomRef.remove();};
+$('link-alltime').onclick=function(e){e.preventDefault();ensureAuth(function(){loadAllTime();});};
+
+// Enter key on inputs
+$('inp-name').addEventListener('keydown',function(e){if(e.key==='Enter')$('btn-create').click();});
+$('inp-code').addEventListener('keydown',function(e){if(e.key==='Enter')$('btn-join').click();});
+
+})();
+</script>
+</body>
+</html>

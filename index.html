@@ -219,6 +219,7 @@ body.theme-light footer {
       <button class="lang-btn on" onclick="setLang('no')">NO</button>
       <button class="lang-btn" onclick="setLang('en')">EN</button>
     </div>
+    <a href="mattekampen.html" class="lp-cta-btn" data-no="Spill nå" data-en="Play now">Spill nå</a>
   </div>
 </header>
 
@@ -254,7 +255,16 @@ body.theme-light footer {
     <button class="filter-chip" data-filter="tool" data-no="Verktøy" data-en="Tools">Verktøy</button>
   </div>
   <div class="game-grid">
-    <!-- spill og verktøy legges til her -->
+    <a class="game-card" href="mattekampen.html" data-subject="matte">
+      <span class="chip game-tag subj-chip-matte" data-no="Matte" data-en="Maths">Matte</span>
+      <h3>Mattekampen</h3>
+      <p data-no="Sanntids matteduell. Opprett rom, del kode, konkurrer mot klassen."
+         data-en="Real-time maths duel. Create a room, share the code, compete against your class.">Sanntids matteduell. Opprett rom, del kode, konkurrer mot klassen.</p>
+      <div class="game-card-meta">
+        <span data-no="8.–10. trinn · ~10 min" data-en="Grades 8–10 · ~10 min">8.–10. trinn · ~10 min</span>
+        <div class="game-card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></div>
+      </div>
+    </a>
   </div>
 </section>
 
@@ -287,6 +297,11 @@ function onLangChange(){
   });
 }
 onLangChange();
+
+// Chips are pointless until games span more than one subject
+var _subjects={};
+document.querySelectorAll('.game-card').forEach(function(c){_subjects[c.dataset.subject]=1;});
+if(Object.keys(_subjects).length<2) document.querySelector('.filter-chips').style.display='none';
 
 document.querySelectorAll('.filter-chip').forEach(function(chip){
   chip.addEventListener('click', function(){

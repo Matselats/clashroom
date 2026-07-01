@@ -1,6 +1,6 @@
 // ─── SHARED UTILITIES ────────────────────────────────────────
 
-const COLORS = ['#e63946','#2176ae','#f5a623','#2a9d5c','#9b5de5','#f77f00','#4cc9f0','#e9c46a','#ef476f','#06d6a0'];
+const COLORS = ['#FF9E33','#4A9E96','#4A7EC2','#3D8C5C','#8B6EC0','#B87333','#A85050','#F5A623','#C25A8A','#5FA8D3'];
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -137,11 +137,11 @@ function spawnConfetti(container, count) {
     p.className = 'confetti-particle';
     p.style.left = Math.random() * 100 + '%';
     p.style.background = colors[Math.floor(Math.random() * colors.length)];
-    p.style.animationDuration = (1.2 + Math.random() * 1.2) + 's';
+    p.style.animationDuration = (2 + Math.random() * 1.5) + 's';
     p.style.animationDelay = (Math.random() * 0.4) + 's';
     container.appendChild(p);
     (function(el) {
-      setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 3000);
+      setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 4200);
     })(p);
   }
 }

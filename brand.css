@@ -9,7 +9,7 @@
   --cream: #FFF6EC;
   --paper: #FAF7F2;
   --ink: #1A1320;
-  --muted: #5B5066;
+  --muted: #9A8FA6; /* dark-theme default; theme-light overrides */
   --line: #E9E2DC;
 
   --accent: var(--apricot);
@@ -267,11 +267,11 @@ button:active { transform: translateY(0); }
 button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn-primary {
-  background: var(--apricot);
+  background: var(--accent);
   color: var(--ink);
   font-weight: 700;
 }
-.btn-primary:hover:not(:disabled) { background: var(--apricot-deep); }
+.btn-primary:hover:not(:disabled) { filter: brightness(0.92); }
 
 .btn-secondary {
   background: transparent;
@@ -647,32 +647,6 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   letter-spacing: 0.02em;
 }
 
-/* ── PODIUM ────────────────────────────────────────── */
-.podium {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  height: 110px;
-}
-.pod {
-  flex: 1;
-  border-radius: var(--r-md) var(--r-md) 0 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding-top: 12px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  gap: 4px;
-}
-.pod-emoji { font-size: 1.2rem; }
-.pod1 { background: rgba(255,158,51,0.14); height: 100%; border: 1px solid rgba(255,158,51,0.28); }
-.pod2 { background: rgba(255,255,255,0.06); height: 72%; border: 1px solid rgba(255,255,255,0.10); }
-.pod3 { background: rgba(255,255,255,0.03); height: 52%; border: 1px solid rgba(255,255,255,0.06); }
-
 /* ── MISC ──────────────────────────────────────────── */
 .info-row {
   display: flex;
@@ -847,7 +821,8 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 @keyframes confettiFall {
   0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-  100% { opacity: 0; transform: translateY(180px) rotate(360deg); }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(105vh) rotate(360deg); }
 }
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(16px); }
@@ -886,8 +861,8 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .score-pop.neg { color: var(--red); }
 
 .confetti-particle {
-  position: absolute;
-  top: 0;
+  position: fixed;
+  top: -12px;
   width: 8px;
   height: 8px;
   border-radius: 2px;
@@ -925,7 +900,7 @@ input:focus-visible,
 textarea:focus-visible,
 a:focus-visible,
 select:focus-visible {
-  outline: 3px solid var(--apricot);
+  outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -949,6 +924,7 @@ select:focus-visible {
 
 /* ── THEME: LIGHT ──────────────────────────────────── */
 body.theme-light {
+  --muted: #5B5066;
   background: var(--paper);
   color: var(--ink);
   display: block;

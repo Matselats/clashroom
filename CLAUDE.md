@@ -4,184 +4,142 @@ Clashroom (clashroom.dev) is a free game-based learning platform for Norwegian m
 
 **Mission:** The best teaching tools cost money. The free alternatives are outdated or bad. Clashroom fills the gap — no login, no download, no cost. Just share the link.
 
+**Status:** Fresh start. The first generation of games (8 local-multiplayer games + 2 teacher tools) was removed in commit `f1f4381`. The platform is being rebuilt around real-time multiplayer with Firebase. Mattekampen is the first game of the new generation and the template for everything that follows.
+
 ---
 
-## What's been built
+## What's live
 
-### Games (8 live)
-
-| Game | Subject | Type | File | Mechanic |
-|------|---------|------|------|----------|
-| **Stavekrig** | Norsk | Multiplayer | `stavekrig.html` | Translate bokmål → nynorsk. 10 words, 15 sec each. Streak bonuses. |
-| **Ordjakten** | Norsk | Multiplayer | `ordjakten.html` | Find correct synonym among alternatives. 20 words, 12 sec each. |
-| **Grammar Duel** | English | Multiplayer | `grammarduell.html` | Choose correct grammar (articles, tenses). 20 Qs, 10 sec. Fastest steals points. |
-| **Word Heist** | English | Multiplayer | `wordheist.html` | Translate Norwegian → English. 15 rounds, 12 sec. Correct answer steals 30 pts from every other player. |
-| **Clashroom Detective** | English | Solo | `detective.html` | 5 progressive mystery cases. Read case files, click highlighted text to collect clues, answer MC questions. Timer + rank system. |
-| **Math Blitz** | Matte | Multiplayer | `mathblitz.html` | Mental arithmetic. 20 problems, 10 sec. Grade selector (8./9./10. trinn). |
-| **Flaggquiz** | Geografi | Multiplayer | `flaggquiz.html` | Recognize flags from 40 countries. 20 questions, 10 sec each. |
-| **Tidslinjen** | Historie | Multiplayer | `tidslinjen.html` | "Which year?" — Norgeshistorie or verdenshistorie. 20 questions. Categories: Blandet, Norgeshistorie, Verdenshistorie. |
-
-### Teacher tools (2 live)
-
-| Tool | File | Purpose |
+| Page | File | Purpose |
 |------|------|---------|
-| **Klassekart** | `klassekart.html` | Paste student names → random seating chart. Layouts: Par, Rader, Grupper. Set constraints for who can't sit together. Print-friendly. |
-| **Klassetimer** | `timer.html` | Fullscreen countdown for smartboard. Three modes: Arbeidsøkt, Gruppearbeid, Prøve. Presets (5–30 min) or custom. |
+| Landing page | `index.html` | Dark header + hero (fox logo, slogan "Der pensum møter puls"), light body with filter chips and game card grid. NO/EN toggle. |
+| **Mattekampen** | `mattekampen.html` | Real-time math duel. Host creates a room, players join with a 4-char code, 10 generated questions, live leaderboard, all-time leaderboard. |
 
-### Landing page
+## Files
 
-`index.html` — Lists all games and tools. Norwegian by default with NO/EN language toggle. Sections: hero, games grid, teacher tools, "why we build this", CTA.
+```
+index.html            Landing page
+mattekampen.html      First game (Firebase multiplayer)
+brand.css             Brand identity: colors, fonts, shared components (buttons, chips, cards, screens)
+shared.css            Legacy shared game styles
+shared.js             Utilities: showScreen, shuffle, avatars, answer validation, sound FX, confetti, language toggle
+firebase-config.js    Firebase init + room helpers (partially superseded — mattekampen.html inlines its own config and uses 4-char codes, not 5)
+database.rules.json   Realtime Database security rules (deploy manually in Firebase console)
+brand-assets/         Logo SVGs
+CNAME                 clashroom.dev (GitHub Pages)
+```
 
 ---
 
 ## Tech stack
 
-- **Architecture:** Each page is a single self-contained HTML file. All CSS and JS are inline. No build step, no bundler, no framework, no npm.
-- **External dependencies:** Google Fonts only (loaded via `@import`).
-- **Fonts:** Syne (headings, weight 700–800), DM Sans (body text, weight 400–600), DM Mono (monospace accents — timers, scores).
-- **Backend:** None. Multiplayer is local — all players share the same page instance on one device (teacher's screen), or each player opens the same URL on their own device and the game runs independently.
-- **Hosting:** Static files on clashroom.dev.
-- **No databases, no APIs, no auth, no cookies.**
+- **Architecture:** Static files, no build step, no bundler, no npm. Each game is one HTML file with inline CSS overrides and inline JS, sharing `brand.css` and `shared.js`.
+- **Backend:** Firebase Realtime Database (europe-west1) with anonymous auth. Loaded via `firebase-*-compat.js` CDN scripts (v10.12.0).
+- **Fonts:** Syne (headings, 700–800), Schibsted Grotesk (body), DM Mono (codes, timers, scores). Loaded via `@import` in brand.css.
+- **Hosting:** GitHub Pages on clashroom.dev.
+- No cookies, no login for users — anonymous auth only, invisible to the player.
 
 ---
 
-## File structure
+## Firebase architecture (Mattekampen pattern)
 
-Every game file follows the same pattern:
+### Data model
 
 ```
-<!DOCTYPE html>
-<html lang="no">
-<head>
-  <style>
-    /* All CSS inline — variables, components, animations, responsive */
-  </style>
-</head>
-<body>
-  <!-- Multiple .screen divs, toggled via .active class -->
-  <div class="screen active" id="screen-role">...</div>
-  <div class="screen" id="screen-lobby">...</div>
-  <div class="screen" id="screen-countdown">...</div>
-  <div class="screen" id="screen-game">...</div>
-  <div class="screen" id="screen-between">...</div>
-  <div class="screen" id="screen-results">...</div>
-
-  <script>
-    /* All JS inline — word banks/data, state object, game logic, rendering */
-  </script>
-</body>
-</html>
+rooms/{CODE}/
+  hostId                 uid of host (write-once)
+  createdAt              server timestamp
+  status                 'lobby' | 'countdown' | 'playing' | 'finished'
+  currentQuestionIndex   -1 in lobby, 0..n during play
+  questionStartedAt      server timestamp, set by host per question
+  questions/             array of {id, topic, difficulty, prompt, answer, choices}
+  players/{uid}/         {name, score, streak, answers/{qIdx}: {choice, timeUsedMs, correct, points}}
+leaderboard/{pushId}     {name, score, date, roomCode} — write-once entries
 ```
 
-### Multiplayer input patterns
+### Security rules (`database.rules.json`)
 
-Two patterns exist for how players join:
+- Everything requires `auth != null` (anonymous auth).
+- `hostId`: writable only if it doesn't exist yet (first writer becomes host).
+- `status`, `currentQuestionIndex`, `questionStartedAt`, `questions`: writable only by the host.
+- `players/{uid}`: each player writes only their own node.
+- The host may delete their own room (room-level write allowed only when the new value is null). The client does this best-effort when the host leaves the results screen; abandoned rooms are never cleaned up (no TTL in RTDB) — needs a scheduled sweep if it ever matters.
+- `leaderboard` entries: write-once (no edits, no deletes).
 
-1. **Join pattern** (Stavekrig, Ordjakten, Grammar Duel, Word Heist): Teacher/student role toggle → enter name → join lobby → teacher presses Start.
-2. **Paste pattern** (Flaggquiz, Tidslinjen): Teacher pastes all player names (one per line) into a textarea → press Start. Simpler, faster setup.
+### Game flow
 
-### Common code patterns
+1. Host enters name → `Opprett rom` → 4-char code generated (`ABCDEFGHJKLMNPQRSTUVWXYZ23456789`, no O/0/I/1), collision-checked.
+2. Players enter name + code → join lobby. Host's Start button enables at 2+ players.
+3. Host generates the question set client-side and writes it to the room, sets `status: 'countdown'`.
+4. All clients run a local 3-2-1 countdown; host then sets `status: 'playing'` and `currentQuestionIndex: 0` with `questionStartedAt: SERVER_TS`.
+5. Each client scores locally against server time (`.info/serverTimeOffset` keeps clocks in sync) and writes its own answer + score.
+6. Between questions: leaderboard renders live from `players` listener. Host advances with `currentQuestionIndex`/`questionStartedAt`, finishes with `status: 'finished'`.
+7. Results: podium + full leaderboard + optional save to all-time leaderboard. `Spill igjen` resets scores and returns everyone to the lobby (same room code).
 
-- Screen management: `showScreen(id)` toggles `.active` on `.screen` divs.
-- State: single `state` object holds everything (role, players, scores, round, timer).
-- Colors: player avatars use a hash function to pick a deterministic color from a palette.
-- Timer: `setInterval` countdown with circular SVG ring or progress bar.
-- Scoring: base points + time bonus (faster answer = more points). Some games add streak bonuses or steal mechanics.
-- Results: podium (🥇🥈🥉) + full scoreboard sorted by score.
+### Scoring
 
----
-
-## Design principles
-
-1. **One file = one tool.** No shared dependencies, no imports between files. Every page must work if you open it alone in a browser.
-2. **Zero friction.** No login, no signup, no download, no install. Share a link, open it, play.
-3. **Teacher-first.** The teacher controls the game flow (start, settings). Students just join and play.
-4. **Mobile-ready.** Every game works on phones, tablets, and smartboards. Use `clamp()`, flexbox/grid, and `@media` for responsiveness.
-5. **Fast to build.** Inline everything. No build tooling overhead. Ship a new game by writing one HTML file.
-6. **Accessibility basics.** Skip-to-content links (`Hopp til innhold`), semantic HTML, keyboard support (Enter to submit answers).
-7. **Language toggle.** Newer pages have a NO/EN toggle. Norwegian is always the default.
+- 15 s per question. Points: 200–1000 scaled linearly by speed, +50 per streak step (cap 5). Wrong or timeout: 0 points, streak resets.
 
 ---
 
 ## Visual design
 
-### Color system
+### Brand
 
-Games use a dark theme. The landing page uses a lighter theme.
+- **Logo:** the fox — inline SVG, apricot on aubergine. Blinking eyes on the landing hero (`fox-blink`).
+- **Slogan:** "Der pensum møter puls" / "Where curriculum meets pulse".
+
+### Colors (all in `brand.css :root`)
 
 ```
---ink: #0f0f1a or #1a1a2e    (dark background)
---paper: #f0ede6 or #f7f5f0  (light text)
---accent: varies per game     (red #e63946, amber #f5a623, pink #e63a8a, etc.)
---green: #2a9d5c             (correct answers, success)
---red: #e63946               (wrong answers, urgency)
---gold: #f4a832 or #f5a623   (scores, leaders, timers)
---muted: #6b6b80 or #8a8a9a  (secondary text)
---card: #1a1a2e              (card backgrounds)
---border: rgba(255,255,255,0.08) (subtle borders)
+--aubergine: #2B1338   dark surfaces (header, hero, game backgrounds)
+--aubergine-deep: #160A1D
+--apricot: #FF9E33     brand accent, CTAs
+--cream: #FFF6EC       text on dark
+--paper: #FAF7F2       light page background
+--ink: #1A1320         text on light
+--muted, --line        secondary text, borders
+--green / --red / --gold   correct / wrong / scores
+--subj-norsk / -english / -matte / -geografi / -historie / -tool   per-subject accents (+ -dim variants)
 ```
 
-### Typography
+- Landing page: light theme (`body.theme-light`) with dark header/hero band.
+- Games: dark theme. Each game sets `--accent: var(--subj-X)` for its subject.
 
-- **Headings:** Syne, weight 800, negative letter-spacing (-0.03em to -0.05em), line-height 1.0–1.1. Use `<em>` with accent color for emphasis (no italic).
-- **Body:** DM Sans, weight 400–600, line-height 1.5–1.65.
-- **Monospace accents:** DM Mono for timers, scores, counters, labels.
+### Typography and UI
 
-### UI patterns
+- Headings: Syne 800, negative letter-spacing. Body: Schibsted Grotesk. Codes/timers/scores: DM Mono.
+- Radii: `--r-sm` 12px, `--r-md` 16px, `--r-lg` 24px. Shadows: `--shadow-sm/md/lg`.
+- Avatars: colored circle with initial, color from name hash (`avHtml` in shared.js).
+- Icons: inline SVG only. No emoji, no icon libraries.
+- Animations: short CSS keyframes (0.2–0.6 s). Respect `prefers-reduced-motion` (confetti and score pops already do).
 
-- **Border radius:** 10–20px for cards, 8–12px for buttons/inputs, 20px for pills/badges.
-- **Cards:** dark background, 1px translucent border, rounded corners.
-- **Buttons:** full-width, 12–14px radius, bold font, subtle hover (opacity + translateY).
-- **Avatars:** colored circle with initial letter, color derived from name hash.
-- **Animations:** `fadeUp`, `slideIn`, `popIn`, `pulse` — all CSS keyframes, short durations (0.2–0.5s).
-- **Icons:** emoji only. No SVG icon library.
-- **Feedback:** colored banners — green for correct, red for wrong, amber/neutral for timeout.
+---
+
+## Language toggle
+
+- Norwegian default, stored in `localStorage` (`clashroom_lang`), handled by `setLang`/`getLang` in shared.js.
+- Translatable elements carry `data-no` and `data-en` attributes; the page defines `onLangChange()` that swaps `innerHTML` from the attribute.
 
 ---
 
 ## Tone of voice
 
-### Norwegian UI text
-
-- **Casual, encouraging, energetic.** Write like a teacher who's excited about the game, not like a textbook.
-- **Use "du/dere"** (informal you), never "De" (formal).
-- **Short sentences.** "Gjør deg klar!" not "Vennligst forbered deg på at spillet snart starter."
-- **Emoji in context** — as visual markers in buttons and labels, not decoratively in prose.
-- Game titles are punchy, one or two words: Stavekrig, Ordjakten, Flaggquiz, Tidslinjen.
-- Button labels are action-first: "Bli med →", "Start spillet", "Spill igjen 🔄".
-
-### English UI text
-
-- Same energy as Norwegian — short, direct, playful.
-- "Play now", "Join the heist →", "Next Case →".
-- Avoid formal/academic tone. This is a game, not an exam.
-
-### Landing page / marketing
-
-- Teacher-to-teacher tone. "Vi bygger gratis klasseromsspill" — we, not the company.
-- Honest about status: "Clashroom er ikke ferdig. Men alt du ser her fungerer allerede."
-- No hype, no buzzwords. Just say what it does.
+- Casual, direct, energetic. "Gjør deg klar!", not textbook prose. Always "du/dere", never "De".
+- Short sentences. Action-first button labels: "Opprett rom", "Bli med", "Start kampen", "Spill igjen".
+- No emoji, no hype, no marketing buzzwords. Say what it does.
+- Norwegian UI is the default. English only via the toggle or for English-subject games.
 
 ---
 
-## When building new games
+## When building a new game
 
-1. Copy an existing game file as a starting point. Stavekrig or Grammar Duel are good templates for multiplayer games.
-2. Keep all CSS and JS inline in the single HTML file.
-3. Use the same screen-based flow: role select → lobby → countdown → game → between rounds → results.
-4. Include a `← Tilbake til Clashroom` link back to `index.html`.
-5. Add a `Hopp til innhold` skip link and a language toggle if applicable.
-6. Use Syne + DM Sans + DM Mono fonts. Stay on the dark theme.
-7. Add the new game to `index.html` in the games grid.
-8. Word banks / question data go in a JS array at the top of the `<script>` block.
-9. Test on mobile — many students will play on their phones.
-10. Keep the Norwegian UI as default. English UI only for English-subject games.
-
----
-
-## When building new teacher tools
-
-1. Teacher tools don't need the lobby/multiplayer flow. They're single-user utilities.
-2. Same visual language — dark theme, Syne headings, DM Sans body.
-3. Include print-friendly output where relevant (`@media print`).
-4. Add to the "Lærerverktøy" section on `index.html`.
+1. Copy `mattekampen.html` — it is the reference implementation for the whole multiplayer flow (home → lobby → countdown → game → between → results).
+2. Link `brand.css` and `shared.js`. Keep game-specific CSS in an inline `<style>` block as overrides; set `--accent` to the subject color.
+3. Never change JS-hooked IDs and classes when restyling — game logic depends on them.
+4. Reuse the Firebase room pattern and data model above. If a new game needs new host-written fields, add them to `database.rules.json` under the host-only rule and update the rules in the Firebase console.
+5. Question data or generators go at the top of the `<script>` block.
+6. Include the `game-header` with `← Clashroom` back link and a `Hopp til innhold` skip link.
+7. Keyboard support: Enter submits on inputs, buttons are real `<button>` elements.
+8. Test on mobile — students play on phones. `clamp()`, grid, `@media`.
+9. Add the game as a card in the `game-grid` on `index.html` with the right `data-subject` and `data-no`/`data-en` texts.
