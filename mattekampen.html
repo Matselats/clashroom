@@ -87,7 +87,9 @@ body { min-height: 100dvh; display: flex; flex-direction: column; align-items: c
 .timer-bg { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 6; }
 .timer-fg { fill: none; stroke: var(--accent); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.3s linear, stroke 0.3s; }
 .timer-fg.urgent { stroke: var(--red); }
-.timer-text { fill: var(--cream); font-family: 'DM Mono',monospace; font-size: 22px; font-weight: 700; }
+.timer-text { fill: var(--cream); font-family: 'DM Mono',monospace; font-size: 22px; font-weight: 700; transform-box: fill-box; transform-origin: center; }
+.timer-fg.urgent ~ .timer-text { fill: var(--red); animation: timerPulse 1s ease infinite; }
+@keyframes timerPulse { 50% { transform: scale(1.18); } }
 
 .q-prompt {
   font-size: clamp(1.05rem,3.5vw,1.3rem); font-weight: 600; text-align: center;
@@ -103,8 +105,8 @@ body { min-height: 100dvh; display: flex; flex-direction: column; align-items: c
 }
 .choice-btn:hover:not(.locked) { background: rgba(255,255,255,0.1); border-color: var(--accent); }
 .choice-btn.selected { background: var(--accent); border-color: var(--accent); color: var(--aubergine-deep); }
-.choice-btn.correct { background: var(--green); border-color: var(--green); color: #fff; }
-.choice-btn.wrong { background: var(--red); border-color: var(--red); color: #fff; }
+.choice-btn.correct { background: var(--green); border-color: var(--green); color: #fff; animation: scalePop 0.3s ease; }
+.choice-btn.wrong { background: var(--red); border-color: var(--red); color: #fff; animation: shake 0.4s ease; }
 .choice-btn.reveal { border-color: var(--green); background: rgba(42,157,92,0.15); }
 .choice-btn.locked { cursor: default; opacity: 0.7; }
 
@@ -124,7 +126,14 @@ body { min-height: 100dvh; display: flex; flex-direction: column; align-items: c
 .lb-row {
   display: flex; align-items: center; gap: 10px; padding: 10px 12px;
   border-radius: 8px; background: rgba(255,255,255,0.04); transition: background 0.2s;
+  animation: slideIn 0.3s ease both;
 }
+.lb-row:nth-child(2) { animation-delay: 0.05s; }
+.lb-row:nth-child(3) { animation-delay: 0.1s; }
+.lb-row:nth-child(4) { animation-delay: 0.15s; }
+.lb-row:nth-child(5) { animation-delay: 0.2s; }
+.lb-row:nth-child(6) { animation-delay: 0.25s; }
+.lb-row:nth-child(n+7) { animation-delay: 0.3s; }
 .lb-row.me { background: var(--accent-dim); }
 .lb-row.top { background: rgba(245,166,35,0.1); }
 .lb-rank { font-family: 'DM Mono',monospace; font-weight: 700; font-size: 0.85rem; width: 24px; text-align: center; color: var(--muted); }
@@ -140,7 +149,17 @@ body { min-height: 100dvh; display: flex; flex-direction: column; align-items: c
 .podium-bar {
   width: 90px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
   padding: 12px 6px 10px; border-radius: 10px 10px 0 0;
+  transform-origin: bottom; animation: podRise 0.5s ease both;
 }
+/* Ceremony order: 3rd, then 2nd, winner last. DOM order is [2nd, 1st, 3rd]. */
+.podium-slot:nth-child(3) .podium-bar { animation-delay: 0.1s; }
+.podium-slot:nth-child(1) .podium-bar { animation-delay: 0.45s; }
+.podium-slot:nth-child(2) .podium-bar { animation-delay: 0.85s; }
+.podium-slot .podium-name { animation: fadeUp 0.3s ease both; }
+.podium-slot:nth-child(3) .podium-name { animation-delay: 0.25s; }
+.podium-slot:nth-child(1) .podium-name { animation-delay: 0.6s; }
+.podium-slot:nth-child(2) .podium-name { animation-delay: 1s; }
+@keyframes podRise { from { transform: scaleY(0); } }
 .podium-bar.p1 { height: 120px; background: linear-gradient(180deg,rgba(245,166,35,0.3),rgba(245,166,35,0.08)); border: 1px solid rgba(245,166,35,0.3); border-bottom: none; }
 .podium-bar.p2 { height: 90px; background: linear-gradient(180deg,rgba(192,192,192,0.2),rgba(192,192,192,0.05)); border: 1px solid rgba(192,192,192,0.2); border-bottom: none; }
 .podium-bar.p3 { height: 70px; background: linear-gradient(180deg,rgba(205,127,50,0.2),rgba(205,127,50,0.05)); border: 1px solid rgba(205,127,50,0.15); border-bottom: none; }
@@ -204,6 +223,7 @@ body { min-height: 100dvh; display: flex; flex-direction: column; align-items: c
 
 <!-- HOME -->
 <div class="screen active" id="screen-home">
+  <div id="home-fox" class="fox-stage fox-blink"></div>
   <h1 class="home-title">Mattekampen</h1>
   <p class="home-sub">Sanntids matteduell for ungdomsskolen</p>
 
@@ -221,6 +241,7 @@ body { min-height: 100dvh; display: flex; flex-direction: column; align-items: c
 
 <!-- LOBBY -->
 <div class="screen" id="screen-lobby">
+  <div id="lobby-fox" class="fox-stage fox-blink"></div>
   <p class="room-code-label">Romkode</p>
   <div id="lobby-code" class="room-code"></div>
   <p class="lobby-wait">Del koden med klassen</p>
@@ -234,6 +255,7 @@ body { min-height: 100dvh; display: flex; flex-direction: column; align-items: c
 <!-- COUNTDOWN -->
 <div class="screen" id="screen-countdown">
   <div id="cd-num" class="countdown-num">3</div>
+  <div id="cd-fox" class="fox-stage fox--cheer-loop"></div>
 </div>
 
 <!-- GAME -->
@@ -254,6 +276,7 @@ body { min-height: 100dvh; display: flex; flex-direction: column; align-items: c
   <p id="q-prompt" class="q-prompt"></p>
   <div id="q-choices" class="choices"></div>
   <div id="q-feedback" class="feedback" style="display:none"></div>
+  <div id="game-fox" class="fox-peek fox-stage fox-blink"></div>
 </div>
 
 <!-- BETWEEN -->
@@ -267,6 +290,7 @@ body { min-height: 100dvh; display: flex; flex-direction: column; align-items: c
 
 <!-- RESULTS -->
 <div class="screen" id="screen-results">
+  <div id="res-fox" class="fox-stage fox--cheer-loop"></div>
   <h2 class="results-heading">Kamp ferdig!</h2>
   <div id="res-podium" class="podium"></div>
   <div id="res-lb" class="lb"></div>
@@ -442,6 +466,17 @@ function ensureAuth(cb){
     .catch(function(){$('home-error').textContent='Kan ikke koble til Firebase. Prøv igjen.';});
 }
 
+/* ── Fox mascot ───────────────────────────────────── */
+$('home-fox').innerHTML=foxSvg(84);
+$('lobby-fox').innerHTML=foxSvg(64);
+$('cd-fox').innerHTML=foxSvg(60);
+$('game-fox').innerHTML=foxSvg(72);
+$('res-fox').innerHTML=foxSvg(72);
+
+function foxMood(m){$('game-fox').className='fox-peek fox-stage '+(m||'fox-blink');}
+
+var _prevPlayers=0;
+
 /* ── Helpers ──────────────────────────────────────── */
 function err(msg){$('home-error').textContent=msg;}
 
@@ -459,6 +494,12 @@ function renderPlayers(){
     $('btn-start').disabled=keys.length<2;
     $('lobby-hint').style.display=keys.length<2?'':'none';
   }
+  if(keys.length>_prevPlayers){
+    var lf=$('lobby-fox');
+    lf.classList.add('fox--cheer');
+    setTimeout(function(){lf.classList.remove('fox--cheer');},1500);
+  }
+  _prevPlayers=keys.length;
 }
 
 function updScore(){
@@ -575,6 +616,7 @@ function runCountdown(cb){
 function showQ(idx){
   S.curQ=idx; S.answered=false;
   var q=S.questions[idx]; if(!q) return;
+  foxMood();
   showScreen('screen-game');
   $('q-number').textContent='Spørsmål '+(idx+1)+'/'+S.questions.length;
   updScore();
@@ -609,6 +651,7 @@ function startTimer(){
     txt.textContent=sec;
     fg.style.strokeDashoffset=CIRC*(1-left/(TIME_LIMIT/1000));
     if(left<=5) fg.classList.add('urgent');
+    if(left<=5&&!S.answered) foxMood('fox--worry');
     if(left<=3&&left>0&&sec!==parseInt(txt.dataset.last||'0')){sfxTick();txt.dataset.last=sec;}
     if(left<=0){stopTimer();if(!S.answered)handleTimeout();}
   }
@@ -629,8 +672,8 @@ function submitAnswer(ci){
   var elapsed=serverNow()-S.qStart;
   var res=calcPoints(correct,elapsed,S.streak);
 
-  if(correct){S.streak++;S.score+=res.points;sfxCorrect();}
-  else{S.streak=0;sfxWrong();}
+  if(correct){S.streak++;S.score+=res.points;sfxCorrect();foxMood('fox--happy fox--cheer');}
+  else{S.streak=0;sfxWrong();foxMood('fox--sad');}
   updScore();
 
   // Mark buttons
@@ -666,6 +709,7 @@ function submitAnswer(ci){
 function handleTimeout(){
   S.answered=true; S.streak=0;
   updScore();
+  foxMood('fox--sad');
   var q=S.questions[S.curQ];
   var btns=$('q-choices').querySelectorAll('.choice-btn');
   btns.forEach(function(b,i){
@@ -750,7 +794,8 @@ function showResults(){
   $('btn-save-lb').style.display='';
   $('res-saved').style.display='none';
 
-  spawnConfetti(document.body,30);
+  // Confetti lands as the winner's podium bar finishes rising
+  setTimeout(function(){spawnConfetti(document.body,30);},1100);
 }
 
 /* ── Save to All-Time Leaderboard ─────────────────── */

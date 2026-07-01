@@ -175,7 +175,10 @@ footer a:hover { text-decoration: underline; }
   flex-direction: column;
   align-items: center;
   gap: 18px;
+  /* opacity only — a transform here would hijack position:fixed children (.fox-peek) */
+  animation: screenIn 0.25s ease;
 }
+@keyframes screenIn { from { opacity: 0; } }
 
 /* ── TYPOGRAPHY ────────────────────────────────────── */
 h1 {
@@ -796,6 +799,53 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 @keyframes foxBlink {
   0%,93%,100% { ry: 4.2; }
   96% { ry: 0.8; }
+}
+
+/* Mood classes go on a .fox-stage wrapper around foxSvg() */
+.fox-stage { display: flex; justify-content: center; }
+.fox-stage .fox { transition: transform 0.3s ease; }
+.fox .fox-eye,
+.fox .fox-eyes,
+.fox .fox-ear-l,
+.fox .fox-ear-r {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.fox--happy .fox-eye { ry: 1.6; }
+.fox--cheer .fox { animation: foxJump 0.7s ease 2; }
+.fox--cheer-loop .fox { animation: foxJump 1.6s ease infinite; }
+.fox--sad .fox { transform: translateY(7px) rotate(-7deg); }
+.fox--sad .fox-eyes { transform: translateY(3px); }
+.fox--sad .fox-ear-l { transform: rotate(-14deg); }
+.fox--sad .fox-ear-r { transform: rotate(14deg); }
+.fox--worry .fox { animation: foxTremble 0.22s linear infinite; }
+.fox--worry .fox-eye { ry: 6; }
+
+@keyframes foxJump {
+  0%,100% { transform: translateY(0); }
+  30% { transform: translateY(-16px) rotate(-4deg); }
+  55% { transform: translateY(0); }
+  75% { transform: translateY(-7px) rotate(3deg); }
+}
+@keyframes foxTremble {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-1.5px) rotate(-1deg); }
+  75% { transform: translateX(1.5px) rotate(1deg); }
+}
+
+/* Mascot peeking up from the bottom edge during play */
+.fox-peek {
+  position: fixed;
+  right: 16px;
+  bottom: -12px;
+  z-index: 5;
+  pointer-events: none;
+}
+@media (max-width: 500px) {
+  .fox-peek { right: 8px; }
+  .fox-peek .fox { width: 54px; height: 58px; }
 }
 
 /* ── ANIMATIONS ────────────────────────────────────── */

@@ -36,6 +36,26 @@ function updateRing(cur, max, el) {
   el.style.strokeDashoffset = circ - (cur / max) * circ;
 }
 
+// ─── FOX MASCOT ─────────────────────────────────────────────
+// Brand fox as a reusable SVG. Parts are classed so CSS mood
+// classes on a wrapper (.fox--happy, .fox--sad, .fox--worry,
+// .fox--cheer, .fox--cheer-loop, .fox-blink) can animate them.
+
+function foxSvg(size) {
+  var w = size || 76, h = Math.round(w * 130 / 120);
+  return '<svg class="fox" viewBox="0 0 120 130" width="' + w + '" height="' + h + '" aria-hidden="true">'
+    + '<path d="M60 36 L46 42 L26 6 L14 54 L26 84 L60 116 L94 84 L106 54 L94 6 L74 42 Z" fill="#FF9E33" stroke="#FF9E33" stroke-width="4" stroke-linejoin="round"/>'
+    + '<path class="fox-ear-l" d="M31 18 L23 48 L43 41 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/>'
+    + '<path class="fox-ear-r" d="M89 18 L97 48 L77 41 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/>'
+    + '<path d="M60 46 L42 58 L34 80 L60 110 L86 80 L78 58 Z" fill="#FFF6EC" stroke="#FFF6EC" stroke-width="3" stroke-linejoin="round"/>'
+    + '<g class="fox-eyes">'
+    + '<ellipse class="fox-eye fox-eye-l" cx="48" cy="68" rx="5" ry="5" fill="#2B1338"/>'
+    + '<ellipse class="fox-eye fox-eye-r" cx="72" cy="68" rx="5" ry="5" fill="#2B1338"/>'
+    + '</g>'
+    + '<path class="fox-nose" d="M53 78 H67 L60 90 Z" fill="#2B1338" stroke="#2B1338" stroke-width="3" stroke-linejoin="round"/>'
+    + '</svg>';
+}
+
 // ─── ANSWER VALIDATION ──────────────────────────────────────
 
 function normalizeAnswer(s) {

@@ -87,6 +87,7 @@ leaderboard/{pushId}     {name, score, date, roomCode} — write-once entries
 ### Brand
 
 - **Logo:** the fox — inline SVG, apricot on aubergine. Blinking eyes on the landing hero (`fox-blink`).
+- **Mascot system:** `foxSvg(size)` in shared.js renders the fox with classed parts. Mood classes on a `.fox-stage` wrapper (all in brand.css): `fox-blink` (idle), `fox--happy` (smiling eyes), `fox--cheer` (two jumps), `fox--cheer-loop` (jumping forever), `fox--sad` (droop, ears down), `fox--worry` (trembling, wide eyes). `.fox-peek` fixes it to the bottom-right viewport corner during play. Every game should use the fox as a reacting character: idle in lobby (cheer when a player joins), worried when the timer runs low, happy/cheer on correct, sad on wrong/timeout, cheer-loop on results. Note: never put a `transform` animation on `.screen.active` — it hijacks `position: fixed` children like `.fox-peek` (screen transition is opacity-only for this reason).
 - **Slogan:** "Der pensum møter puls" / "Where curriculum meets pulse".
 
 ### Colors (all in `brand.css :root`)
