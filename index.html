@@ -17,8 +17,6 @@ body.theme-light header.lp-header {
   padding: 14px clamp(20px, 4vw, 64px);
 }
 body.theme-light .lp-header .header-brand { color: var(--cream); }
-body.theme-light .lp-header .header-nav a { color: rgba(255,255,255,0.5); font-size: 0.88rem; font-weight: 500; text-decoration: none; }
-body.theme-light .lp-header .header-nav a:hover { color: var(--cream); }
 body.theme-light .lp-header .lang-toggle { background: rgba(255,255,255,0.08); }
 body.theme-light .lp-header .lang-btn { color: rgba(255,255,255,0.45); }
 body.theme-light .lp-header .lang-btn:hover { color: var(--cream); background: rgba(255,255,255,0.06); }
@@ -43,7 +41,7 @@ body.theme-light .lp-header .lang-btn.on { background: rgba(255,255,255,0.12); c
 .hero {
   max-width: none;
   margin: 0;
-  padding: 52px 32px 48px;
+  padding: 36px 32px 32px;
   text-align: center;
   background: var(--aubergine);
 }
@@ -78,7 +76,7 @@ body.theme-light .lp-header .lang-btn.on { background: rgba(255,255,255,0.12); c
 .lp-section {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 48px 32px 56px;
+  padding: 32px 32px 48px;
 }
 .lp-section h2 {
   margin-bottom: 20px;
@@ -139,7 +137,7 @@ body.theme-light .lp-header .lang-btn.on { background: rgba(255,255,255,0.12); c
 .game-card[data-subject="norsk"]   { --card-accent: var(--subj-norsk); }
 .game-card[data-subject="english"] { --card-accent: var(--subj-english); }
 .game-card[data-subject="matte"]   { --card-accent: var(--subj-matte); }
-.tool-grid .game-card              { --card-accent: var(--subj-tool); }
+.game-card[data-subject="tool"]    { --card-accent: var(--subj-tool); }
 
 .game-card .game-tag { align-self: flex-start; margin-bottom: 12px; }
 .game-card h3 {
@@ -176,12 +174,6 @@ body.theme-light .lp-header .lang-btn.on { background: rgba(255,255,255,0.12); c
 }
 .game-card:hover .game-card-arrow { background: var(--apricot); color: var(--aubergine); }
 
-.tool-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 14px;
-}
-
 /* ── FOOTER ───────────────────────────────────────── */
 body.theme-light footer {
   max-width: 1120px;
@@ -192,17 +184,12 @@ body.theme-light footer {
   flex-wrap: wrap;
 }
 
-/* ── SCROLL REVEAL (opacity only) ─────────────────── */
-.sr { opacity: 0; transform: none; transition: opacity 0.4s ease; }
-.sr.v { opacity: 1; transform: none; }
-
 /* ── RESPONSIVE ───────────────────────────────────── */
 @media (max-width: 700px) {
   body.theme-light header.lp-header { padding: 10px 16px; }
   .hero { padding: 40px 16px 36px; }
   .lp-section { padding: 32px 16px 40px; }
-  .game-grid, .tool-grid { grid-template-columns: 1fr; }
-  .lp-header .header-nav { display: none; }
+  .game-grid { grid-template-columns: 1fr; }
   footer { padding: 24px 16px; }
 }
 @media (min-width: 701px) and (max-width: 900px) {
@@ -227,10 +214,6 @@ body.theme-light footer {
     </svg>
     <span class="header-brand-name">Clashroom</span>
   </a>
-  <nav class="header-nav" style="display:flex;align-items:center;gap:24px;">
-    <a href="#spill" data-no="Spill" data-en="Games">Spill</a>
-    <a href="#verktoy" data-no="Verktøy" data-en="Tools">Verktøy</a>
-  </nav>
   <div class="header-right" style="gap:12px;">
     <div class="lang-toggle">
       <button class="lang-btn on" onclick="setLang('no')">NO</button>
@@ -263,19 +246,17 @@ body.theme-light footer {
 </section>
 
 
-<!-- SPILL -->
 <section class="lp-section" id="spill">
-  <h2 data-no="Spill" data-en="Games">Spill</h2>
   <div class="filter-chips">
     <button class="filter-chip active" data-filter="all" data-no="Alle" data-en="All">Alle</button>
     <button class="filter-chip" data-filter="norsk" data-no="Norsk" data-en="Norwegian">Norsk</button>
     <button class="filter-chip" data-filter="english" data-no="Engelsk" data-en="English">Engelsk</button>
     <button class="filter-chip" data-filter="matte" data-no="Matte" data-en="Maths">Matte</button>
+    <button class="filter-chip" data-filter="tool" data-no="Verktøy" data-en="Tools">Verktøy</button>
   </div>
 
   <div class="game-grid">
-
-    <a class="game-card sr" href="stavekrig.html" data-subject="norsk">
+    <a class="game-card" href="stavekrig.html" data-subject="norsk">
       <span class="chip game-tag subj-chip-norsk" data-no="Norsk" data-en="Norwegian">Norsk</span>
       <h3>Stavekrig</h3>
       <p data-no="Oversett bokmål til nynorsk raskere enn resten av klassen."
@@ -286,7 +267,7 @@ body.theme-light footer {
       </div>
     </a>
 
-    <a class="game-card sr" href="ordjakten.html" data-subject="norsk">
+    <a class="game-card" href="ordjakten.html" data-subject="norsk">
       <span class="chip game-tag subj-chip-norsk" data-no="Norsk" data-en="Norwegian">Norsk</span>
       <h3>Ordjakten</h3>
       <p data-no="Finn riktig synonym blant fire alternativer. 30 norske ord under tidspress."
@@ -297,7 +278,7 @@ body.theme-light footer {
       </div>
     </a>
 
-    <a class="game-card sr" href="grammarduell.html" data-subject="english">
+    <a class="game-card" href="grammarduell.html" data-subject="english">
       <span class="chip game-tag subj-chip-english" data-no="Engelsk" data-en="English">Engelsk</span>
       <h3>Grammar Duel</h3>
       <p data-no="Velg riktig tempus og grammatikk under tidspress."
@@ -308,7 +289,7 @@ body.theme-light footer {
       </div>
     </a>
 
-    <a class="game-card sr" href="wordheist.html" data-subject="english">
+    <a class="game-card" href="wordheist.html" data-subject="english">
       <span class="chip game-tag subj-chip-english" data-no="Engelsk" data-en="English">Engelsk</span>
       <h3>Word Heist</h3>
       <p data-no="Oversett norsk til engelsk. Raskest svar stjeler poeng fra alle andre."
@@ -319,7 +300,7 @@ body.theme-light footer {
       </div>
     </a>
 
-    <a class="game-card sr" href="detective.html" data-subject="english">
+    <a class="game-card" href="detective.html" data-subject="english">
       <span class="chip game-tag subj-chip-english" data-no="Engelsk" data-en="English">Engelsk</span>
       <h3>Clashroom Detective</h3>
       <p data-no="Les krimrapporter, samle ledetråder og løs mysteriet."
@@ -330,7 +311,7 @@ body.theme-light footer {
       </div>
     </a>
 
-    <a class="game-card sr" href="mathblitz.html" data-subject="matte">
+    <a class="game-card" href="mathblitz.html" data-subject="matte">
       <span class="chip game-tag subj-chip-matte" data-no="Matte" data-en="Maths">Matte</span>
       <h3>Math Blitz</h3>
       <p data-no="Hoderegning mot klokka. Velg 8., 9. eller 10. trinn."
@@ -341,16 +322,7 @@ body.theme-light footer {
       </div>
     </a>
 
-
-  </div>
-</section>
-
-<!-- LÆRERVERKTØY -->
-<section class="lp-section" id="verktoy">
-  <h2 data-no="Lærerverktøy" data-en="Teacher tools">Lærerverktøy</h2>
-  <div class="tool-grid">
-
-    <a class="game-card sr" href="klassekart.html">
+    <a class="game-card" href="klassekart.html" data-subject="tool">
       <span class="chip game-tag subj-chip-tool" data-no="Verktøy" data-en="Tool">Verktøy</span>
       <h3 data-no="Klassekart" data-en="Seating chart">Klassekart</h3>
       <p data-no="Lim inn elevnavn, få tilfeldig sittekart. Sett begrensninger for hvem som ikke kan sitte sammen."
@@ -361,7 +333,7 @@ body.theme-light footer {
       </div>
     </a>
 
-    <a class="game-card sr" href="timer.html">
+    <a class="game-card" href="timer.html" data-subject="tool">
       <span class="chip game-tag subj-chip-tool" data-no="Verktøy" data-en="Tool">Verktøy</span>
       <h3 data-no="Klassetimer" data-en="Class timer">Klassetimer</h3>
       <p data-no="Fullskjerm nedtelling for smartboard. Tre moduser med fargetema og lydsignal."
@@ -371,7 +343,6 @@ body.theme-light footer {
         <div class="game-card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></div>
       </div>
     </a>
-
   </div>
 </section>
 
@@ -416,12 +387,6 @@ document.querySelectorAll('.filter-chip').forEach(function(chip){
   });
 });
 
-var obs=new IntersectionObserver(function(entries){
-  entries.forEach(function(e){
-    if(e.isIntersecting){e.target.classList.add('v');obs.unobserve(e.target)}
-  });
-},{threshold:0.12});
-document.querySelectorAll('.sr').forEach(function(el){obs.observe(el)});
 </script>
 </body>
 </html>
